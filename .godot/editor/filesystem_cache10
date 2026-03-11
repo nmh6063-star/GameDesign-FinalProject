@@ -1,0 +1,12 @@
+63f7b34db8d8cdea90c76aacccf841ec
+::res://::1773250434
+Instructions.gd::GDScript::5997949805979060789::1773246407::0::1::::<>Sprite<><>0<>0<><>::
+::res://assets/::1773247762
+slime-Sheet.png::CompressedTexture2D::7072348949734713212::1773247762::1773247762::1::::<><><>0<>0<>589e53f1f91a57f493b0bb43c56a277e<>res://.godot/imported/slime-Sheet.png-c43053396b9d9e41b5fa9c2243b7cbf1.ctex::
+::res://scenes/::1773250422
+main.tscn::PackedScene::1374387365935234674::1773250422::0::1::::<><><>0<>0<><>::uid://s4qt6dvg74hs::::res://scripts/ball.gd<>uid://cftpvhiigjnfb::::res://scripts/game_manager.gd<>uid://cporlap5pcio6::::res://scripts/box_out.gd<>uid://c705s3lh6osjc::::res://assets/slime-Sheet.png
+::res://scripts/::1773250338
+ball.gd::GDScript::1324273176142494004::1773249228::0::1::::<>RigidBody2D<><>0<>0<><>::
+box_out.gd::GDScript::5855627167678770843::1773250325::0::1::::<>StaticBody2D<><>0<>0<><>::
+game_manager.gd::GDScript::5163957399860756231::1773247789::0::1::::<>Node<><>0<>0<><>::
+Global.gd::GDScript::3427758377388971652::1773218233::0::1::::<>Node<><>0<>0<><>::

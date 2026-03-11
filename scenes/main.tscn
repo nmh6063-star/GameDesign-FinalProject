@@ -1,0 +1,342 @@
+[gd_scene format=3 uid="uid://tt07u0d3npdi"]
+
+[ext_resource type="Script" uid="uid://s4qt6dvg74hs" path="res://scripts/ball.gd" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://cftpvhiigjnfb" path="res://scripts/game_manager.gd" id="2_gm"]
+[ext_resource type="Script" uid="uid://cporlap5pcio6" path="res://scripts/box_out.gd" id="3_boxout"]
+[ext_resource type="Texture2D" uid="uid://c705s3lh6osjc" path="res://assets/slime-Sheet.png" id="3_sugp2"]
+[ext_resource type="Script" uid="uid://c84djf6lsmrg3" path="res://scripts/enemy.gd" id="4_enemy"]
+
+[sub_resource type="GDScript" id="GDScript_0wfyh"]
+script/source = "extends Node2D
+
+@onready var template_ball := $Ball
+@onready var attack_label := $UI/AttackLabel
+@onready var box_out := $BoxOut
+
+var spawn_position: Vector2
+var current_attack_level: int = 0
+
+func _ready() -> void:
+	randomize()
+	spawn_position = template_ball.position
+	update_attack_label()
+	template_ball.dropped.connect(_on_ball_dropped)
+
+func _on_draw_pressed() -> void:
+	box_out.rotate_cup()
+
+func _on_ball_dropped() -> void:
+	get_tree().create_timer(1.0).timeout.connect(spawn_ball)
+
+func spawn_ball() -> void:
+	var b := template_ball.duplicate()
+	b.position = spawn_position
+	b.set_up = true
+	b.gravity_scale = 0.0
+	b.level = 1
+	b.dropped.connect(_on_ball_dropped)
+	add_child(b)
+	current_attack_level = b.level
+	update_attack_label()
+
+func update_attack_label() -> void:
+	if current_attack_level > 0:
+		attack_label.text = \"Attack %d\" % current_attack_level
+	else:
+		attack_label.text = \"Attack -\"
+"
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jyhfs"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(0, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tbgi4"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(32, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tefeu"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(64, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_o6xl0"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(96, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_tipki"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(128, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_85g3d"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(160, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_choun"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(192, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ya4ey"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(224, 25, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_eb6dy"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(0, 50, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_trceg"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(32, 50, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a8y0u"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(64, 50, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jkv2x"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(96, 50, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jbj1t"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(128, 50, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_muem4"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(0, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dp3eg"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(32, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0ld40"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(64, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gqmmt"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(96, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yc10j"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(128, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jscy8"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(160, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pm3ni"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(192, 0, 32, 25)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y6deb"]
+atlas = ExtResource("3_sugp2")
+region = Rect2(224, 0, 32, 25)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_og1vs"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jyhfs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tbgi4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tefeu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_o6xl0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_tipki")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_85g3d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_choun")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ya4ey")
+}],
+"loop": true,
+"name": &"attack",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_eb6dy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_trceg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a8y0u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jkv2x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jbj1t")
+}],
+"loop": true,
+"name": &"die",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_muem4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dp3eg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0ld40")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gqmmt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yc10j")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jscy8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pm3ni")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y6deb")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="Node2D" type="Node2D" unique_id=1625147204]
+position = Vector2(328, 323)
+script = SubResource("GDScript_0wfyh")
+
+[node name="GameManager" type="Node" parent="." unique_id=393182643]
+script = ExtResource("2_gm")
+
+[node name="Ball" type="RigidBody2D" parent="." unique_id=1860811735]
+position = Vector2(0, -144)
+gravity_scale = 0.0
+script = ExtResource("1_o5qli")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ball" unique_id=186235093]
+shape = SubResource("CircleShape2D_o5qli")
+debug_color = Color(0.99310964, 0, 0.24909496, 0.41960785)
+
+[node name="Polygon2D" type="Polygon2D" parent="Ball" unique_id=1960507745]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1533831879]
+position = Vector2(248, 0)
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
+
+[node name="DrawButton" type="Button" parent="UI" unique_id=1800000001]
+offset_left = 40.0
+offset_top = 24.0
+offset_right = 200.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 32
+text = "Draw"
+metadata/_edit_use_anchors_ = true
+
+[node name="AttackLabel" type="Label" parent="UI" unique_id=1800000002]
+anchors_preset = -1
+anchor_right = 0.024305556
+offset_left = 256.0
+offset_top = 24.0
+offset_right = 396.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 32
+text = "Attack -"
+vertical_alignment = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
+position = Vector2(-16, 8)
+
+[node name="box_right" type="Polygon2D" parent="Box" unique_id=1725285406]
+position = Vector2(14, -226)
+scale = Vector2(1, 10.75)
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(33.811523, 36.651157, 170, 36.65116, 170, 0.1860466, 202, 0.1860466, 202, 40.372093, 33.811523, 40.372093)
+uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
+
+[node name="box_left" type="Polygon2D" parent="Box" unique_id=1832960912]
+position = Vector2(14, -226)
+scale = Vector2(1, 10.75)
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-198, 0.1860466, -158, 0.1860466, -158, 36.65116, -30, 36.65116, -30, 40.372093, -198, 40.372093)
+uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
+
+[node name="collision_right" type="CollisionPolygon2D" parent="Box" unique_id=1433676150]
+position = Vector2(14, -9)
+scale = Vector2(7.6547318, 8.198811)
+polygon = PackedVector2Array(4.441698, 26.467253, 26.388906, 26.467255, 26.388906, -26.223316, 22.208487, -26.223316, 22.208487, 21.588497, 4.441698, 21.588495)
+
+[node name="collision_left" type="CollisionPolygon2D" parent="Box" unique_id=2092186238]
+position = Vector2(16, -8)
+scale = Vector2(7.6547318, 8.198811)
+polygon = PackedVector2Array(-26.127632, -26.345284, -26.127632, 26.345285, -4.18042, 26.345285, -4.18042, 21.466528, -20.902103, 21.466528, -20.902103, -26.345284)
+
+[node name="Enemy" type="Node2D" parent="." unique_id=144872954]
+script = ExtResource("4_enemy")
+
+[node name="HealthBar" type="Control" parent="Enemy" unique_id=9001001]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 526.0
+offset_top = 110.0
+offset_right = 626.0
+offset_bottom = 122.0
+
+[node name="Background" type="ColorRect" parent="Enemy/HealthBar" unique_id=9001002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+color = Color(0.2, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="Enemy/HealthBar" unique_id=9001003]
+layout_mode = 1
+anchors_preset = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 99.0
+offset_bottom = 11.0
+color = Color(1, 0, 0, 1)
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemy" unique_id=48224419]
+texture_filter = 1
+position = Vector2(576, 31.999996)
+scale = Vector2(3, 3)
+sprite_frames = SubResource("SpriteFrames_og1vs")
+animation = &"idle"
+autoplay = "idle"
+frame_progress = 0.18569645
+
+[node name="BoxOut" type="StaticBody2D" parent="." unique_id=1591346892]
+position = Vector2(0, 192)
+script = ExtResource("3_boxout")
+
+[node name="box_out" type="Polygon2D" parent="BoxOut" unique_id=575773673]
+position = Vector2(3.0994415e-06, -16.000008)
+scale = Vector2(0.37500003, 0.5000001)
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-80, 0, -72, 0, -56, 32, -32, 48, 0, 56, 32, 48, 56, 32, 72, 0, 80, 0, 64, 32, 32, 56, 0, 64, -32, 56, -64, 32)
+
+[node name="collision" type="CollisionPolygon2D" parent="BoxOut" unique_id=394954758]
+position = Vector2(3.0994415e-06, -16.000008)
+scale = Vector2(0.37500003, 0.5000001)
+polygon = PackedVector2Array(-80, 0, -72, 0, -56, 32, -32, 48, 0, 56, 32, 48, 56, 32, 72, 0, 80, 0, 64, 32, 32, 56, 0, 64, -32, 56, -64, 32)
+
+[connection signal="pressed" from="UI/DrawButton" to="." method="_on_draw_pressed"]

@@ -1,0 +1,5 @@
+res://scenes/main.tscn
+res://scripts/box_out.gd
+res://scripts/ball.gd
+res://scripts/game_manager.gd
+res://scripts/enemy.gd
