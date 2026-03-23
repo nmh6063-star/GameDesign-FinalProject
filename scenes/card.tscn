@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://dx4o74gb1vkls"]
+
+[ext_resource type="Script" uid="uid://lv3dydsm70w4" path="res://card.gd" id="1_6u4wf"]
+[ext_resource type="Texture2D" uid="uid://u6l4n4vn83tn" path="res://assets/cardThing.png" id="1_d81rb"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tefeu"]
+size = Vector2(480, 679.99994)
+
+[node name="Card" type="StaticBody2D" unique_id=1364125414]
+scale = Vector2(0.2, 0.2)
+script = ExtResource("1_6u4wf")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=699973711]
+texture = ExtResource("1_d81rb")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="Sprite2D" unique_id=24366303]
+modulate = Color(0, 0, 0, 1)
+offset_left = -159.99998
+offset_top = -40.00001
+offset_right = 159.99998
+offset_bottom = 239.99995
+theme_override_font_sizes/normal_font_size = 50
+text = "Test"
+
+[node name="Area2D" type="Area2D" parent="." unique_id=180278618]
+position = Vector2(0, 4.999999)
+scale = Vector2(0.99999964, 0.99999964)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=734854945]
+position = Vector2(0, 4.7683716e-07)
+shape = SubResource("RectangleShape2D_tefeu")

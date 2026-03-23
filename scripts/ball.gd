@@ -2,15 +2,20 @@ extends RigidBody2D
 
 signal dropped
 
-var set_up: bool = true
+var set_up: bool = false
 var move_speed: float = 200.0
 var direction: int = 0
 var level: int = 1
+var reset = false
 
 const LABEL_FONT_SIZE := 24
 
 func _radius() -> float:
-	return 20.0 + 1.0 * (level - 1)
+	var radius = 20.0
+	if !reset:
+		for i in range(1, level):
+			radius += 10.0/i
+	return radius
 
 func get_radius() -> float:
 	return _radius()
@@ -50,3 +55,8 @@ func _physics_process(delta: float) -> void:
 			gravity_scale = 1.0
 			set_up = false
 			dropped.emit()
+			
+func _shake():
+	var bodies = get_colliding_bodies()
+	if bodies.size() > 0:
+		apply_central_impulse(Vector2(randi_range(-1, 1), randi_range(-1, 1)) * 500.0)

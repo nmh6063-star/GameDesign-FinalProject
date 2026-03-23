@@ -3,6 +3,8 @@ extends Node
 const MERGE_TOLERANCE := 4.0
 const DROP_OFFSET := 80.0
 
+@onready var card_manager = get_node("/root/Node2D/CardManager")
+
 func _physics_process(_delta: float) -> void:
 	var balls := get_tree().get_nodes_in_group("ball")
 	var valid: Array = []
@@ -17,22 +19,23 @@ func _physics_process(_delta: float) -> void:
 		valid.append(body)
 
 	# merge logic
-	for i in valid.size():
-		var a := valid[i] as RigidBody2D
-		if not is_instance_valid(a):
-			continue
-		for j in range(i + 1, valid.size()):
-			var b := valid[j] as RigidBody2D
-			if not is_instance_valid(b):
+	if Global.mergeTime:
+		for i in valid.size():
+			var a := valid[i] as RigidBody2D
+			if not is_instance_valid(a):
 				continue
-			if a.level != b.level:
-				continue
-			var dist := a.global_position.distance_to(b.global_position)
-			var sum_r: float = a.get_radius() + b.get_radius() + MERGE_TOLERANCE
-			if dist <= sum_r:
-				a.merge_into_me()
-				b.queue_free()
-				return
+			for j in range(i + 1, valid.size()):
+				var b := valid[j] as RigidBody2D
+				if not is_instance_valid(b):
+					continue
+				if a.level != b.level:
+					continue
+				var dist := a.global_position.distance_to(b.global_position)
+				var sum_r: float = a.get_radius() + b.get_radius() + MERGE_TOLERANCE
+				if dist <= sum_r:
+					a.merge_into_me()
+					b.queue_free()
+					return
 
 	# balls that fell out below the cup
 	var box_out := get_parent().get_node_or_null("BoxOut")
@@ -51,3 +54,10 @@ func _physics_process(_delta: float) -> void:
 				if enemy and enemy.has_method("apply_attack"):
 					enemy.apply_attack(dmg)
 				body.queue_free()
+	
+	#keep cards supplied
+	if Global.currentHand.size() < Global.handSize and card_manager.cardPlay:
+		card_manager.draw()
+
+func _card_play_toggle():
+	card_manager.cardPlay = !card_manager.cardPlay
