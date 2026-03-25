@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dx4o74gb1vkls"]
 
-[ext_resource type="Script" path="res://script/card/card_view.gd" id="1_6u4wf"]
+[ext_resource type="Script" uid="uid://vgko7lykb5to" path="res://script/card/card_view.gd" id="1_6u4wf"]
 [ext_resource type="Texture2D" uid="uid://dvrcd2kbcspvf" path="res://assets/CardBase.png" id="2_6u4wf"]
 [ext_resource type="FontFile" uid="uid://cayrjpy74afpm" path="res://assets/dogica/TTF/dogica.ttf" id="3_kg30u"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="4_sy11y"]

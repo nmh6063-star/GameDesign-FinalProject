@@ -1,4 +1,3 @@
+res://scenes/card.tscn
 res://scenes/main.tscn
-res://script/core/global.gd
 res://script/card/card_view.gd
-res://script/session/game_manager.gd

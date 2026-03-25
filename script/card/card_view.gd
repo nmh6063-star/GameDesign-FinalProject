@@ -41,6 +41,9 @@ func _physics_process(delta: float) -> void:
 		get_node("Sprite2D").scale = get_node("Sprite2D").scale.lerp(baseScale * sizeMulti * 1.1, delta * scaleSpeed)
 		modulate = Color(1.25, 1.25, 1.25, 1)
 	rotation = lerp_angle(rotation, targetRot * PI / 180.0, delta * rotSpeed)
+	if self.position.x > 400:
+		print("help")
+		$Info.position.x = 400- self.position.x
 
 	var over := _mouse_over_card()
 	if not _armed:
