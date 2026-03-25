@@ -33,7 +33,9 @@ var _player_damage_apply_timer := 0.0
 
 
 func _ready() -> void:
-	Global.player_energy = Global.player_energy_max
+	#Global.player_energy = Global.player_energy_max
+	#change to some constant
+	Global.player_energy = 5
 	energy_changed.emit(Global.player_energy, Global.player_energy_max)
 
 
@@ -168,7 +170,9 @@ func _end_turn() -> void:
 	_clamp_ball_in_play_pointer(template as Node)
 	_combat_damage_phase = false
 	Global.phase = Global.Phase.PLAY
-	Global.player_energy = Global.player_energy_max
+	Global.player_energy += 5
+	if Global.player_energy > Global.player_energy_max:
+		Global.player_energy = Global.player_energy_max
 	energy_changed.emit(Global.player_energy, Global.player_energy_max)
 	_resolving = false
 	player_turn_started.emit()

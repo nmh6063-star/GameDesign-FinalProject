@@ -44,14 +44,17 @@ func _physics_process(delta: float) -> void:
 
 	var over := _mouse_over_card()
 	if not _armed:
-		if over:
+		if over and (!Global.cardInPlay or Global.cardInPlay == self):
 			if not hover:
 				timer.start()
 				info.rotation = -rotation
 			hover = true
+			Global.cardInPlay = self
 		else:
 			info.visible = false
 			hover = false
+			if Global.cardInPlay == self:
+				Global.cardInPlay = null
 		if hover and Input.is_action_just_pressed("play_card"):
 			if _armed_card != null and is_instance_valid(_armed_card) and _armed_card != self:
 				_armed_card.disarm_snap()
