@@ -1,6 +1,2 @@
 res://scenes/main.tscn
-res://scripts/box_out.gd
-res://scripts/ball.gd
-res://scripts/game_manager.gd
-res://scripts/enemy.gd
-res://scripts/Global.gd
+res://scripts/card_manager.gd

@@ -43,6 +43,7 @@ func discard(index):
 	child.reparent(get_tree().root)
 	child.queue_free()
 	_update_cards()
+	Global.ballInPlay._update_collision()
 	cardPlay = false
 	
 	
