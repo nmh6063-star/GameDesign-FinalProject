@@ -60,4 +60,4 @@ func _physics_process(_delta: float) -> void:
 		card_manager.draw()
 
 func _card_play_toggle():
-	card_manager.cardPlay = !card_manager.cardPlay
+	card_manager.cardPlay = Global.actionPoints > 0 and Global.planningPhase

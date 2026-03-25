@@ -10,11 +10,19 @@
 [sub_resource type="GDScript" id="GDScript_0wfyh"]
 script/source = "extends Node2D
 
+enum Phase { PLANNING, MERGING, OPPONENT }
+
 @onready var template_ball := $Ball
 @onready var attack_label := $UI/AttackLabel
+@onready var ap_label := $UI/ActionPointsLabel
+@onready var phase_label := $UI/PhaseLabel
+@onready var finish_button := $UI/FinishButton
+@onready var draw_button := $UI/DrawButton
+@onready var card_manager := $CardManager
 @onready var box_out := $BoxOut
 @onready var game_manager := $GameManager
 
+var current_phase: Phase = Phase.PLANNING
 var spawn_position: Vector2
 var current_attack_level: int = 0
 
@@ -23,13 +31,28 @@ func _ready() -> void:
 	spawn_position = template_ball.position
 	update_attack_label()
 	template_ball.dropped.connect(_on_ball_dropped)
+	Global.action_points_changed.connect(_on_ap_changed)
+	_on_ap_changed(Global.actionPoints, Global.maxActionPoints)
+	card_manager.card_played.connect(_on_card_played)
+	_start_planning_phase()
 
 func _on_draw_pressed() -> void:
-	box_out.rotate_cup()
+	if current_phase == Phase.MERGING:
+		_start_opponent_phase()
+	else:
+		box_out.rotate_cup()
+
+func _on_card_played() -> void:
+	finish_button.visible = false
 
 func _on_ball_dropped() -> void:
 	get_tree().create_timer(1.0).timeout.connect(game_manager._card_play_toggle)
 	get_tree().create_timer(1.0).timeout.connect(spawn_ball)
+	get_tree().create_timer(1.0).timeout.connect(_show_finish_button)
+
+func _show_finish_button() -> void:
+	if Global.planningPhase:
+		finish_button.visible = true
 
 func spawn_ball() -> void:
 	var b := template_ball.duplicate()
@@ -49,6 +72,39 @@ func update_attack_label() -> void:
 		attack_label.text = \"Attack %d\" % current_attack_level
 	else:
 		attack_label.text = \"Attack -\"
+
+func _on_ap_changed(current: int, maximum: int) -> void:
+	ap_label.text = \"AP: %d / %d\" % [current, maximum]
+
+func _on_finish_pressed() -> void:
+	if current_phase == Phase.PLANNING:
+		_start_merging_phase()
+
+func _start_planning_phase() -> void:
+	current_phase = Phase.PLANNING
+	Global.planningPhase = true
+	Global.mergeTime = false
+	Global.actionPoints = Global.maxActionPoints
+	Global.action_points_changed.emit(Global.actionPoints, Global.maxActionPoints)
+	phase_label.text = \"Planning Phase\"
+	draw_button.text = \"Draw\"
+	finish_button.visible = true
+	card_manager.cardPlay = true
+
+func _start_merging_phase() -> void:
+	current_phase = Phase.MERGING
+	Global.planningPhase = false
+	Global.mergeTime = true
+	phase_label.text = \"Merging Phase\"
+	draw_button.text = \"Next\"
+	finish_button.visible = false
+	card_manager.cardPlay = false
+
+func _start_opponent_phase() -> void:
+	current_phase = Phase.OPPONENT
+	Global.mergeTime = false
+	phase_label.text = \"Opponent Phase\"
+	draw_button.text = \"Draw\"
 "
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
@@ -277,6 +333,47 @@ text = "Attack -"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
+[node name="ActionPointsLabel" type="Label" parent="UI" unique_id=1800000003]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -220.0
+offset_top = 24.0
+offset_right = -20.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 32
+text = "AP: 3 / 3"
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="PhaseLabel" type="Label" parent="UI" unique_id=1800000004]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 24.0
+offset_right = 160.0
+offset_bottom = 72.0
+theme_override_font_sizes/font_size = 36
+text = "Planning Phase"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="FinishButton" type="Button" parent="UI" unique_id=1800000005]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 128.0
+offset_top = -56.0
+offset_right = 284.0
+offset_bottom = -9.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 28
+text = "Finish"
+
 [node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
 position = Vector2(-16, 8)
 
@@ -376,3 +473,4 @@ hand_curve = SubResource("Curve_o6xl0")
 rotation_curve = SubResource("Curve_tipki")
 
 [connection signal="pressed" from="UI/DrawButton" to="." method="_on_draw_pressed"]
+[connection signal="pressed" from="UI/FinishButton" to="." method="_on_finish_pressed"]

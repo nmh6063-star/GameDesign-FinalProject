@@ -52,9 +52,9 @@ func _physics_process(delta: float) -> void:
 			for child in balls:
 				child._shake();
 	else:
-		if !Global.mergeTime:
-			rotater()
-		Global.mergeTime = true
+		# if !Global.mergeTime:
+		#	rotater()
+		# Global.mergeTime = true
 		box.position = box.position.move_toward(startPos, 500.0 * delta)
 
 

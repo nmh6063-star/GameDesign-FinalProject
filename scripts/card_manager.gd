@@ -1,5 +1,7 @@
 extends Node2D
 
+signal card_played
+
 @export var hand_curve: Curve
 @export var rotation_curve: Curve
 
@@ -34,7 +36,12 @@ func draw():
 func discard(index):
 	if Global.currentHand.size() < 1:
 		return
-	
+	if Global.actionPoints <= 0:
+		return
+
+	Global.actionPoints -= 1
+	Global.action_points_changed.emit(Global.actionPoints, Global.maxActionPoints)
+
 	Global.currentHand.remove_at(index)
 	var child := get_child(index)
 	Global.ballInPlay.visible = true
@@ -44,6 +51,7 @@ func discard(index):
 	child.queue_free()
 	_update_cards()
 	cardPlay = false
+	card_played.emit()
 	
 	
 
