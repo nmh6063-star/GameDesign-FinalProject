@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://cporlap5pcio6" path="res://scripts/box_out.gd" id="3_boxout"]
 [ext_resource type="Texture2D" uid="uid://c705s3lh6osjc" path="res://assets/slime-Sheet.png" id="3_sugp2"]
 [ext_resource type="Script" uid="uid://c84djf6lsmrg3" path="res://scripts/enemy.gd" id="4_enemy"]
-[ext_resource type="Script" uid="uid://p3wyp646yn4m" path="res://scripts/card_manager.gd" id="6_o6xl0"]
+[ext_resource type="Script" path="res://scripts/card_manager.gd" id="6_o6xl0"]
 
 [sub_resource type="GDScript" id="GDScript_0wfyh"]
 script/source = "extends Node2D
@@ -52,9 +52,6 @@ func update_attack_label() -> void:
 "
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_tbgi4"]
-size = Vector2(133.33333, 3.1999998)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jyhfs"]
 atlas = ExtResource("3_sugp2")
@@ -280,41 +277,17 @@ metadata/_edit_use_anchors_ = true
 [node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
 position = Vector2(-16, 8)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Box" unique_id=463985912]
-position = Vector2(16, -211)
-scale = Vector2(3, 5)
-shape = SubResource("RectangleShape2D_tbgi4")
-
-[node name="box_right2" type="Polygon2D" parent="Box" unique_id=1067607692]
-position = Vector2(24, -211)
-scale = Vector2(3, 5)
-color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-70.0917, -1.9414673, 66.09678, -1.9414635, 66.03542, -1.8123665, 66.13758, -1.8123665, 66.53332, 1.8151131, -70.0917, 1.7794685)
-uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
-
-[node name="box_right" type="Polygon2D" parent="Box" unique_id=1725285406]
-position = Vector2(14, -226)
-scale = Vector2(1, 10.75)
-color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(33.811523, 36.651157, 170, 36.65116, 170, 0.1860466, 202, 0.1860466, 202, 40.372093, 33.811523, 40.372093)
-uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
-
 [node name="box_left" type="Polygon2D" parent="Box" unique_id=1832960912]
 position = Vector2(14, -226)
 scale = Vector2(1, 10.75)
 color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-198, 0.1860466, -158, 0.1860466, -158, 36.65116, -30, 36.65116, -30, 40.372093, -198, 40.372093)
+polygon = PackedVector2Array(-198, 0.6511631, -166, 0.6511631, -166, 37.860466, 162, 37.860466, 162, 0.6511631, 194, 0.6511631, 194, 40.83721, -198, 40.83721)
 uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
 
-[node name="collision_right" type="CollisionPolygon2D" parent="Box" unique_id=1433676150]
-position = Vector2(14, -9)
-scale = Vector2(7.6547318, 8.198811)
-polygon = PackedVector2Array(4.441698, 26.467253, 26.388906, 26.467255, 26.388906, -26.223316, 22.208487, -26.223316, 22.208487, 21.588497, 4.441698, 21.588495)
-
 [node name="collision_left" type="CollisionPolygon2D" parent="Box" unique_id=2092186238]
-position = Vector2(16, -8)
+position = Vector2(8, -3)
 scale = Vector2(7.6547318, 8.198811)
-polygon = PackedVector2Array(-26.127632, -26.345284, -26.127632, 26.345285, -4.18042, 26.345285, -4.18042, 21.466528, -20.902103, 21.466528, -20.902103, -26.345284)
+polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
 
 [node name="Enemy" type="Node2D" parent="." unique_id=144872954]
 script = ExtResource("4_enemy")
