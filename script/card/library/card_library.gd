@@ -35,8 +35,8 @@ static func _normal(modifier: int) -> CardDefinition:
 static func _dup() -> CardDefinition:
 	var c := CardDefinition.new()
 	c.title = "Duplication Ball"
-	c.summary = "D · clone big clusters"
-	c.description = "If D touches more than 4 other balls, duplicate each once; D is removed."
+	c.summary = "D · duplicate touching balls"
+	c.description = "If D touches 2+ other balls, duplicate each once; D is removed."
 	c.cost = 2
 	c.modifier = 1
 	c.kind = BallBehavior.Kind.DUPLICATION

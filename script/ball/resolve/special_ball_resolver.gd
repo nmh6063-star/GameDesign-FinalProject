@@ -61,8 +61,10 @@ func _wave_heal(root: Node2D, template: GameBall) -> int:
 		for o in comp:
 			if o.behavior.participates_in_level_merge():
 				sum += o.level
+		# Heal deletes only numbered (NORMAL) balls, not other specials.
 		for o in comp:
-			_consume(o)
+			if o.behavior.participates_in_level_merge():
+				_consume(o)
 		_consume(b)
 		_wake_playfield(root)
 		return sum * 2
@@ -95,7 +97,8 @@ func _wave_dup(root: Node2D, template: GameBall, wire: Callable) -> bool:
 		for o in comp:
 			if o != b:
 				others.append(o)
-		if others.size() <= 4:
+		# D triggers when it touches at least 2 other balls.
+		if others.size() < 2:
 			continue
 		for o in others:
 			var d := o.duplicate() as GameBall
