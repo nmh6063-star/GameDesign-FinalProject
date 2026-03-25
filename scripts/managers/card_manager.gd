@@ -24,26 +24,44 @@ const card = preload("res://scenes/card.tscn")
 func draw():
 	var new_card = card.instantiate()
 	add_child(new_card)
-	var card_detail = {"name": "test", "ability": "temp", "modifier": randi_range(1, 4)}
+	var card_detail = {"name": "test", "ability": "temp", "modifier": randi_range(1, 4), "cost": 1}
 	new_card.get_node("Sprite2D/RichTextLabel").text = card_detail["name"] + "\n Ability: " + card_detail["ability"] + "\n" + str(card_detail.modifier)
+	var cost_label := new_card.get_node_or_null("CostBadge/CostText") as Label
+	if cost_label:
+		cost_label.text = str(card_detail["cost"])
 	new_card.details = card_detail
 	index += 1
 	Global.currentHand.append(card_detail)
 	_update_cards()
 
-func discard(index):
+func confirm_play(card: Node2D) -> void:
 	if not cardPlay or Global.currentHand.size() < 1:
 		return
+	if card == null or not is_instance_valid(card):
+		return
+	var idx := card.get_index()
+	if idx < 0 or idx >= get_child_count():
+		return
+	var cost := 1
+	if card.details != null and "cost" in card.details:
+		cost = int(card.details["cost"])
+	if Global.player_energy < cost:
+		if card.has_method("disarm_snap"):
+			card.disarm_snap()
+		return
+	if card.has_method("clear_arm_state"):
+		card.clear_arm_state()
 
+	Global.player_energy -= cost
+	(get_node("/root/Node2D") as Node).update_energy_ui()
 	(get_node("/root/Node2D") as Node).ensure_ball_in_play()
-	
-	Global.currentHand.remove_at(index)
-	var child := get_child(index)
+
+	Global.currentHand.remove_at(idx)
 	Global.ballInPlay.visible = true
 	Global.ballInPlay.set_up = true
-	Global.ballInPlay.level = child.details.modifier
-	child.reparent(get_tree().root)
-	child.queue_free()
+	Global.ballInPlay.level = card.details.modifier
+	card.reparent(get_tree().root)
+	card.queue_free()
 	_update_cards()
 	Global.ballInPlay._update_collision()
 	Global.ballInPlay.queue_redraw()

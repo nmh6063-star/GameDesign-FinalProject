@@ -53,7 +53,6 @@ func _draw() -> void:
 	var num := str(level)
 	var sz := font.get_string_size(num, HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT_SIZE)
 	$RichTextLabel.text = num
-	#draw_string(font, Vector2(-sz.x / 2.0, sz.y / 2.0), num, HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT_SIZE)
 
 func _physics_process(delta: float) -> void:
 	if set_up:

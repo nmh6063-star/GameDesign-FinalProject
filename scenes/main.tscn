@@ -16,10 +16,17 @@
 script/source = "extends Node2D
 
 @onready var template_ball: Node = $Ball
-@onready var attack_label := $UI/AttackLabel
+@onready var turn_banner := $UI/TurnBanner
 @onready var player_fill := $UI/PlayerHealthBar/Fill
+@onready var player_hp_top := $UI/TopBar/PlayerHPText
+@onready var energy_label := get_node_or_null(\"UI/EnergyLabel\")
+@onready var energy_badge_text := get_node_or_null(\"UI/CostBadge/CostText\")
 @onready var result_label := $UI/ResultLabel
 @onready var game_manager := $GameManager
+@onready var enemy_node := $Enemy
+@onready var player_damage_anchor := $UI/PlayerHealthBar
+@onready var damage_anchor_player := get_node_or_null(\"DamageAnchorPlayer\")
+@onready var damage_anchor_enemy := get_node_or_null(\"DamageAnchorEnemy\")
 
 var spawn_position: Vector2
 
@@ -31,15 +38,26 @@ func _ready() -> void:
 	game_manager.attack_calculated.connect(_on_attack_calculated)
 	game_manager.player_attacked.connect(_on_player_attacked)
 	game_manager.turn_ended.connect(_on_turn_ended)
+	game_manager.energy_changed.connect(_on_energy_changed)
+	if game_manager.has_signal(\"enemy_turn_started\"):
+		game_manager.enemy_turn_started.connect(_on_enemy_turn_started)
+	if game_manager.has_signal(\"player_turn_started\"):
+		game_manager.player_turn_started.connect(_on_player_turn_started)
+	if enemy_node and enemy_node.has_signal(\"damaged\"):
+		enemy_node.damaged.connect(_on_enemy_damaged)
 	game_manager.game_over.connect(_on_game_over)
 	game_manager.game_clear.connect(_on_game_clear)
-	_update_attack_label(0)
 	_update_player_bar()
+	update_energy_ui()
 	result_label.visible = false
 	ensure_ball_in_play()
+	_show_turn_banner(\"PLAYER TURN\")
 
 func _on_draw_pressed() -> void:
-	(get_node(\"BoxOut\") as Node).rotate_cup()
+	$CardManager.draw()
+	var box_out := get_node_or_null(\"BoxOut\")
+	if box_out != null and box_out.has_method(\"rotate_cup\"):
+		box_out.rotate_cup()
 
 func _on_finish_turn_pressed() -> void:
 	game_manager.finish_turn()
@@ -72,20 +90,76 @@ func ensure_ball_in_play() -> void:
 
 func _on_turn_ended() -> void:
 	$CardManager.cardPlay = true
-	_update_attack_label(0)
 	ensure_ball_in_play()
+	_show_turn_banner(\"PLAYER TURN\")
+
+func _on_enemy_turn_started() -> void:
+	_show_turn_banner(\"ENEMY TURN\")
+
+func _on_player_turn_started() -> void:
+	_show_turn_banner(\"PLAYER TURN\")
 
 func _on_attack_calculated(amount: int) -> void:
-	_update_attack_label(amount)
+	pass
 
 func _on_player_attacked(_amount: int) -> void:
 	_update_player_bar()
+	if damage_anchor_player:
+		_spawn_damage_floater_on_node(_amount, damage_anchor_player, Color(1, 0.3, 0.3))
+	else:
+		_spawn_damage_floater_on_node(_amount, player_damage_anchor, Color(1, 0.3, 0.3))
 
-func _update_attack_label(amount: int) -> void:
-	attack_label.text = \"Attack %d\" % amount if amount > 0 else \"Attack -\"
+func _on_enemy_damaged(amount: int) -> void:
+	if damage_anchor_enemy:
+		_spawn_damage_floater_on_node(amount, damage_anchor_enemy, Color(0.92, 0.58, 0.06))
+	else:
+		_spawn_damage_floater_on_node(amount, enemy_node, Color(0.92, 0.58, 0.06))
+
+func _on_energy_changed(_current: int, _max: int) -> void:
+	update_energy_ui()
+
+func _spawn_damage_floater_on_node(amount: int, target: Node, color: Color) -> void:
+	if amount <= 0 or target == null:
+		return
+	var floater := preload(\"res://scenes/damage_floater.tscn\").instantiate()
+	$UI.add_child(floater)
+	var pos := Vector2.ZERO
+	if target is Node2D:
+		pos = (target as Node2D).global_position
+	elif target is Control:
+		pos = (target as Control).global_position
+	(floater as Label).global_position = pos
+	if floater.has_method(\"play\"):
+		floater.play(amount, color)
+
+func _show_turn_banner(text: String) -> void:
+	if turn_banner == null:
+		return
+	var label := turn_banner.get_node_or_null(\"Label\") as Label
+	if label:
+		label.text = text
+	turn_banner.visible = true
+	turn_banner.modulate.a = 0.0
+	turn_banner.scale = Vector2(1.0, 1.0)
+	var tween := create_tween()
+	tween.tween_property(turn_banner, \"modulate:a\", 0.7, 0.15)
+	tween.tween_property(turn_banner, \"modulate:a\", 0.0, 0.6).set_delay(0.6)
+	tween.tween_callback(func(): turn_banner.visible = false)
 
 func _update_player_bar() -> void:
 	player_fill.size.x = 100.0 * float(Global.player_health) / float(Global.player_max_health)
+	var hp_text := $UI/PlayerHealthBar/HPText
+	if hp_text:
+		hp_text.text = \"%d/%d\" % [Global.player_health, Global.player_max_health]
+	if player_hp_top:
+		player_hp_top.text = \"%d/%d\" % [Global.player_health, Global.player_max_health]
+
+func update_energy_ui() -> void:
+	if energy_label:
+		energy_label.visible = true
+		energy_label.text = \"Energy\"
+	if energy_badge_text:
+		energy_badge_text.text = \"%d/%d\" % [Global.player_energy, Global.player_energy_max]
 
 func _on_game_over() -> void:
 	_show_result(\"Game Over\")
@@ -96,21 +170,25 @@ func _on_game_clear() -> void:
 func _show_result(text: String) -> void:
 	result_label.text = text
 	result_label.visible = true
-	$UI/FinishTurnButton.disabled = true
-	$UI/DrawButton.disabled = true
+	$UI/ActionBar/FinishTurnButton.disabled = true
+	$UI/ActionBar/DrawButton.disabled = true
 	$CardManager.cardPlay = false
 "
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
+friction = 1.2
+bounce = 0.05
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
 
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_slippery"]
-friction = 0.0
-bounce = 0.0
-
 [sub_resource type="FontVariation" id="FontVariation_ya4ey"]
 base_font = ExtResource("6_choun")
 spacing_glyph = -2
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_slippery"]
+friction = 0.9
+bounce = 0.05
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jyhfs"]
 atlas = ExtResource("3_sugp2")
@@ -290,6 +368,12 @@ point_count = 3
 position = Vector2(328, 323)
 script = SubResource("GDScript_0wfyh")
 
+[node name="DamageAnchorPlayer" type="Marker2D" parent="." unique_id=1800000040]
+position = Vector2(88, -149)
+
+[node name="DamageAnchorEnemy" type="Marker2D" parent="." unique_id=1800000041]
+position = Vector2(664, -132)
+
 [node name="GameManager" type="Node" parent="." unique_id=393182643]
 script = ExtResource("2_gm")
 
@@ -312,6 +396,7 @@ script = ExtResource("11_ya4ey")
 [node name="Ball" type="RigidBody2D" parent="." unique_id=1860811735]
 visible = false
 position = Vector2(0, -83)
+physics_material_override = SubResource("PhysicsMaterial_ball")
 gravity_scale = 0.0
 contact_monitor = true
 max_contacts_reported = 1
@@ -346,51 +431,91 @@ position = Vector2(248, 0)
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
 
-[node name="DrawButton" type="Button" parent="UI" unique_id=1800000001]
-offset_left = 40.0
-offset_top = 24.0
-offset_right = 200.0
-offset_bottom = 88.0
-theme_override_font_sizes/font_size = 32
-text = "Draw"
-metadata/_edit_use_anchors_ = true
+[node name="TopBar" type="Panel" parent="UI" unique_id=1800000030]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 48.0
+grow_horizontal = 2
 
-[node name="AttackLabel" type="Label" parent="UI" unique_id=1800000002]
-anchors_preset = -1
-anchor_right = 0.024305556
-offset_left = 256.0
-offset_top = 24.0
-offset_right = 396.0
-offset_bottom = 88.0
-theme_override_font_sizes/font_size = 32
-text = "Attack -"
+[node name="PlayerHPText" type="Label" parent="UI/TopBar" unique_id=1800000031]
+layout_mode = 0
+offset_left = 115.0
+offset_top = 6.0
+offset_right = 319.0
+offset_bottom = 38.0
+theme_override_font_sizes/font_size = 22
+text = "100/100"
+
+[node name="TurnBanner" type="ColorRect" parent="UI" unique_id=1800000012]
+visible = false
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 180.0
+offset_bottom = 260.0
+color = Color(0, 0, 0, 0)
+
+[node name="Label" type="Label" parent="UI/TurnBanner" unique_id=1800000013]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 48
+text = "PLAYER TURN"
+horizontal_alignment = 1
 vertical_alignment = 1
-metadata/_edit_use_anchors_ = true
 
-[node name="FinishTurnButton" type="Button" parent="UI" unique_id=1800000003]
-offset_left = 410.0
-offset_top = 24.0
-offset_right = 660.0
-offset_bottom = 88.0
-theme_override_font_sizes/font_size = 32
+[node name="ActionBar" type="Panel" parent="UI" unique_id=1800000020]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = 8.0
+offset_top = 256.0
+offset_right = 488.0
+offset_bottom = 326.0
+grow_horizontal = 2
+
+[node name="DrawButton" type="Button" parent="UI/ActionBar" unique_id=1800000001]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 10.0
+offset_right = 208.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 28
+text = "Draw"
+
+[node name="FinishTurnButton" type="Button" parent="UI/ActionBar" unique_id=1800000003]
+layout_mode = 0
+offset_left = 260.0
+offset_top = 10.0
+offset_right = 460.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 28
 text = "End Turn"
-metadata/_edit_use_anchors_ = true
 
 [node name="PlayerHP" type="Label" parent="UI" unique_id=1800000004]
-offset_left = 40.0
-offset_top = 96.0
-offset_right = 180.0
-offset_bottom = 118.0
+offset_left = 16.0
+offset_top = 8.0
+offset_right = 156.0
+offset_bottom = 34.0
 theme_override_font_sizes/font_size = 18
 text = "Player HP"
+
+[node name="EnergyLabel" type="Label" parent="UI" unique_id=1800000011]
+offset_left = 584.0
+offset_top = 335.0
+offset_right = 768.0
+offset_bottom = 394.0
+theme_override_font_sizes/font_size = 20
+text = "Energy
+"
 
 [node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000005]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 40.0
-offset_top = 122.0
-offset_right = 140.0
-offset_bottom = 134.0
+offset_left = 206.0
+offset_top = 168.0
+offset_right = 306.0
+offset_bottom = 180.0
 
 [node name="Background" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000006]
 layout_mode = 1
@@ -409,6 +534,20 @@ offset_right = 99.0
 offset_bottom = 11.0
 color = Color(0, 0.8, 0.2, 1)
 
+[node name="HPText" type="Label" parent="UI/PlayerHealthBar" unique_id=1800000010]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 12
+text = "100/100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="ResultLabel" type="Label" parent="UI" unique_id=1800000008]
 offset_left = 256.0
 offset_top = 96.0
@@ -424,6 +563,42 @@ offset_bottom = 40.0
 
 [node name="TextureRect" type="TextureRect" parent="UI/MarginContainer" unique_id=299898437]
 layout_mode = 2
+
+[node name="CostBadge" type="Node2D" parent="UI" unique_id=2081867748]
+z_index = -1
+position = Vector2(688, 352)
+scale = Vector2(1.5, 1.5)
+
+[node name="SunPoly" type="Polygon2D" parent="UI/CostBadge" unique_id=2089877567]
+scale = Vector2(1.4, 1.4)
+color = Color(0.972549, 0.54902, 0.176471, 1)
+polygon = PackedVector2Array(0, -14, 3.8, -7.6, 11.3, -11.3, 7.6, -3.8, 14, 0, 7.6, 3.8, 11.3, 11.3, 3.8, 7.6, 0, 14, -3.8, 7.6, -11.3, 11.3, -7.6, 3.8, -14, 0, -7.6, -3.8, -11.3, -11.3, -3.8, -7.6)
+
+[node name="Sphere" type="Polygon2D" parent="UI/CostBadge" unique_id=488056572]
+scale = Vector2(1.4, 1.4)
+color = Color(1, 0.713726, 0.301961, 1)
+polygon = PackedVector2Array(8, 0, 7.391, 3.061, 5.657, 5.657, 3.061, 7.391, 0, 8, -3.061, 7.391, -5.657, 5.657, -7.391, 3.061, -8, 0, -7.391, -3.061, -5.657, -5.657, -3.061, -7.391, 0, -8, 3.061, -7.391, 5.657, -5.657, 7.391, -3.061)
+
+[node name="CostText" type="Label" parent="UI/CostBadge" unique_id=2081867749]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -10.0
+offset_top = -9.333328
+offset_right = 31.333313
+offset_bottom = 26.666672
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.5, 0.5)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 22
+text = "3/3"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
 position = Vector2(-40, 109)
@@ -470,6 +645,20 @@ offset_right = 99.0
 offset_bottom = 11.0
 color = Color(1, 0, 0, 1)
 
+[node name="HPText" type="Label" parent="Enemy/HealthBar" unique_id=9001004]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 12
+text = "100/100"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemy" unique_id=48224419]
 texture_filter = 1
 position = Vector2(576, 31.999996)
@@ -485,5 +674,5 @@ script = ExtResource("6_o6xl0")
 hand_curve = SubResource("Curve_o6xl0")
 rotation_curve = SubResource("Curve_tipki")
 
-[connection signal="pressed" from="UI/DrawButton" to="." method="_on_draw_pressed"]
-[connection signal="pressed" from="UI/FinishTurnButton" to="." method="_on_finish_turn_pressed"]
+[connection signal="pressed" from="UI/ActionBar/DrawButton" to="." method="_on_draw_pressed"]
+[connection signal="pressed" from="UI/ActionBar/FinishTurnButton" to="." method="_on_finish_turn_pressed"]

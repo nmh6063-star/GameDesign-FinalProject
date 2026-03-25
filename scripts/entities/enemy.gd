@@ -1,5 +1,7 @@
 extends Node2D
 
+signal damaged(amount: int)
+
 @export var max_health: int = 100
 @export var attack_damage: int = 10
 var current_health: int
@@ -13,6 +15,7 @@ func _ready() -> void:
 	_update_bar()
 
 func apply_attack(amount: int) -> void:
+	damaged.emit(amount)
 	current_health = max(current_health - amount, 0)
 	_update_bar()
 	if current_health <= 0:
@@ -20,4 +23,7 @@ func apply_attack(amount: int) -> void:
 
 func _update_bar() -> void:
 	(get_node("HealthBar/Fill") as ColorRect).size.x = BAR_WIDTH * float(current_health) / float(max_health)
+	var hp_text := get_node_or_null("HealthBar/HPText") as Label
+	if hp_text:
+		hp_text.text = "%d/%d" % [current_health, max_health]
 

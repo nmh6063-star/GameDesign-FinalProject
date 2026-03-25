@@ -9,5 +9,8 @@ var cardInPlay = null
 var player_health := 100
 var player_max_health := 100
 
+var player_energy_max := 3
+var player_energy := 3
+
 @onready var ballInPlay = get_node("/root/Node2D/Ball")
 
