@@ -1,64 +1,112 @@
 [gd_scene format=3 uid="uid://tt07u0d3npdi"]
 
-[ext_resource type="Script" uid="uid://s4qt6dvg74hs" path="res://scripts/ball.gd" id="1_o5qli"]
-[ext_resource type="Script" uid="uid://cftpvhiigjnfb" path="res://scripts/game_manager.gd" id="2_gm"]
-[ext_resource type="Script" uid="uid://cporlap5pcio6" path="res://scripts/box_out.gd" id="3_boxout"]
+[ext_resource type="Script" uid="uid://s4qt6dvg74hs" path="res://scripts/entities/ball.gd" id="1_o5qli"]
+[ext_resource type="Script" uid="uid://cftpvhiigjnfb" path="res://scripts/managers/game_manager.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cb5hmafbmxhfj" path="res://assets/WoodBack.png" id="3_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://c705s3lh6osjc" path="res://assets/slime-Sheet.png" id="3_sugp2"]
 [ext_resource type="Texture2D" uid="uid://dxxvadmvkcnn5" path="res://assets/grassland.png" id="3_tipki"]
-[ext_resource type="Script" uid="uid://c84djf6lsmrg3" path="res://scripts/enemy.gd" id="4_enemy"]
+[ext_resource type="Script" uid="uid://c84djf6lsmrg3" path="res://scripts/entities/enemy.gd" id="4_enemy"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
-[ext_resource type="Script" uid="uid://p3wyp646yn4m" path="res://scripts/card_manager.gd" id="6_o6xl0"]
-[ext_resource type="Script" uid="uid://bv761w1yohjv5" path="res://scripts/line_indicator.gd" id="11_ya4ey"]
+[ext_resource type="Script" uid="uid://p3wyp646yn4m" path="res://scripts/managers/card_manager.gd" id="6_o6xl0"]
+[ext_resource type="Script" uid="uid://bv761w1yohjv5" path="res://scripts/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
 
 [sub_resource type="GDScript" id="GDScript_0wfyh"]
 script/source = "extends Node2D
 
-@onready var template_ball := $Ball
+@onready var template_ball: Node = $Ball
 @onready var attack_label := $UI/AttackLabel
-@onready var box_out := $BoxOut
+@onready var player_fill := $UI/PlayerHealthBar/Fill
+@onready var result_label := $UI/ResultLabel
 @onready var game_manager := $GameManager
 
 var spawn_position: Vector2
-var current_attack_level: int = 0
 
 func _ready() -> void:
 	randomize()
-	spawn_position = template_ball.position
-	update_attack_label()
-	template_ball.dropped.connect(_on_ball_dropped)
+	spawn_position = (template_ball as Node2D).position
+	template_ball.connect(\"dropped\", _on_ball_dropped)
+	((template_ball as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = true
+	game_manager.attack_calculated.connect(_on_attack_calculated)
+	game_manager.player_attacked.connect(_on_player_attacked)
+	game_manager.turn_ended.connect(_on_turn_ended)
+	game_manager.game_over.connect(_on_game_over)
+	game_manager.game_clear.connect(_on_game_clear)
+	_update_attack_label(0)
+	_update_player_bar()
+	result_label.visible = false
+	ensure_ball_in_play()
 
 func _on_draw_pressed() -> void:
-	box_out.rotate_cup()
+	(get_node(\"BoxOut\") as Node).rotate_cup()
+
+func _on_finish_turn_pressed() -> void:
+	game_manager.finish_turn()
 
 func _on_ball_dropped() -> void:
-	get_tree().create_timer(1.0).timeout.connect(game_manager._card_play_toggle)
-	get_tree().create_timer(1.0).timeout.connect(spawn_ball)
+	if Global.phase != Global.Phase.PLAY:
+		return
+	await get_tree().create_timer(1.0).timeout
+	$CardManager.cardPlay = true
+	_spawn_ball()
 
-func spawn_ball() -> void:
+func _spawn_ball() -> void:
 	var b := template_ball.duplicate()
 	Global.ballInPlay = b
-	b.position = spawn_position
+	(b as Node2D).position = spawn_position
 	b.set_up = false
 	b.visible = false
 	b.gravity_scale = 0.0
 	b.level = 1
-	b.dropped.connect(_on_ball_dropped)
+	((b as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = false
+	b.connect(\"dropped\", _on_ball_dropped)
 	add_child(b)
-	current_attack_level = b.level
-	update_attack_label()
 
-func update_attack_label() -> void:
-	if current_attack_level > 0:
-		attack_label.text = \"Attack %d\" % current_attack_level
-	else:
-		attack_label.text = \"Attack -\"
+func ensure_ball_in_play() -> void:
+	if Global.phase != Global.Phase.PLAY:
+		return
+	if is_instance_valid(Global.ballInPlay) and Global.ballInPlay != template_ball:
+		return
+	_spawn_ball()
+
+func _on_turn_ended() -> void:
+	$CardManager.cardPlay = true
+	_update_attack_label(0)
+	ensure_ball_in_play()
+
+func _on_attack_calculated(amount: int) -> void:
+	_update_attack_label(amount)
+
+func _on_player_attacked(_amount: int) -> void:
+	_update_player_bar()
+
+func _update_attack_label(amount: int) -> void:
+	attack_label.text = \"Attack %d\" % amount if amount > 0 else \"Attack -\"
+
+func _update_player_bar() -> void:
+	player_fill.size.x = 100.0 * float(Global.player_health) / float(Global.player_max_health)
+
+func _on_game_over() -> void:
+	_show_result(\"Game Over\")
+
+func _on_game_clear() -> void:
+	_show_result(\"Game Clear\")
+
+func _show_result(text: String) -> void:
+	result_label.text = text
+	result_label.visible = true
+	$UI/FinishTurnButton.disabled = true
+	$UI/DrawButton.disabled = true
+	$CardManager.cardPlay = false
 "
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_slippery"]
+friction = 0.0
+bounce = 0.0
 
 [sub_resource type="FontVariation" id="FontVariation_ya4ey"]
 base_font = ExtResource("6_choun")
@@ -270,6 +318,7 @@ max_contacts_reported = 1
 script = ExtResource("1_o5qli")
 
 [node name="Sprite2D" type="Sprite2D" parent="Ball" unique_id=1556687559]
+texture_filter = 1
 scale = Vector2(1.25, 1.25)
 texture = ExtResource("5_85g3d")
 
@@ -318,6 +367,57 @@ text = "Attack -"
 vertical_alignment = 1
 metadata/_edit_use_anchors_ = true
 
+[node name="FinishTurnButton" type="Button" parent="UI" unique_id=1800000003]
+offset_left = 410.0
+offset_top = 24.0
+offset_right = 660.0
+offset_bottom = 88.0
+theme_override_font_sizes/font_size = 32
+text = "End Turn"
+metadata/_edit_use_anchors_ = true
+
+[node name="PlayerHP" type="Label" parent="UI" unique_id=1800000004]
+offset_left = 40.0
+offset_top = 96.0
+offset_right = 180.0
+offset_bottom = 118.0
+theme_override_font_sizes/font_size = 18
+text = "Player HP"
+
+[node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000005]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 40.0
+offset_top = 122.0
+offset_right = 140.0
+offset_bottom = 134.0
+
+[node name="Background" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000006]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.2, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000007]
+layout_mode = 1
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 99.0
+offset_bottom = 11.0
+color = Color(0, 0.8, 0.2, 1)
+
+[node name="ResultLabel" type="Label" parent="UI" unique_id=1800000008]
+offset_left = 256.0
+offset_top = 96.0
+offset_right = 660.0
+offset_bottom = 144.0
+theme_override_font_sizes/font_size = 36
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=651569895]
 offset_right = 40.0
 offset_bottom = 40.0
@@ -327,6 +427,7 @@ layout_mode = 2
 
 [node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
 position = Vector2(-40, 109)
+physics_material_override = SubResource("PhysicsMaterial_slippery")
 
 [node name="box_left" type="Polygon2D" parent="Box" unique_id=1832960912]
 position = Vector2(14, -226)
@@ -378,22 +479,6 @@ animation = &"idle"
 autoplay = "idle"
 frame_progress = 0.18569645
 
-[node name="BoxOut" type="StaticBody2D" parent="." unique_id=1591346892]
-visible = false
-position = Vector2(0, 192)
-script = ExtResource("3_boxout")
-
-[node name="box_out" type="Polygon2D" parent="BoxOut" unique_id=575773673]
-position = Vector2(3.0994415e-06, -16.000008)
-scale = Vector2(0.37500003, 0.5000001)
-color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-80, 0, -72, 0, -56, 32, -32, 48, 0, 56, 32, 48, 56, 32, 72, 0, 80, 0, 64, 32, 32, 56, 0, 64, -32, 56, -64, 32)
-
-[node name="collision" type="CollisionPolygon2D" parent="BoxOut" unique_id=394954758]
-position = Vector2(3.0994415e-06, -16.000008)
-scale = Vector2(0.37500003, 0.5000001)
-polygon = PackedVector2Array(-80, 0, -72, 0, -56, 32, -32, 48, 0, 56, 32, 48, 56, 32, 72, 0, 80, 0, 64, 32, 32, 56, 0, 64, -32, 56, -64, 32)
-
 [node name="CardManager" type="Node2D" parent="." unique_id=492797140]
 position = Vector2(184, 216)
 script = ExtResource("6_o6xl0")
@@ -401,3 +486,4 @@ hand_curve = SubResource("Curve_o6xl0")
 rotation_curve = SubResource("Curve_tipki")
 
 [connection signal="pressed" from="UI/DrawButton" to="." method="_on_draw_pressed"]
+[connection signal="pressed" from="UI/FinishTurnButton" to="." method="_on_finish_turn_pressed"]

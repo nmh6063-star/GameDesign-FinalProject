@@ -48,6 +48,6 @@ func _physics_process(delta: float) -> void:
 	if hover and Input.is_action_just_pressed("play_card"):
 		get_parent().discard(index)
 
-
 func _on_timer_timeout() -> void:
 	info.visible = true
+

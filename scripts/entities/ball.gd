@@ -9,6 +9,8 @@ var level: int = 1
 var reset = false
 
 const LABEL_FONT_SIZE := 24
+const OUTLINE_WIDTH := 2.0
+const OUTLINE_POINTS := 64
 
 func _radius() -> float:
 	var radius = 20.0
@@ -41,7 +43,7 @@ func merge_into_me() -> void:
 func _draw() -> void:
 	var radius := _radius()
 	var color := Color(0.3 + 0.05 * level, 0.8 - 0.06 * level, 0.3)
-	#draw_circle(Vector2.ZERO, radius, color)
+	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, color, OUTLINE_WIDTH, true)
 	var sprite = $Sprite2D
 	var texture_width = sprite.texture.get_width()
 	var scale_factor = (radius * 2) / texture_width
@@ -66,3 +68,4 @@ func _shake():
 	var bodies = get_colliding_bodies()
 	if bodies.size() > 0:
 		apply_central_impulse(Vector2(randi_range(-1, 1), randi_range(-1, 1)) * 500.0)
+

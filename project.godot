@@ -14,15 +14,15 @@ config/name="ProfessorPinballsCastle"
 run/main_scene="uid://tt07u0d3npdi"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/bg_color=Color(0, 0.133333, 0.764706, 1)
-boot_splash/image="res://graphics/splash.png"
 config/icon="res://graphics/icon.png"
 
 [autoload]
 
-Global="*uid://bo3oxdx5uv4bg"
+Global="*res://scripts/globals/Global.gd"
 
 [display]
 
+window/size/mode=3
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 

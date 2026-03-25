@@ -1,6 +1,7 @@
 extends Node2D
 
-@export var max_health: int = 10
+@export var max_health: int = 100
+@export var attack_damage: int = 10
 var current_health: int
 
 const BAR_WIDTH := 98.0
@@ -15,15 +16,8 @@ func apply_attack(amount: int) -> void:
 	current_health = max(current_health - amount, 0)
 	_update_bar()
 	if current_health <= 0:
-		var anim := get_node_or_null("AnimatedSprite2D")
-		if anim:
-			anim.play("die")
+		(get_node("AnimatedSprite2D") as AnimatedSprite2D).play("die")
 
 func _update_bar() -> void:
-	var fill := get_node_or_null("HealthBar/Fill") as ColorRect
-	if fill == null:
-		return
-	var ratio: float = 1.0
-	if max_health > 0:
-		ratio = float(current_health) / float(max_health)
-	fill.size.x = BAR_WIDTH * ratio
+	(get_node("HealthBar/Fill") as ColorRect).size.x = BAR_WIDTH * float(current_health) / float(max_health)
+

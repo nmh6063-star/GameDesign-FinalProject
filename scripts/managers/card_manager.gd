@@ -32,8 +32,10 @@ func draw():
 	_update_cards()
 
 func discard(index):
-	if Global.currentHand.size() < 1:
+	if not cardPlay or Global.currentHand.size() < 1:
 		return
+
+	(get_node("/root/Node2D") as Node).ensure_ball_in_play()
 	
 	Global.currentHand.remove_at(index)
 	var child := get_child(index)
@@ -46,8 +48,6 @@ func discard(index):
 	Global.ballInPlay._update_collision()
 	Global.ballInPlay.queue_redraw()
 	cardPlay = false
-	
-	
 
 func _update_cards():
 	var cards = Global.currentHand.size()
@@ -72,3 +72,4 @@ func _update_cards():
 		card.targetPos = Vector2(final_x, final_y)
 		card.targetRot = max_rotation_degrees * rot_multi
 		card.index = i
+
