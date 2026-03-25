@@ -5,6 +5,8 @@ signal damaged(amount: int)
 @export var max_health: int = 100
 @export var attack_damage: int = 10
 var current_health: int
+@onready var base = $AnimatedSprite2D.modulate
+
 
 const BAR_WIDTH := 98.0
 const BAR_HEIGHT := 10.0
@@ -27,3 +29,10 @@ func _update_bar() -> void:
 	if hp_text:
 		hp_text.text = "%d/%d" % [current_health, max_health]
 
+func _flash():
+	$AnimatedSprite2D.modulate = Color(18.892, 0.0, 0.0)
+	$Timer.start()
+
+
+func _on_timer_timeout() -> void:
+	$AnimatedSprite2D.modulate = base

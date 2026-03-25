@@ -17,6 +17,7 @@ var index := 0
 var details = null
 @onready var info = $Info
 @onready var timer = $Timer
+@onready var baseModulate = self.modulate
 
 var _armed := false
 var _arm_mouse_start := Vector2.ZERO
@@ -28,10 +29,11 @@ func _physics_process(delta: float) -> void:
 		position = position.lerp(targetPos + raisedY, delta * shuffleSpeed)
 		rotation = lerp_angle(rotation, targetRot * PI / 180.0, delta * rotSpeed)
 	else:
-		global_position = get_global_mouse_position()
+		#global_position = get_global_mouse_position()
 		rotation = lerp_angle(rotation, targetRot * PI / 180.0, delta * rotSpeed)
 
 	if not _armed:
+		modulate = baseModulate
 		if hover:
 			z_index = 999
 			raisedY = Vector2(0.0, -20.0)
@@ -42,7 +44,8 @@ func _physics_process(delta: float) -> void:
 			get_node("Sprite2D").scale = get_node("Sprite2D").scale.lerp(baseScale, delta * scaleSpeed)
 	else:
 		z_index = 1000
-		get_node("Sprite2D").scale = get_node("Sprite2D").scale.lerp(baseScale * sizeMulti, delta * scaleSpeed)
+		get_node("Sprite2D").scale = get_node("Sprite2D").scale.lerp(baseScale * (sizeMulti * 1.1), delta * scaleSpeed)
+		modulate = Color(1.25, 1.25, 1.25, 1)
 
 	var mouse_pos := get_global_mouse_position()
 	var space_state := get_world_2d().direct_space_state
@@ -71,20 +74,23 @@ func _physics_process(delta: float) -> void:
 			if _armed_card != null and is_instance_valid(_armed_card) and _armed_card != self:
 				if _armed_card.has_method("disarm_snap"):
 					_armed_card.disarm_snap()
-			_arm_mouse_start = get_global_mouse_position()
+			#_arm_mouse_start = get_global_mouse_position()
 			_arm_slot_local = targetPos
 			_armed = true
 			_armed_card = self
-			info.visible = false
+			#info.visible = false
 	else:
 		if Input.is_action_just_pressed("play_card"):
-			var drag := get_global_mouse_position().distance_to(_arm_mouse_start)
-			if drag >= DRAG_CONFIRM_DISTANCE_PX:
+			if over_self:
 				var cm := get_parent()
-				if cm != null and cm.has_method("confirm_play"):
-					cm.confirm_play(self)
-				else:
-					disarm_snap()
+				cm.confirm_play(self)
+			#var drag := get_global_mouse_position().distance_to(_arm_mouse_start)
+			#if drag >= DRAG_CONFIRM_DISTANCE_PX:
+			#	var cm := get_parent()
+			#	if cm != null and cm.has_method("confirm_play"):
+			#		cm.confirm_play(self)
+			#	else:
+			#		disarm_snap()
 			else:
 				disarm_snap()
 

@@ -9,6 +9,8 @@
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
 [ext_resource type="Script" uid="uid://p3wyp646yn4m" path="res://scripts/managers/card_manager.gd" id="6_o6xl0"]
+[ext_resource type="Texture2D" uid="uid://qtn02f1n8vj8" path="res://assets/Sample.png" id="9_eb6dy"]
+[ext_resource type="Script" uid="uid://m1rnntsvg662" path="res://scripts/entities/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://bv761w1yohjv5" path="res://scripts/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
 
@@ -103,6 +105,7 @@ func _on_attack_calculated(amount: int) -> void:
 	pass
 
 func _on_player_attacked(_amount: int) -> void:
+	$Player._flash()
 	_update_player_bar()
 	if damage_anchor_player:
 		_spawn_damage_floater_on_node(_amount, damage_anchor_player, Color(1, 0.3, 0.3))
@@ -110,6 +113,7 @@ func _on_player_attacked(_amount: int) -> void:
 		_spawn_damage_floater_on_node(_amount, player_damage_anchor, Color(1, 0.3, 0.3))
 
 func _on_enemy_damaged(amount: int) -> void:
+	$Enemy._flash()
 	if damage_anchor_enemy:
 		_spawn_damage_floater_on_node(amount, damage_anchor_enemy, Color(0.92, 0.58, 0.06))
 	else:
@@ -616,6 +620,18 @@ position = Vector2(8, -3)
 scale = Vector2(7.6547318, 8.198811)
 polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
 
+[node name="Player" type="Node2D" parent="." unique_id=1652955601]
+position = Vector2(-144, -187)
+script = ExtResource("9_trceg")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=271390611]
+scale = Vector2(3, 3)
+texture = ExtResource("9_eb6dy")
+
+[node name="Timer" type="Timer" parent="Player" unique_id=321131043]
+wait_time = 0.1
+one_shot = true
+
 [node name="Enemy" type="Node2D" parent="." unique_id=144872954]
 position = Vector2(0, -230)
 script = ExtResource("4_enemy")
@@ -668,6 +684,9 @@ animation = &"idle"
 autoplay = "idle"
 frame_progress = 0.18569645
 
+[node name="Timer" type="Timer" parent="Enemy" unique_id=1336342294]
+wait_time = 0.1
+
 [node name="CardManager" type="Node2D" parent="." unique_id=492797140]
 position = Vector2(184, 216)
 script = ExtResource("6_o6xl0")
@@ -676,3 +695,5 @@ rotation_curve = SubResource("Curve_tipki")
 
 [connection signal="pressed" from="UI/ActionBar/DrawButton" to="." method="_on_draw_pressed"]
 [connection signal="pressed" from="UI/ActionBar/FinishTurnButton" to="." method="_on_finish_turn_pressed"]
+[connection signal="timeout" from="Player/Timer" to="Player" method="_on_timer_timeout"]
+[connection signal="timeout" from="Enemy/Timer" to="Enemy" method="_on_timer_timeout"]

@@ -17,7 +17,7 @@ func _physics_process(delta: float) -> void:
 	if cardPlay:
 		self.position = self.position.lerp(targetPos, delta * hideSpeed)
 	else:
-		self.position = self.position.lerp(targetPos + Vector2(0, 250), delta * hideSpeed)
+		self.position = self.position.lerp(targetPos + Vector2(0, 350), delta * hideSpeed)
 
 const card = preload("res://scenes/card.tscn")
 
@@ -90,4 +90,3 @@ func _update_cards():
 		card.targetPos = Vector2(final_x, final_y)
 		card.targetRot = max_rotation_degrees * rot_multi
 		card.index = i
-
