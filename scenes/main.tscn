@@ -1,21 +1,23 @@
 [gd_scene format=3 uid="uid://tt07u0d3npdi"]
 
-[ext_resource type="Script" uid="uid://s4qt6dvg74hs" path="res://scripts/entities/ball.gd" id="1_o5qli"]
-[ext_resource type="Script" uid="uid://cftpvhiigjnfb" path="res://scripts/managers/game_manager.gd" id="2_gm"]
+[ext_resource type="Script" path="res://script/ball/game_ball.gd" id="1_o5qli"]
+[ext_resource type="Script" path="res://script/session/game_manager.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cb5hmafbmxhfj" path="res://assets/WoodBack.png" id="3_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://c705s3lh6osjc" path="res://assets/slime-Sheet.png" id="3_sugp2"]
 [ext_resource type="Texture2D" uid="uid://dxxvadmvkcnn5" path="res://assets/grassland.png" id="3_tipki"]
-[ext_resource type="Script" uid="uid://c84djf6lsmrg3" path="res://scripts/entities/enemy.gd" id="4_enemy"]
+[ext_resource type="Script" path="res://script/entities/enemy.gd" id="4_enemy"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
-[ext_resource type="Script" uid="uid://p3wyp646yn4m" path="res://scripts/managers/card_manager.gd" id="6_o6xl0"]
+[ext_resource type="Script" path="res://script/card/card_manager.gd" id="6_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://qtn02f1n8vj8" path="res://assets/Sample.png" id="9_eb6dy"]
-[ext_resource type="Script" uid="uid://m1rnntsvg662" path="res://scripts/entities/player.gd" id="9_trceg"]
-[ext_resource type="Script" uid="uid://bv761w1yohjv5" path="res://scripts/ui/line_indicator.gd" id="11_ya4ey"]
+[ext_resource type="Script" path="res://script/entities/player.gd" id="9_trceg"]
+[ext_resource type="Script" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
 
 [sub_resource type="GDScript" id="GDScript_0wfyh"]
 script/source = "extends Node2D
+
+const GameBall := preload(\"res://script/ball/game_ball.gd\")
 
 @onready var template_ball: Node = $Ball
 @onready var turn_banner := $UI/TurnBanner
@@ -39,6 +41,7 @@ func _ready() -> void:
 	((template_ball as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = true
 	game_manager.attack_calculated.connect(_on_attack_calculated)
 	game_manager.player_attacked.connect(_on_player_attacked)
+	game_manager.player_healed.connect(_on_player_healed)
 	game_manager.turn_ended.connect(_on_turn_ended)
 	game_manager.energy_changed.connect(_on_energy_changed)
 	if game_manager.has_signal(\"enemy_turn_started\"):
@@ -71,16 +74,23 @@ func _on_ball_dropped() -> void:
 	$CardManager.cardPlay = true
 	_spawn_ball()
 
+func wire_playfield_ball(b: GameBall) -> void:
+	if not b.dropped.is_connected(_on_ball_dropped):
+		b.dropped.connect(_on_ball_dropped)
+
+func _on_player_healed(_amount: int) -> void:
+	_update_player_bar()
+
 func _spawn_ball() -> void:
-	var b := template_ball.duplicate()
+	var b := template_ball.duplicate() as GameBall
 	Global.ballInPlay = b
 	(b as Node2D).position = spawn_position
+	b.reset_for_spawn()
 	b.set_up = false
 	b.visible = false
 	b.gravity_scale = 0.0
-	b.level = 1
 	((b as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = false
-	b.connect(\"dropped\", _on_ball_dropped)
+	wire_playfield_ball(b)
 	add_child(b)
 
 func ensure_ball_in_play() -> void:
@@ -180,8 +190,13 @@ func _show_result(text: String) -> void:
 "
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
-friction = 1.2
-bounce = 0.05
+friction = 2.5
+bounce = 0.0
+
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_surface"]
+friction = 2.5
+bounce = 0.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
@@ -190,9 +205,6 @@ radius = 20.0
 base_font = ExtResource("6_choun")
 spacing_glyph = -2
 
-[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_slippery"]
-friction = 0.9
-bounce = 0.05
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_jyhfs"]
 atlas = ExtResource("3_sugp2")
@@ -401,6 +413,8 @@ script = ExtResource("11_ya4ey")
 visible = false
 position = Vector2(0, -83)
 physics_material_override = SubResource("PhysicsMaterial_ball")
+linear_damp = 4.0
+angular_damp = 4.0
 gravity_scale = 0.0
 contact_monitor = true
 max_contacts_reported = 1
@@ -606,7 +620,7 @@ vertical_alignment = 1
 
 [node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
 position = Vector2(-40, 109)
-physics_material_override = SubResource("PhysicsMaterial_slippery")
+physics_material_override = SubResource("PhysicsMaterial_surface")
 
 [node name="box_left" type="Polygon2D" parent="Box" unique_id=1832960912]
 position = Vector2(14, -226)

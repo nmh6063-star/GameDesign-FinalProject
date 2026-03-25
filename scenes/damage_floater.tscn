@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://damagefloater"]
 
-[ext_resource type="Script" uid="uid://damagefloater_script" path="res://scripts/ui/damage_floater.gd" id="1_damagefloater"]
+[ext_resource type="Script" uid="uid://damagefloater_script" path="res://script/ui/damage_floater.gd" id="1_damagefloater"]
 
 [node name="DamageFloater" type="Label"]
 script = ExtResource("1_damagefloater")
