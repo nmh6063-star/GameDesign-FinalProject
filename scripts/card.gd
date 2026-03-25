@@ -11,6 +11,8 @@ var hover = false
 var raisedY = Vector2.ZERO
 var index = 0
 var details = null
+@onready var info = $Info
+@onready var timer = $Timer
 
 func _physics_process(delta: float) -> void:
 	self.position = self.position.lerp(targetPos + raisedY, delta * shuffleSpeed)
@@ -35,9 +37,17 @@ func _physics_process(delta: float) -> void:
 	for i in range(result.size()):
 		colliders.append(result[i].collider)
 	if colliders.size() > 0 and colliders[0] == get_node("Area2D"):
+		if !hover:
+			timer.start()
+			info.rotation = -self.rotation
 		hover = true
 	else:
+		info.visible = false
 		hover = false
 	
 	if hover and Input.is_action_just_pressed("play_card"):
 		get_parent().discard(index)
+
+
+func _on_timer_timeout() -> void:
+	info.visible = true

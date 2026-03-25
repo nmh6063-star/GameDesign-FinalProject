@@ -1,2 +1,8 @@
 res://scenes/main.tscn
+res://scenes/card.tscn
 res://scripts/card_manager.gd
+res://scripts/card.gd
+res://scripts/ball.gd
+res://scenes/line_indicator.gd
+res://scripts/line_indicator.gd
+res://scenes/indicator_sprite.tscn

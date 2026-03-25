@@ -41,11 +41,17 @@ func merge_into_me() -> void:
 func _draw() -> void:
 	var radius := _radius()
 	var color := Color(0.3 + 0.05 * level, 0.8 - 0.06 * level, 0.3)
-	draw_circle(Vector2.ZERO, radius, color)
+	#draw_circle(Vector2.ZERO, radius, color)
+	var sprite = $Sprite2D
+	var texture_width = sprite.texture.get_width()
+	var scale_factor = (radius * 2) / texture_width
+	sprite.scale = Vector2(scale_factor, scale_factor)
+	sprite.modulate = color
 	var font := ThemeDB.fallback_font
 	var num := str(level)
 	var sz := font.get_string_size(num, HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT_SIZE)
-	draw_string(font, Vector2(-sz.x / 2.0, sz.y / 2.0), num, HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT_SIZE)
+	$RichTextLabel.text = num
+	#draw_string(font, Vector2(-sz.x / 2.0, sz.y / 2.0), num, HORIZONTAL_ALIGNMENT_LEFT, -1, LABEL_FONT_SIZE)
 
 func _physics_process(delta: float) -> void:
 	if set_up:

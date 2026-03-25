@@ -4,7 +4,7 @@ extends Node2D
 @export var rotation_curve: Curve
 
 @export var max_rotation_degrees := 5
-@export var x_sep := -560
+@export var x_sep := 50
 @export var y_min := 0
 @export var y_max := -15
 var hideSpeed = 10.0
@@ -44,6 +44,7 @@ func discard(index):
 	child.queue_free()
 	_update_cards()
 	Global.ballInPlay._update_collision()
+	Global.ballInPlay.queue_redraw()
 	cardPlay = false
 	
 	
