@@ -42,8 +42,7 @@ func _physics_process(delta: float) -> void:
 		modulate = Color(1.25, 1.25, 1.25, 1)
 	rotation = lerp_angle(rotation, targetRot * PI / 180.0, delta * rotSpeed)
 	if self.position.x > 400:
-		print("help")
-		$Info.position.x = 400- self.position.x
+		$Info.position.x = (400-self.position.x)/2.0
 
 	var over := _mouse_over_card()
 	if not _armed:
