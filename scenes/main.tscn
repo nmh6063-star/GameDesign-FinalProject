@@ -14,181 +14,7 @@
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
-
-[sub_resource type="GDScript" id="GDScript_0wfyh"]
-script/source = "extends Node2D
-
-const GameBall := preload(\"res://script/ball/game_ball.gd\")
-
-@onready var template_ball: Node = $Ball
-@onready var turn_banner := $UI/TurnBanner
-@onready var player_fill := $UI/PlayerHealthBar/Fill
-@onready var player_hp_top := $UI/TopBar/PlayerHPText
-@onready var energy_label := get_node_or_null(\"UI/EnergyLabel\")
-@onready var energy_badge_text := get_node_or_null(\"UI/CostBadge/CostText\")
-@onready var result_label := $UI/ResultLabel
-@onready var game_manager := $GameManager
-@onready var enemy_node := $Enemy
-@onready var player_damage_anchor := $UI/PlayerHealthBar
-@onready var damage_anchor_player := get_node_or_null(\"DamageAnchorPlayer\")
-@onready var damage_anchor_enemy := get_node_or_null(\"DamageAnchorEnemy\")
-
-var spawn_position: Vector2
-
-func _ready() -> void:
-	randomize()
-	spawn_position = (template_ball as Node2D).position
-	template_ball.connect(\"dropped\", _on_ball_dropped)
-	((template_ball as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = true
-	game_manager.attack_calculated.connect(_on_attack_calculated)
-	enemy_node.player_attacked.connect(_on_player_attacked)
-	game_manager.player_healed.connect(_on_player_healed)
-	game_manager.turn_ended.connect(_on_turn_ended)
-	game_manager.energy_changed.connect(_on_energy_changed)
-	if game_manager.has_signal(\"enemy_turn_started\"):
-		game_manager.enemy_turn_started.connect(_on_enemy_turn_started)
-	if game_manager.has_signal(\"player_turn_started\"):
-		game_manager.player_turn_started.connect(_on_player_turn_started)
-	if enemy_node and enemy_node.has_signal(\"damaged\"):
-		enemy_node.damaged.connect(_on_enemy_damaged)
-	game_manager.game_over.connect(_on_game_over)
-	game_manager.game_clear.connect(_on_game_clear)
-	_update_player_bar()
-	update_energy_ui()
-	result_label.visible = false
-	ensure_ball_in_play()
-	_show_turn_banner(\"PLAYER TURN\")
-
-func _on_draw_pressed() -> void:
-	$CardManager.draw()
-	var box_out := get_node_or_null(\"BoxOut\")
-	if box_out != null and box_out.has_method(\"rotate_cup\"):
-		box_out.rotate_cup()
-
-func _on_finish_turn_pressed() -> void:
-	game_manager.finish_turn()
-
-func _on_ball_dropped() -> void:
-	if Global.phase != Global.Phase.PLAY:
-		return
-	await get_tree().create_timer(1.0).timeout
-	$CardManager.cardPlay = true
-	_spawn_ball()
-
-func wire_playfield_ball(b: GameBall) -> void:
-	if not b.dropped.is_connected(_on_ball_dropped):
-		b.dropped.connect(_on_ball_dropped)
-
-func _on_player_healed(_amount: int) -> void:
-	_update_player_bar()
-
-func _spawn_ball() -> void:
-	var b := template_ball.duplicate() as GameBall
-	Global.ballInPlay = b
-	(b as Node2D).position = spawn_position
-	b.reset_for_spawn()
-	b.set_up = false
-	b.visible = false
-	b.gravity_scale = 0.0
-	((b as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = false
-	wire_playfield_ball(b)
-	add_child(b)
-
-func ensure_ball_in_play() -> void:
-	if Global.phase != Global.Phase.PLAY:
-		return
-	if is_instance_valid(Global.ballInPlay) and Global.ballInPlay != template_ball:
-		return
-	_spawn_ball()
-
-func _on_turn_ended() -> void:
-	$CardManager.cardPlay = true
-	ensure_ball_in_play()
-	_show_turn_banner(\"PLAYER TURN\")
-
-func _on_enemy_turn_started() -> void:
-	_show_turn_banner(\"ENEMY TURN\")
-
-func _on_player_turn_started() -> void:
-	_show_turn_banner(\"PLAYER TURN\")
-
-func _on_attack_calculated(amount: int) -> void:
-	pass
-
-func _on_player_attacked(_amount: int) -> void:
-	$Player._flash()
-	_update_player_bar()
-	if damage_anchor_player:
-		_spawn_damage_floater_on_node(_amount, damage_anchor_player, Color(1, 0.3, 0.3))
-	else:
-		_spawn_damage_floater_on_node(_amount, player_damage_anchor, Color(1, 0.3, 0.3))
-
-func _on_enemy_damaged(amount: int) -> void:
-	$Enemy._flash()
-	if damage_anchor_enemy:
-		_spawn_damage_floater_on_node(amount, damage_anchor_enemy, Color(0.92, 0.58, 0.06))
-	else:
-		_spawn_damage_floater_on_node(amount, enemy_node, Color(0.92, 0.58, 0.06))
-
-func _on_energy_changed(_current: int, _max: int) -> void:
-	update_energy_ui()
-
-func _spawn_damage_floater_on_node(amount: int, target: Node, color: Color) -> void:
-	if amount <= 0 or target == null:
-		return
-	var floater := preload(\"res://scenes/damage_floater.tscn\").instantiate()
-	$UI.add_child(floater)
-	var pos := Vector2.ZERO
-	if target is Node2D:
-		pos = (target as Node2D).global_position
-	elif target is Control:
-		pos = (target as Control).global_position
-	(floater as Label).global_position = pos
-	if floater.has_method(\"play\"):
-		floater.play(amount, color)
-
-func _show_turn_banner(text: String) -> void:
-	if turn_banner == null:
-		return
-	var label := turn_banner.get_node_or_null(\"Label\") as Label
-	if label:
-		label.text = text
-	turn_banner.visible = true
-	turn_banner.modulate.a = 0.0
-	turn_banner.scale = Vector2(1.0, 1.0)
-	var tween := create_tween()
-	tween.tween_property(turn_banner, \"modulate:a\", 0.7, 0.15)
-	tween.tween_property(turn_banner, \"modulate:a\", 0.0, 0.6).set_delay(0.6)
-	tween.tween_callback(func(): turn_banner.visible = false)
-
-func _update_player_bar() -> void:
-	player_fill.size.x = 100.0 * float(Global.player_health) / float(Global.player_max_health)
-	var hp_text := $UI/PlayerHealthBar/HPText
-	if hp_text:
-		hp_text.text = \"%d/%d\" % [Global.player_health, Global.player_max_health]
-	if player_hp_top:
-		player_hp_top.text = \"%d/%d\" % [Global.player_health, Global.player_max_health]
-
-func update_energy_ui() -> void:
-	if energy_label:
-		energy_label.visible = true
-		energy_label.text = \"Energy\"
-	if energy_badge_text:
-		energy_badge_text.text = \"%d/%d\" % [Global.player_energy, Global.player_energy_max]
-
-func _on_game_over() -> void:
-	_show_result(\"Game Over\")
-
-func _on_game_clear() -> void:
-	_show_result(\"Game Clear\")
-
-func _show_result(text: String) -> void:
-	result_label.text = text
-	result_label.visible = true
-	$UI/ActionBar/FinishTurnButton.disabled = true
-	$UI/ActionBar/DrawButton.disabled = true
-	$CardManager.cardPlay = false
-"
+[ext_resource type="Script" uid="uid://ddrsxjsu3fd3n" path="res://script/battle/battle.gd" id="15_battle"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
@@ -381,9 +207,9 @@ point_count = 3
 [sub_resource type="CircleShape2D" id="CircleShape2D_jkv2x"]
 radius = 40.311287
 
-[node name="Node2D" type="Node2D" unique_id=1625147204]
+[node name="Battle" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
-script = SubResource("GDScript_0wfyh")
+script = ExtResource("15_battle")
 
 [node name="DamageAnchorPlayer" type="Marker2D" parent="." unique_id=1800000040]
 position = Vector2(88, -149)
@@ -668,11 +494,13 @@ texture = ExtResource("9_eb6dy")
 wait_time = 0.1
 one_shot = true
 
-[node name="Enemy" type="Node2D" parent="." unique_id=144872954]
+[node name="EnemyHandler" type="Node2D" parent="." unique_id=1800000050]
+
+[node name="Enemy" type="Node2D" parent="EnemyHandler" unique_id=144872954]
 position = Vector2(0, -230)
 script = ExtResource("4_enemy")
 
-[node name="HealthBar" type="Control" parent="Enemy" unique_id=9001001]
+[node name="HealthBar" type="Control" parent="EnemyHandler/Enemy" unique_id=9001001]
 layout_mode = 3
 anchors_preset = 0
 offset_left = 526.0
@@ -680,7 +508,7 @@ offset_top = 83.0
 offset_right = 626.0
 offset_bottom = 95.0
 
-[node name="Background" type="ColorRect" parent="Enemy/HealthBar" unique_id=9001002]
+[node name="Background" type="ColorRect" parent="EnemyHandler/Enemy/HealthBar" unique_id=9001002]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -689,7 +517,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.2, 0, 0, 1)
 
-[node name="Fill" type="ColorRect" parent="Enemy/HealthBar" unique_id=9001003]
+[node name="Fill" type="ColorRect" parent="EnemyHandler/Enemy/HealthBar" unique_id=9001003]
 layout_mode = 1
 offset_left = 1.0
 offset_top = 1.0
@@ -697,7 +525,7 @@ offset_right = 99.0
 offset_bottom = 11.0
 color = Color(1, 0, 0, 1)
 
-[node name="HPText" type="Label" parent="Enemy/HealthBar" unique_id=9001004]
+[node name="HPText" type="Label" parent="EnemyHandler/Enemy/HealthBar" unique_id=9001004]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -711,7 +539,7 @@ text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Enemy" unique_id=48224419]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="EnemyHandler/Enemy" unique_id=48224419]
 texture_filter = 1
 position = Vector2(576, 31.999996)
 scale = Vector2(3, 3)
@@ -720,33 +548,35 @@ animation = &"idle"
 autoplay = "idle"
 frame_progress = 0.18569645
 
-[node name="Timer" type="Timer" parent="Enemy" unique_id=1336342294]
+[node name="Timer" type="Timer" parent="EnemyHandler/Enemy" unique_id=1336342294]
 wait_time = 0.1
 
-[node name="Timer2" type="Timer" parent="Enemy" unique_id=421151047]
+[node name="Timer2" type="Timer" parent="EnemyHandler/Enemy" unique_id=421151047]
 wait_time = 5.0
 one_shot = true
 autostart = true
 
-[node name="CardManager" type="Node2D" parent="." unique_id=492797140]
+[node name="PlayerHandler" type="Node2D" parent="." unique_id=1800000051]
+
+[node name="CardManager" type="Node2D" parent="PlayerHandler" unique_id=492797140]
 position = Vector2(184, 216)
 script = ExtResource("6_o6xl0")
 hand_curve = SubResource("Curve_o6xl0")
 rotation_curve = SubResource("Curve_tipki")
 
-[node name="Target" type="Node2D" parent="." unique_id=2058900465]
+[node name="Target" type="Node2D" parent="PlayerHandler" unique_id=2058900465]
 
-[node name="Area2D" type="Area2D" parent="Target" unique_id=1811101269]
+[node name="Area2D" type="Area2D" parent="PlayerHandler/Target" unique_id=1811101269]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Target/Area2D" unique_id=1870874704]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerHandler/Target/Area2D" unique_id=1870874704]
 shape = SubResource("CircleShape2D_jkv2x")
 
-[node name="Sprite2D" type="Sprite2D" parent="Target" unique_id=1555519289]
+[node name="Sprite2D" type="Sprite2D" parent="PlayerHandler/Target" unique_id=1555519289]
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("14_a8y0u")
 
 [connection signal="pressed" from="UI/ActionBar/DrawButton" to="." method="_on_draw_pressed"]
 [connection signal="pressed" from="UI/ActionBar/FinishTurnButton" to="." method="_on_finish_turn_pressed"]
 [connection signal="timeout" from="Player/Timer" to="Player" method="_on_timer_timeout"]
-[connection signal="timeout" from="Enemy/Timer" to="Enemy" method="_on_timer_timeout"]
-[connection signal="timeout" from="Enemy/Timer2" to="Enemy" method="_on_timer_2_timeout"]
+[connection signal="timeout" from="EnemyHandler/Enemy/Timer" to="EnemyHandler/Enemy" method="_on_timer_timeout"]
+[connection signal="timeout" from="EnemyHandler/Enemy/Timer2" to="EnemyHandler/Enemy" method="_on_timer_2_timeout"]

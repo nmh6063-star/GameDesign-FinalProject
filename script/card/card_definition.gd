@@ -1,4 +1,6 @@
 extends Resource
+## Data-only card resource (Slay-the-Spire–style "Card"): title ≈ name, cost ≈ mana,
+## behavior carries ball/effect logic for this game.
 class_name CardDefinition
 
 const BallBehavior := preload("res://script/ball/behaviors/ball_behavior.gd")

@@ -7,7 +7,7 @@ const POST_PLAYER_DAMAGE_UI_DELAY := 0.35
 const ENEMY_ATTACK_DELAY := 2.0
 const PLAYER_DAMAGE_APPLY_INTERVAL := 0.1
 
-@onready var card_manager: CardManager = get_node("/root/Node2D/CardManager")
+@onready var card_manager: CardManager = get_parent().get_node("PlayerHandler/CardManager")
 @onready var _ball_query := preload("res://script/ball/resolve/ball_query.gd").new()
 @onready var _merge := preload("res://script/ball/resolve/merge_resolver.gd").new()
 @onready var _specials := preload("res://script/ball/resolve/special_ball_resolver.gd").new()
@@ -36,7 +36,7 @@ var target
 
 func _ready() -> void:
 	Global.player_energy = Global.player_energy_max
-	target = get_node("/root/Node2D/Target")
+	target = get_parent().get_node("PlayerHandler/Target")
 	target.z_index = 999
 	#change to some constant
 	#Global.player_energy = 5
@@ -84,7 +84,7 @@ func _physics_process(_delta: float) -> void:
 					if body != self:
 						var direction = body.position - target.position
 						direction.normalized()
-						body.apply_central_impulse(direction * $"/root/Node2D/HSlider".value)
+						body.apply_central_impulse(direction * get_parent().get_node("HSlider").value)
 	else:
 		target.visible = false
 
@@ -125,7 +125,7 @@ func _try_merge() -> void:
 	_turn_attack += delta
 	#if delta > 0:
 		#_pending_player_damage.append(delta)
-	var test = get_node("/root/Node2D/HSlider")
+	var test = get_parent().get_node("HSlider")
 	#print(test)
 	for node in get_tree().get_nodes_in_group("ball"):
 		if not is_instance_valid(node):
@@ -187,14 +187,14 @@ func _resolve_combat() -> void:
 	while not _pending_player_damage.is_empty():
 		await get_tree().physics_frame
 	var enemy := get_tree().get_first_node_in_group("enemy")
-	if enemy != null and enemy.current_health <= 0:
+	if is_instance_valid(enemy) and enemy.current_health <= 0:
 		_combat_damage_phase = false
 		_resolving = false
 		game_clear.emit()
 		return
 	await get_tree().create_timer(POST_PLAYER_DAMAGE_UI_DELAY).timeout
 	enemy_turn_started.emit()
-	if enemy == null:
+	if not is_instance_valid(enemy):
 		await get_tree().create_timer(ENEMY_ATTACK_DELAY).timeout
 		_end_turn()
 		return

@@ -3,10 +3,11 @@ extends Node2D
 var tile = preload("res://scenes/map_tile.tscn")
 var gameState = "res://scenes/main.tscn"
 var currentTile = Vector2(0, 0)
-@onready var shopButton = $"/root/Node2D/CanvasLayer/Container/Button"
+@onready var shopButton: Button = get_node("../CanvasLayer/Container/Button") as Button
 
 func _ready() -> void:
-	shopButton.visible = false
+	if shopButton:
+		shopButton.visible = false
 	if !Global.map_drawn:
 		Global.map_drawn = true
 		_generate_map()
@@ -26,7 +27,8 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("enter_level"):
 		var tileType = _get_current_tile_type()
 		if tileType == "shop":
-			shopButton.visible = true
+			if shopButton:
+				shopButton.visible = true
 		else:
 			get_tree().change_scene_to_file(gameState)
 	#print(currentTile)

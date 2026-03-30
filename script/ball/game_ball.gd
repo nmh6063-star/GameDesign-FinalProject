@@ -120,11 +120,17 @@ func _physics_process(_delta: float) -> void:
 		gravity_scale = GRAVITY_SCALE
 		return
 	gravity_scale = 0.0
-	direction = int((get_node("/root/Node2D/Target").position.x - self.position.x)/abs(get_node("/root/Node2D/Target").position.x - self.position.x))
-	if abs(get_node("/root/Node2D/Target").position.x - self.position.x) < 15:
+	var aim := get_node("/root/Battle/PlayerHandler/Target") as Node2D
+	if aim == null:
+		return
+	var dx := aim.position.x - self.position.x
+	var adx := absf(dx)
+	if adx < 15.0:
 		direction = 0
+	else:
+		direction = signi(dx)
 	#direction = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
-	linear_velocity = Vector2(clamp(abs(get_node("/root/Node2D/Target").position.x - self.position.x) * 25, 0, 2500) * direction, 0)
+	linear_velocity = Vector2(clamp(abs(aim.position.x - self.position.x) * 25, 0, 2500) * direction, 0)
 	if Input.is_action_just_pressed("play_card"):
 		gravity_scale = GRAVITY_SCALE
 		set_up = false

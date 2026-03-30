@@ -17,4 +17,4 @@ var map_horizontal = 4
 var map_vertical = 2
 var current_tile = Vector2(-1, 0)
 
-@onready var ballInPlay = get_node("/root/Node2D/Ball")
+@onready var ballInPlay = get_node("/root/Battle/Ball")

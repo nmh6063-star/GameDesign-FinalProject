@@ -25,15 +25,8 @@ var deck = []
 func _physics_process(delta: float) -> void:
 	var target := targetPos + (Vector2.ZERO if cardPlay else Vector2(0, 350))
 	position = position.lerp(target, delta * hideSpeed)
-	if cardPlay:
-		if deck.size() == 0:
-			deck = _LIB._build()
-		var index = randi() % deck.size()
-		var details = deck[index].duplicate(true)
-		var inst = _CARD.instantiate()
-		inst.details = details
-		deck.remove_at(index)
-		confirm_play(inst)
+	if cardPlay and deck.is_empty():
+		deck = _LIB._build()
 
 
 #below here is all invalidated code. TODO, edit other scripts so can easily delete
@@ -54,19 +47,24 @@ func draw() -> void:
 func confirm_play(card: Node2D) -> void:
 	if not cardPlay or Global.currentHand.is_empty():
 		return
-	var idx := card.get_index()
 	var def := card.details as CardDefinition
-	#if def == null or idx < 0 or idx >= get_child_count():
-	#	return
+	if def == null:
+		return
+	if card.index < 0 or card.index >= Global.currentHand.size():
+		return
 	if Global.player_energy < def.cost:
 		card.disarm_snap()
 		return
 	card.clear_arm_state()
 	Global.player_energy -= def.cost
-	(get_node("/root/Node2D") as Node).update_energy_ui()
-	(get_node("/root/Node2D") as Node).ensure_ball_in_play()
-	Global.currentHand.remove_at(idx)
+	(get_node("/root/Battle") as Node).update_energy_ui()
+	(get_node("/root/Battle") as Node).ensure_ball_in_play()
+	Global.currentHand.remove_at(card.index)
 	var play := Global.ballInPlay as GameBall
+	if play == null or not is_instance_valid(play):
+		_update_cards()
+		cardPlay = false
+		return
 	play.visible = true
 	play.set_up = true
 	play.behavior = BallBehavior.from_kind(def.kind)
@@ -85,7 +83,12 @@ func _update_cards() -> void:
 	var n := Global.currentHand.size()
 	if n < 1 or get_child_count() < 1:
 		return
-	var card_w: float = get_child(0).get_node("Area2D/CollisionShape2D").shape.extents.x * 2.0
+	var shape := get_child(0).get_node("Area2D/CollisionShape2D").shape as Shape2D
+	var card_w: float = 48.0
+	if shape is RectangleShape2D:
+		card_w = (shape as RectangleShape2D).size.x
+	elif shape is CircleShape2D:
+		card_w = (shape as CircleShape2D).radius * 2.0
 	var sep: float = x_sep
 	var total: float = card_w * n + x_sep * maxi(n - 1, 0)
 	if n > 1 and total > deckSize:
@@ -95,8 +98,8 @@ func _update_cards() -> void:
 	for i in n:
 		var c := get_child(i)
 		var t := 0.5 if n <= 1 else float(i) / float(n - 1)
-		var ym := 0.0 if n <= 1 else hand_curve.sample(t)
-		var rm := 0.0 if n <= 1 else rotation_curve.sample(t)
+		var ym := 0.0 if n <= 1 or hand_curve == null else hand_curve.sample(t)
+		var rm := 0.0 if n <= 1 or rotation_curve == null else rotation_curve.sample(t)
 		c.targetPos = Vector2(offset + (card_w + sep) * i, y_min + y_max * ym)
 		c.targetRot = max_rotation_degrees * rm
 		c.index = i
