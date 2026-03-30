@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://c6nksbnqw6wkk"]
+
+[ext_resource type="Script" uid="uid://d1e4u0j6ifmdy" path="res://script/map/map_tile.gd" id="1_eader"]
+
+[node name="MapTile" type="Polygon2D" unique_id=309099207]
+scale = Vector2(2, 2)
+polygon = PackedVector2Array(-32, -7.9999995, -32, 32, 8, 32, 8, -7.9999995)
+uv = PackedVector2Array(-32, -7.9999995, -32, 32, 8, 32, 8, -7.9999995)
+script = ExtResource("1_eader")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1922397898]
+position = Vector2(-11.999999, 11.999999)
+scale = Vector2(0.025, 0.025)

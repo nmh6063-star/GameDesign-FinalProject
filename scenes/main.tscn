@@ -13,6 +13,7 @@
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/entities/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
+[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 
 [sub_resource type="GDScript" id="GDScript_0wfyh"]
 script/source = "extends Node2D
@@ -40,7 +41,7 @@ func _ready() -> void:
 	template_ball.connect(\"dropped\", _on_ball_dropped)
 	((template_ball as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = true
 	game_manager.attack_calculated.connect(_on_attack_calculated)
-	game_manager.player_attacked.connect(_on_player_attacked)
+	enemy_node.player_attacked.connect(_on_player_attacked)
 	game_manager.player_healed.connect(_on_player_healed)
 	game_manager.turn_ended.connect(_on_turn_ended)
 	game_manager.energy_changed.connect(_on_energy_changed)
@@ -191,6 +192,7 @@ func _show_result(text: String) -> void:
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
+bounce = 0.9
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
@@ -376,6 +378,9 @@ _limits = [-1.0, 1.0, 0.0, 1.0]
 _data = [Vector2(0, -1), 0.0, 6.0, 0, 0, Vector2(0.4950249, 0.00042247772), 0.0, 0.0, 0, 0, Vector2(1, 1), 6.0, 0.0, 0, 0]
 point_count = 3
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_jkv2x"]
+radius = 40.311287
+
 [node name="Node2D" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
 script = SubResource("GDScript_0wfyh")
@@ -386,7 +391,7 @@ position = Vector2(88, -149)
 [node name="DamageAnchorEnemy" type="Marker2D" parent="." unique_id=1800000041]
 position = Vector2(664, -132)
 
-[node name="GameManager" type="Node" parent="." unique_id=393182643]
+[node name="GameManager" type="Node2D" parent="." unique_id=1775782920]
 script = ExtResource("2_gm")
 
 [node name="WoodBack" type="Sprite2D" parent="." unique_id=1221723363]
@@ -515,6 +520,7 @@ theme_override_font_sizes/font_size = 18
 text = "Player HP"
 
 [node name="EnergyLabel" type="Label" parent="UI" unique_id=1800000011]
+visible = false
 offset_left = 584.0
 offset_top = 335.0
 offset_right = 768.0
@@ -579,6 +585,7 @@ offset_bottom = 40.0
 layout_mode = 2
 
 [node name="CostBadge" type="Node2D" parent="UI" unique_id=2081867748]
+visible = false
 z_index = -1
 position = Vector2(688, 352)
 scale = Vector2(1.5, 1.5)
@@ -614,15 +621,34 @@ text = "3/3"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="HSlider" type="HSlider" parent="." unique_id=756710493]
+offset_left = 560.0
+offset_top = 42.0
+offset_right = 704.0
+offset_bottom = 58.0
+
+[node name="HSlider2" type="HSlider" parent="." unique_id=1124735120]
+offset_left = 560.0
+offset_top = 12.0
+offset_right = 704.0
+offset_bottom = 28.0
+
 [node name="Box" type="StaticBody2D" parent="." unique_id=953407219]
 position = Vector2(-40, 109)
 physics_material_override = SubResource("PhysicsMaterial_surface")
 
-[node name="box_left" type="Polygon2D" parent="Box" unique_id=1832960912]
+[node name="box_left2" type="Polygon2D" parent="Box" unique_id=1908746544]
 position = Vector2(14, -226)
 scale = Vector2(1, 10.75)
 color = Color(0.4, 0.4, 0.4, 1)
 polygon = PackedVector2Array(-198, 0.6511631, -166, 0.6511631, -166, 37.860466, 162, 37.860466, 162, 0.6511631, 194, 0.6511631, 194, 40.83721, -198, 40.83721)
+uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
+
+[node name="box_left3" type="Polygon2D" parent="Box" unique_id=1522180883]
+position = Vector2(17, -632)
+scale = Vector2(1, 10.75)
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-199, 34.25, -167, 36.75, -166, 37.860466, 162, 37.860466, 160, 36.75, 194.5, 35.75, 194, 40.83721, -198, 40.83721)
 uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
 
 [node name="collision_left" type="CollisionPolygon2D" parent="Box" unique_id=2092186238]
@@ -697,13 +723,30 @@ frame_progress = 0.18569645
 [node name="Timer" type="Timer" parent="Enemy" unique_id=1336342294]
 wait_time = 0.1
 
+[node name="Timer2" type="Timer" parent="Enemy" unique_id=421151047]
+wait_time = 5.0
+one_shot = true
+autostart = true
+
 [node name="CardManager" type="Node2D" parent="." unique_id=492797140]
 position = Vector2(184, 216)
 script = ExtResource("6_o6xl0")
 hand_curve = SubResource("Curve_o6xl0")
 rotation_curve = SubResource("Curve_tipki")
 
+[node name="Target" type="Node2D" parent="." unique_id=2058900465]
+
+[node name="Area2D" type="Area2D" parent="Target" unique_id=1811101269]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Target/Area2D" unique_id=1870874704]
+shape = SubResource("CircleShape2D_jkv2x")
+
+[node name="Sprite2D" type="Sprite2D" parent="Target" unique_id=1555519289]
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("14_a8y0u")
+
 [connection signal="pressed" from="UI/ActionBar/DrawButton" to="." method="_on_draw_pressed"]
 [connection signal="pressed" from="UI/ActionBar/FinishTurnButton" to="." method="_on_finish_turn_pressed"]
 [connection signal="timeout" from="Player/Timer" to="Player" method="_on_timer_timeout"]
 [connection signal="timeout" from="Enemy/Timer" to="Enemy" method="_on_timer_timeout"]
+[connection signal="timeout" from="Enemy/Timer2" to="Enemy" method="_on_timer_2_timeout"]

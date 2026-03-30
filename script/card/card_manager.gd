@@ -19,13 +19,24 @@ var hideSpeed := 10.0
 var deckSize := 700
 var index := 0
 var cardPlay := true
+var deck = []
 
 
 func _physics_process(delta: float) -> void:
 	var target := targetPos + (Vector2.ZERO if cardPlay else Vector2(0, 350))
 	position = position.lerp(target, delta * hideSpeed)
+	if cardPlay:
+		if deck.size() == 0:
+			deck = _LIB._build()
+		var index = randi() % deck.size()
+		var details = deck[index].duplicate(true)
+		var inst = _CARD.instantiate()
+		inst.details = details
+		deck.remove_at(index)
+		confirm_play(inst)
 
 
+#below here is all invalidated code. TODO, edit other scripts so can easily delete
 func draw() -> void:
 	var inst := _CARD.instantiate()
 	add_child(inst)
@@ -45,8 +56,8 @@ func confirm_play(card: Node2D) -> void:
 		return
 	var idx := card.get_index()
 	var def := card.details as CardDefinition
-	if def == null or idx < 0 or idx >= get_child_count():
-		return
+	#if def == null or idx < 0 or idx >= get_child_count():
+	#	return
 	if Global.player_energy < def.cost:
 		card.disarm_snap()
 		return

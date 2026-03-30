@@ -12,11 +12,14 @@ var move_speed: float = 200.0
 var direction: int = 0
 var level: int = 1
 var reset: bool = false
+var bounce = 1
 
 const GRAVITY_SCALE := 2.0
 
 const OUTLINE_WIDTH := 2.0
 const OUTLINE_POINTS := 64
+
+var last_velocity = Vector2.ZERO
 
 
 func _radius() -> float:
@@ -26,7 +29,7 @@ func _radius() -> float:
 	if reset:
 		return radius
 	for i in range(1, level):
-		radius += 10.0 / i
+		radius += 5.0 / i
 	return radius
 
 
@@ -55,6 +58,8 @@ func _ready() -> void:
 	gravity_scale = 0.0
 	_update_collision()
 	queue_redraw()
+	contact_monitor = true
+	max_contacts_reported = 10
 
 
 func _update_collision() -> void:
@@ -69,7 +74,7 @@ func _update_collision() -> void:
 func merge_into_me() -> void:
 	if not behavior.participates_in_level_merge():
 		return
-	level += 1
+	level *= 2
 	_update_collision()
 	queue_redraw()
 
@@ -92,6 +97,10 @@ func _draw() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if linear_velocity.y <= 1:
+		physics_material_override.absorbent = true
+	else:
+		physics_material_override.absorbent = false
 	# Keep spare (hidden) balls from falling.
 	if not visible:
 		gravity_scale = 0.0
@@ -110,15 +119,48 @@ func _physics_process(_delta: float) -> void:
 	if not set_up:
 		gravity_scale = GRAVITY_SCALE
 		return
-
 	gravity_scale = 0.0
-	direction = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
-	linear_velocity = Vector2(move_speed * direction, 0.0)
-	if Input.is_action_just_pressed("space"):
+	direction = int((get_node("/root/Node2D/Target").position.x - self.position.x)/abs(get_node("/root/Node2D/Target").position.x - self.position.x))
+	if abs(get_node("/root/Node2D/Target").position.x - self.position.x) < 15:
+		direction = 0
+	#direction = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
+	linear_velocity = Vector2(clamp(abs(get_node("/root/Node2D/Target").position.x - self.position.x) * 25, 0, 2500) * direction, 0)
+	if Input.is_action_just_pressed("play_card"):
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()
 
+func _integrate_forces(state):
+	pass
+	"""
+	for i in range(state.get_contact_count()):
+		var collider = state.get_contact_collider_object(i)
+		if (collider == null or collider.name != "Box"):
+			continue
+		var normal: Vector2 = state.get_contact_local_normal(i)
+		var finalImpulse = Vector2.ZERO
+		print(normal)
+		if abs(normal.x) > 0.1:
+			finalImpulse.x = -sign(normal.x)
+		if abs(normal.y) > 0.1:
+			finalImpulse.y = sign(normal.y)
+		if finalImpulse == Vector2.ZERO:
+			continue
+		var impulse_strength = last_velocity
+		var impulse = finalImpulse * impulse_strength
+		if impulse.y == abs(last_velocity.y):
+			impulse.y = 0
+		if impulse.x > 0:
+			print("negative")
+		else:
+			print("positive")
+		if abs(impulse.x) > 0:
+			print(impulse)
+		#print(last_velocity)
+		print("HERE")
+		#bounce += 1
+		apply_central_impulse(impulse)
+	"""
 
 func _shake() -> void:
 	if get_colliding_bodies().size() > 0:

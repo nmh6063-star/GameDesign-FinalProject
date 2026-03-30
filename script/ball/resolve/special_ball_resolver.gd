@@ -57,6 +57,8 @@ func _wave_heal(root: Node2D, template: GameBall) -> int:
 		if b.behavior.kind != BallBehavior.Kind.HEAL:
 			continue
 		var comp := _touching(b, balls)
+		if comp.size() == 0:
+			continue
 		var sum := 0
 		for o in comp:
 			if o.behavior.participates_in_level_merge():
@@ -75,6 +77,8 @@ func _wave_mult(root: Node2D, template: GameBall) -> bool:
 	var balls := _balls(root, template)
 	for b in balls:
 		if b.behavior.kind != BallBehavior.Kind.MULTIPLICATION:
+			continue
+		if _touching(b, balls).size() == 0:
 			continue
 		for o in _touching(b, balls):
 			if o.behavior.participates_in_level_merge():
@@ -98,14 +102,20 @@ func _wave_dup(root: Node2D, template: GameBall, wire: Callable) -> bool:
 			if o != b:
 				others.append(o)
 		# D triggers when it touches at least 2 other balls.
+		for i in range(others.size()):
+			if others[i].behavior.kind == BallBehavior.Kind.DUPLICATION:
+				others.remove_at(i)
 		if others.size() < 2:
 			continue
+			print("wait")
 		for o in others:
-			var d := o.duplicate() as GameBall
-			_prep_playfield(d)
-			root.add_child(d)
-			d.global_position = o.global_position + Vector2(randf_range(-8.0, 8.0), randf_range(-8.0, 8.0))
-			wire.call(d)
+			for i in range(2):
+				var d := o.duplicate() as GameBall
+				d.level = o.level
+				_prep_playfield(d)
+				root.add_child(d)
+				d.global_position = o.global_position + Vector2(randf_range(-8.0, 8.0), randf_range(-8.0, 8.0))
+				wire.call(d)
 		_consume(b)
 		_wake_playfield(root)
 		return true

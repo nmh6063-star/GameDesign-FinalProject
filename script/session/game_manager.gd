@@ -1,4 +1,4 @@
-extends Node
+extends Node2D
 
 const GameBall := preload("res://script/ball/game_ball.gd")
 const CardManager := preload("res://script/card/card_manager.gd")
@@ -30,16 +30,28 @@ var _turn_attack := 0
 var _attack_levels_by_id: Dictionary = {}
 var _pending_player_damage: Array[int] = []
 var _player_damage_apply_timer := 0.0
+var mode = true
+var target
 
 
 func _ready() -> void:
-	#Global.player_energy = Global.player_energy_max
+	Global.player_energy = Global.player_energy_max
+	target = get_node("/root/Node2D/Target")
+	target.z_index = 999
 	#change to some constant
-	Global.player_energy = 5
+	#Global.player_energy = 5
 	energy_changed.emit(Global.player_energy, Global.player_energy_max)
 
 
 func _physics_process(_delta: float) -> void:
+	_try_merge()
+	var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
+	if healed > 0:
+		player_healed.emit(healed)
+	match Global.phase:
+		Global.Phase.PLAY:
+			_keep_hand()
+	"""
 	match Global.phase:
 		Global.Phase.PLAY:
 			_keep_hand()
@@ -49,9 +61,32 @@ func _physics_process(_delta: float) -> void:
 				if healed > 0:
 					player_healed.emit(healed)
 				_resolve_specials_done = true
-			if not _combat_damage_phase:
-				_try_merge()
+			#if not _combat_damage_phase:
 			_process_pending_player_damage(_delta)
+	"""
+	if Input.is_action_just_pressed("mode_switch"):
+		mode = !mode
+	target.position = get_local_mouse_position()
+	if !mode:
+		target.visible = true
+		if Input.is_action_just_pressed("play_card"):
+			var bodies = target.get_node("Area2D").get_overlapping_bodies()
+			var enemy := get_tree().get_first_node_in_group("enemy")
+			for body in bodies:
+				if body.name != "Box":
+					_combat.player_attack(enemy, body.level)
+					body.queue_free()
+			if bodies.size() > 0:
+				for node in get_tree().get_nodes_in_group("ball"):
+					if not is_instance_valid(node):
+						continue
+					var body := node as RigidBody2D
+					if body != self:
+						var direction = body.position - target.position
+						direction.normalized()
+						body.apply_central_impulse(direction * $"/root/Node2D/HSlider".value)
+	else:
+		target.visible = false
 
 
 func _keep_hand() -> void:
@@ -76,7 +111,7 @@ func _clamp_ball_in_play_pointer(template_node: Node) -> void:
 
 func _active_balls() -> Array[RigidBody2D]:
 	return _ball_query.active_balls(get_tree(), _template_ball())
-
+	
 
 func _try_merge() -> void:
 	var merged := _merge.step_merge(_active_balls())
@@ -88,8 +123,24 @@ func _try_merge() -> void:
 	_attack_levels_by_id[id] = new_level
 	var delta: int = new_level - prev
 	_turn_attack += delta
-	if delta > 0:
-		_pending_player_damage.append(delta)
+	#if delta > 0:
+		#_pending_player_damage.append(delta)
+	var test = get_node("/root/Node2D/HSlider")
+	#print(test)
+	for node in get_tree().get_nodes_in_group("ball"):
+		if not is_instance_valid(node):
+			continue
+		var body := node as RigidBody2D
+		if body != self:
+			var direction = body.position - merged.position
+			direction.normalized()
+			body.apply_central_impulse(direction * test.value)
+		#if body != _merge:
+			#var jump_impulse = Vector2(100, -100 * test.value)
+		#if body != template and (not body.visible or body.set_up):
+			#pass
+	#var jump_impulse = Vector2(100, -100 * test.value)
+	#merged.apply_central_impulse(jump_impulse)
 
 
 func _process_pending_player_damage(dt: float) -> void:
@@ -123,7 +174,8 @@ func finish_turn() -> void:
 			continue
 		var body := node as RigidBody2D
 		if body != template and (not body.visible or body.set_up):
-			body.queue_free()
+			pass
+			#body.queue_free()
 	_clamp_ball_in_play_pointer(template as Node)
 	await get_tree().create_timer(MERGE_SETTLE_TIME).timeout
 	await _resolve_combat()
@@ -166,7 +218,8 @@ func _end_turn() -> void:
 			continue
 		var body := node as RigidBody2D
 		if body != template and _attack_levels_by_id.has(body.get_instance_id()):
-			body.queue_free()
+			pass
+			#body.queue_free()
 	_clamp_ball_in_play_pointer(template as Node)
 	_combat_damage_phase = false
 	Global.phase = Global.Phase.PLAY

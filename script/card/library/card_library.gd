@@ -9,14 +9,13 @@ static func random_card() -> CardDefinition:
 	var pool := _build()
 	return pool[randi() % pool.size()].duplicate(true)
 
-
 static func _build() -> Array[CardDefinition]:
 	var a: Array[CardDefinition] = []
 	for lv in range(1, 5):
 		a.append(_normal(lv))
 	a.append(_dup())
 	a.append(_mult())
-	a.append(_heal())
+	#a.append(_heal())
 	return a
 
 

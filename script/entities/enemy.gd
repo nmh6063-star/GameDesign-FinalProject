@@ -2,10 +2,15 @@ extends Node2D
 
 signal damaged(amount: int)
 
-@export var max_health: int = 100
+@export var max_health: int = 50
 @export var attack_damage: int = 10
 var current_health: int
 @onready var base = $AnimatedSprite2D.modulate
+@onready var timer2 = $Timer2
+@onready var startPos = self.position
+@onready var player = get_node("/root/Node2D/Player")
+var time = 0.0
+signal player_attacked(amount: int)
 
 
 const BAR_WIDTH := 98.0
@@ -36,3 +41,15 @@ func _flash():
 
 func _on_timer_timeout() -> void:
 	$AnimatedSprite2D.modulate = base
+
+func _physics_process(delta: float) -> void:
+	time += delta
+	var weight = time / 5.0
+	position = startPos.lerp(Vector2(player.position.x * 5, self.position.y), weight)
+	
+func _on_timer_2_timeout() -> void:
+	player_attacked.emit(10)
+	Global.player_health = max(Global.player_health - 10, 0)
+	self.position = startPos
+	time = 0
+	timer2.start()
