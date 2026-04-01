@@ -10,6 +10,9 @@ func _ready() -> void:
 	if !Global.map_drawn:
 		Global.map_drawn = true
 		_generate_map()
+	else:
+		for i in range(Global.savedMapData.size()):
+			_generate_tile(Global.savedMapData[i]["pos"], Global.savedMapData[i]["type"])
 
 func _physics_process(delta: float) -> void:
 	if currentTile != Global.current_tile:
@@ -35,7 +38,7 @@ func _physics_process(delta: float) -> void:
 func _generate_map():
 	var horizontal = 0
 	while horizontal < Global.map_horizontal:
-		_generate_tile(Vector2(horizontal, 0))
+		_generate_tile(Vector2(horizontal, 0), "")
 		for i in range(2):
 			var vertical = 0
 			while vertical < Global.map_vertical:
@@ -45,29 +48,31 @@ func _generate_map():
 						vertical +=  1
 					else:
 						vertical -= 1
-					_generate_tile(Vector2(horizontal, vertical))
+					_generate_tile(Vector2(horizontal, vertical), "")
 				else:
 					break
 		horizontal += 1
 	
-func _generate_tile(pos: Vector2):
+func _generate_tile(pos: Vector2, typing: String):
 	var inst = tile.instantiate()
 	inst.position = pos * 80
 	var setType = randf_range(0.0, 1.0)
-	var type = ""
-	if pos == Vector2.ZERO:
-		type = "empty"
-	else:
-		if setType < 0.25:
-			type = "fight"
-		elif setType < 0.5:
-			type = "chest"
-		elif setType < 0.75:
-			type = "shop"
+	var type = typing
+	if typing == "":
+		if pos == Vector2.ZERO:
+			type = "empty"
 		else:
-			type = "random"
+			if setType < 0.25:
+				type = "fight"
+			elif setType < 0.5:
+				type = "chest"
+			elif setType < 0.75:
+				type = "shop"
+			else:
+				type = "random"
 	inst.setPanel(type)
 	add_child(inst)
+	Global.savedMapData.append({"type" = type, "pos" = pos})
 
 func _check_tile_valid(pos: Vector2):
 	var children = get_children()

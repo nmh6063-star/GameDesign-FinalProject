@@ -39,6 +39,8 @@ var _player_damage_apply_timer := 0.0
 var target
 var _shoot_ammo: RefCounted = ShootAmmoT.new()
 
+var mapState = "res://scenes/map.tscn"
+
 
 func _ready() -> void:
 	Global.player_energy = Global.player_energy_max
@@ -64,39 +66,42 @@ func _sync_shoot_ammo_ui() -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	_try_merge()
-	var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
-	if healed > 0:
-		player_healed.emit(healed)
-	match Global.phase:
-		Global.Phase.PLAY:
-			_keep_hand()
-	"""
-	match Global.phase:
-		Global.Phase.PLAY:
-			_keep_hand()
-		Global.Phase.RESOLVE:
-			if not _resolve_specials_done:
-				var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
-				if healed > 0:
-					player_healed.emit(healed)
-				_resolve_specials_done = true
-			#if not _combat_damage_phase:
-			_process_pending_player_damage(_delta)
-	"""
-	target.position = get_local_mouse_position()
-	target.visible = Input.is_action_pressed("shoot") and _shoot_ammo.can_shoot()
-	if Input.is_action_just_pressed("shoot"):
-		if not _shoot_ammo.try_consume_shot():
-			return
-		var bodies = target.get_node("Area2D").get_overlapping_bodies()
-		var enemy := get_tree().get_first_node_in_group("enemy")
-		for body in bodies:
-			if body.name != "Box":
-				_combat.player_attack(enemy, body.level)
-				body.queue_free()
-		_burst_knock_on_balls(target.global_position, SHOOT_BURST_STRENGTH_MULT)
-		_sync_shoot_ammo_ui()
+	if get_tree().get_first_node_in_group("enemy").current_health <= 0:
+		get_tree().change_scene_to_file(mapState)
+	else:
+		_try_merge()
+		var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
+		if healed > 0:
+			player_healed.emit(healed)
+		match Global.phase:
+			Global.Phase.PLAY:
+				_keep_hand()
+		"""
+		match Global.phase:
+			Global.Phase.PLAY:
+				_keep_hand()
+			Global.Phase.RESOLVE:
+				if not _resolve_specials_done:
+					var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
+					if healed > 0:
+						player_healed.emit(healed)
+					_resolve_specials_done = true
+				#if not _combat_damage_phase:
+				_process_pending_player_damage(_delta)
+		"""
+		target.position = get_local_mouse_position()
+		target.visible = Input.is_action_pressed("shoot") and _shoot_ammo.can_shoot()
+		if Input.is_action_just_pressed("shoot"):
+			if not _shoot_ammo.try_consume_shot():
+				return
+			var bodies = target.get_node("Area2D").get_overlapping_bodies()
+			var enemy := get_tree().get_first_node_in_group("enemy")
+			for body in bodies:
+				if body.name != "Box":
+					_combat.player_attack(enemy, body.level)
+					body.queue_free()
+			_burst_knock_on_balls(target.global_position, SHOOT_BURST_STRENGTH_MULT)
+			_sync_shoot_ammo_ui()
 
 
 func _keep_hand() -> void:
