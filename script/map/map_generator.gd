@@ -28,30 +28,63 @@ func _physics_process(delta: float) -> void:
 			currentTile.x += 1
 	if Input.is_action_just_pressed("enter_level"):
 		var tileType = _get_current_tile_type()
-		if tileType == "shop":
+		if tileType == "shop" or tileType == "chest":
 			shopButton.visible = true
+			shopButton.pressed.connect(_add_ball)
 		else:
 			get_tree().change_scene_to_file(gameState)
 	#print(currentTile)
-		
+
+func _add_ball():
+	Global.boughtBalls.append("EXPLODE")
 
 func _generate_map():
 	var horizontal = 0
 	while horizontal < Global.map_horizontal:
-		_generate_tile(Vector2(horizontal, 0), "")
-		for i in range(2):
-			var vertical = 0
-			while vertical < Global.map_vertical:
-				var vertChance = randi_range(0, 1)
-				if vertChance == 1:
-					if i == 0:
-						vertical +=  1
+		for x in range(2):
+			_generate_tile(Vector2(horizontal, 0), "")
+			var vertical1 = 0
+			var vertical2 = 0
+			for i in range(2):
+				var vertical = 0
+				while vertical < Global.map_vertical and vertical > -Global.map_vertical:
+					var vertChance = randi_range(0, 1)
+					if vertChance == 1:
+						if i == 0:
+							vertical +=  1
+						else:
+							vertical -= 1
+						print(vertical)
+						print("moving")
+						_generate_tile(Vector2(horizontal, vertical), "")
 					else:
-						vertical -= 1
-					_generate_tile(Vector2(horizontal, vertical), "")
+						break
+				if i == 0:
+					vertical1 = vertical
+					print(str(vertical1) + " is first ending")
 				else:
-					break
-		horizontal += 1
+					vertical2 = vertical
+					print(str(vertical2) + " is second ending")
+				print("tester")
+			horizontal += 1
+			_generate_tile(Vector2(horizontal, 0), "")
+			for i in range(2):
+				var vert = 0
+				var modifier = 1
+				if i == 0:
+					vert = vertical1
+				else:
+					vert = abs(vertical2)
+					modifier = -1
+				var counter = 1
+				print(str(vert) + " and going " + str(modifier))
+				while vert > 0:
+					_generate_tile(Vector2(horizontal, counter * modifier), "")
+					vert -= 1
+					counter += 1
+				print(counter)
+			horizontal += 1
+	_generate_tile(Vector2(horizontal, 0), "empty")
 	
 func _generate_tile(pos: Vector2, typing: String):
 	var inst = tile.instantiate()

@@ -98,6 +98,9 @@ func _physics_process(_delta: float) -> void:
 			var enemy := get_tree().get_first_node_in_group("enemy")
 			for body in bodies:
 				if body.name != "Box":
+					if body.behavior.kind == 4:
+						body.explode = true
+						continue
 					_combat.player_attack(enemy, body.level)
 					body.queue_free()
 			_burst_knock_on_balls(target.global_position, SHOOT_BURST_STRENGTH_MULT)
@@ -160,7 +163,7 @@ func _try_merge() -> void:
 		#_pending_player_damage.append(delta)
 	_shoot_ammo.register_merge()
 	_sync_shoot_ammo_ui()
-	_burst_knock_on_balls(merged.global_position)
+	_burst_knock_on_balls(merged.global_position, merged.level)
 
 
 func _process_pending_player_damage(dt: float) -> void:

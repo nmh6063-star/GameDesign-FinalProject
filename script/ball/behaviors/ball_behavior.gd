@@ -1,7 +1,7 @@
 extends Resource
 class_name BallBehavior
 
-enum Kind { NORMAL, DUPLICATION, MULTIPLICATION, HEAL }
+enum Kind { NORMAL, DUPLICATION, MULTIPLICATION, HEAL, EXPLODE }
 
 @export var kind: Kind = Kind.NORMAL
 
@@ -27,5 +27,7 @@ func display_label(lv: int) -> String:
 			return "M"
 		Kind.HEAL:
 			return "H"
+		Kind.EXPLODE:
+			return "E"
 		_:
 			return str(lv)

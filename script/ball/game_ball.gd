@@ -13,6 +13,7 @@ var direction: int = 0
 var level: int = 1
 var reset: bool = false
 var bounce = 1
+var explode = false
 
 const GRAVITY_SCALE := 2.0
 
@@ -48,6 +49,8 @@ func _label_color() -> Color:
 			return Color(0.25, 0.55, 1.0)
 		BallBehavior.Kind.HEAL:
 			return Color(0.35, 0.92, 0.55)
+		BallBehavior.Kind.EXPLODE:
+			return Color(1.0, 0.0, 0.0)
 		_:
 			return base
 

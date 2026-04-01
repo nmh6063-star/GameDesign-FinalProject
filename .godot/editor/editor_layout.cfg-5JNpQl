@@ -1,8 +1,13 @@
 [docks]
 
+dock_3="Scene,Import"
 dock_3_selected_tab_idx=0
+dock_4="FileSystem,History"
 dock_4_selected_tab_idx=0
+dock_5="Inspector,Signals,Groups"
 dock_5_selected_tab_idx=0
+dock_9="Output,Debugger,Audio,Animation,Shader Editor,Search Results,AnimationTree,ResourcePreloader,ShaderFile,SpriteFrames,Theme,Polygon,TileSet,TileMap,Replication,GridMap"
+dock_9_selected_tab_idx=1
 dock_floating={}
 dock_closed=[]
 dock_split_2=0
@@ -11,11 +16,6 @@ dock_hsplit_1=0
 dock_hsplit_2=280
 dock_hsplit_3=-280
 dock_hsplit_4=0
-dock_9_selected_tab_idx=0
-dock_3="Scene,Import"
-dock_4="FileSystem,History"
-dock_5="Inspector,Signals,Groups"
-dock_9="Output,Debugger,Audio,Animation,Shader Editor,Search Results,AnimationTree,ResourcePreloader,ShaderFile,SpriteFrames,Theme,Polygon,TileSet,TileMap,Replication,GridMap"
 
 [docks/FileSystem]
 
@@ -24,8 +24,8 @@ v_split_offset=0
 display_mode=0
 file_sort=0
 file_list_display_mode=1
-selected_paths=PackedStringArray("res://script/map/map_tile.gd")
-uncollapsed_paths=PackedStringArray("Favorites", "res://", "res://script/", "res://script/map/", "res://script/card/library/", "res://script/ball/")
+selected_paths=PackedStringArray("res://script/ball/game_ball.gd")
+uncollapsed_paths=PackedStringArray("Favorites", "res://", "res://script/", "res://script/card/", "res://script/card/library/", "res://script/ball/", "res://script/ball/resolve/", "res://script/ball/behaviors/")
 
 [docks/History]
 
@@ -52,7 +52,6 @@ selected_main_editor_idx=2
 
 screen=0
 mode="maximized"
-size=Vector2i(2944, 2110)
 position=Vector2i(0, 76)
 
 [ScriptEditor]

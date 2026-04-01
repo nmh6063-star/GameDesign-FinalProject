@@ -32,6 +32,7 @@ func _physics_process(delta: float) -> void:
 		var details = deck[index].duplicate(true)
 		var inst = _CARD.instantiate()
 		inst.details = details
+		print(details.title)
 		deck.remove_at(index)
 		confirm_play(inst)
 
@@ -70,6 +71,8 @@ func confirm_play(card: Node2D) -> void:
 	play.visible = true
 	play.set_up = true
 	play.behavior = BallBehavior.from_kind(def.kind)
+	print(def.kind)
+	print("oops")
 	play.level = def.modifier if play.behavior.participates_in_level_merge() else 1
 	card.reparent(get_tree().root)
 	card.queue_free()

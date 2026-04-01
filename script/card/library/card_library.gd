@@ -15,6 +15,8 @@ static func _build() -> Array[CardDefinition]:
 		a.append(_normal(lv))
 	a.append(_dup())
 	a.append(_mult())
+	if Global.boughtBalls:
+		a.append(_explode())
 	#a.append(_heal())
 	return a
 
@@ -64,4 +66,15 @@ static func _heal() -> CardDefinition:
 	c.modifier = 1
 	c.kind = BallBehavior.Kind.HEAL
 	c.behavior = BallBehavior.from_kind(BallBehavior.Kind.HEAL)
+	return c
+
+static func _explode() -> CardDefinition:
+	var c := CardDefinition.new()
+	c.title = "Explode Ball"
+	c.summary = "E · explodes upon targetting"
+	c.description = "E · explodes into smaller balls upon targetting"
+	c.cost = 2
+	c.modifier = 1
+	c.kind = BallBehavior.Kind.EXPLODE
+	c.behavior = BallBehavior.from_kind(BallBehavior.Kind.EXPLODE)
 	return c

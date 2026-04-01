@@ -24,6 +24,8 @@ func resolve(root: Node2D, template: GameBall, wire: Callable) -> int:
 		pass
 	while _wave_dup(root, template, wire):
 		pass
+	while _wave_explode(root, template, wire):
+		pass
 	if heal_total > 0:
 		Global.player_health = mini(Global.player_health + heal_total, Global.player_max_health)
 	return heal_total
@@ -119,6 +121,50 @@ func _wave_dup(root: Node2D, template: GameBall, wire: Callable) -> bool:
 		_consume(b)
 		_wake_playfield(root)
 		return true
+	return false
+	
+func _wave_explode(root: Node2D, template: GameBall, wire: Callable) -> bool:
+	var balls := _balls(root, template)
+	for b in balls:
+		if b.behavior.kind != BallBehavior.Kind.EXPLODE or !b.explode:
+			continue
+		for i in range(4):
+			var d := b.duplicate() as GameBall
+			d.behavior = BallBehavior.from_kind(BallBehavior.Kind.NORMAL)
+			d.level = 2
+			_prep_playfield(d)
+			root.add_child(d)
+			d.global_position = b.global_position + Vector2(randf_range(-8.0, 8.0), randf_range(-8.0, 8.0))
+			wire.call(d)
+		_consume(b)
+		_wake_playfield(root)
+		return true
+		"""
+		var comp := _touching(b, balls)
+		var others: Array[GameBall] = []
+		for o in comp:
+			if o != b:
+				others.append(o)
+		# D triggers when it touches at least 2 other balls.
+		for i in range(others.size()):
+			if others[i].behavior.kind == BallBehavior.Kind.DUPLICATION:
+				others.remove_at(i)
+		if others.size() < 2:
+			continue
+			print("wait")
+		for o in others:
+			for i in range(2):
+				var d := o.duplicate() as GameBall
+				d.level = o.level
+				_prep_playfield(d)
+				root.add_child(d)
+				d.global_position = o.global_position + Vector2(randf_range(-8.0, 8.0), randf_range(-8.0, 8.0))
+				wire.call(d)
+		_consume(b)
+		_wake_playfield(root)
+		return true
+	return false
+	"""
 	return false
 
 

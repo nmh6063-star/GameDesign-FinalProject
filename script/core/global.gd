@@ -20,3 +20,4 @@ var current_tile = Vector2(-1, 0)
 @onready var ballInPlay = get_node("/root/Node2D/Ball")
 
 var savedMapData = []
+var boughtBalls = []
