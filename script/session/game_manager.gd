@@ -6,6 +6,10 @@ const MERGE_SETTLE_TIME := 1.0
 const POST_PLAYER_DAMAGE_UI_DELAY := 0.35
 const ENEMY_ATTACK_DELAY := 2.0
 const PLAYER_DAMAGE_APPLY_INTERVAL := 0.1
+## Balls within this radius (pixels, global space) get knock-on impulse from merge or shoot.
+const BURST_AREA_RADIUS := 320.0
+## Extra multiplier on HSlider impulse when the burst comes from shooting (merge uses 1.0).
+const SHOOT_BURST_STRENGTH_MULT := 10.0
 
 @onready var card_manager: CardManager = get_node("/root/Node2D/CardManager")
 @onready var _ball_query := preload("res://script/ball/resolve/ball_query.gd").new()
@@ -30,7 +34,6 @@ var _turn_attack := 0
 var _attack_levels_by_id: Dictionary = {}
 var _pending_player_damage: Array[int] = []
 var _player_damage_apply_timer := 0.0
-var mode = true
 var target
 
 
@@ -64,29 +67,16 @@ func _physics_process(_delta: float) -> void:
 			#if not _combat_damage_phase:
 			_process_pending_player_damage(_delta)
 	"""
-	if Input.is_action_just_pressed("mode_switch"):
-		mode = !mode
 	target.position = get_local_mouse_position()
-	if !mode:
-		target.visible = true
-		if Input.is_action_just_pressed("play_card"):
-			var bodies = target.get_node("Area2D").get_overlapping_bodies()
-			var enemy := get_tree().get_first_node_in_group("enemy")
-			for body in bodies:
-				if body.name != "Box":
-					_combat.player_attack(enemy, body.level)
-					body.queue_free()
-			if bodies.size() > 0:
-				for node in get_tree().get_nodes_in_group("ball"):
-					if not is_instance_valid(node):
-						continue
-					var body := node as RigidBody2D
-					if body != self:
-						var direction = body.position - target.position
-						direction.normalized()
-						body.apply_central_impulse(direction * $"/root/Node2D/HSlider".value)
-	else:
-		target.visible = false
+	target.visible = Input.is_action_pressed("shoot")
+	if Input.is_action_just_pressed("shoot"):
+		var bodies = target.get_node("Area2D").get_overlapping_bodies()
+		var enemy := get_tree().get_first_node_in_group("enemy")
+		for body in bodies:
+			if body.name != "Box":
+				_combat.player_attack(enemy, body.level)
+				body.queue_free()
+		_burst_knock_on_balls(target.global_position, SHOOT_BURST_STRENGTH_MULT)
 
 
 func _keep_hand() -> void:
@@ -111,7 +101,25 @@ func _clamp_ball_in_play_pointer(template_node: Node) -> void:
 
 func _active_balls() -> Array[RigidBody2D]:
 	return _ball_query.active_balls(get_tree(), _template_ball())
-	
+
+
+## Radial push only for balls inside a circle around `origin_global`, scaled by HSlider × `strength_scale`.
+func _burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -> void:
+	var strength: float = ($"/root/Node2D/HSlider" as HSlider).value * strength_scale
+	var r2: float = BURST_AREA_RADIUS * BURST_AREA_RADIUS
+	for node in get_tree().get_nodes_in_group("ball"):
+		if not is_instance_valid(node):
+			continue
+		var body := node as RigidBody2D
+		if body == self:
+			continue
+		var offset := body.global_position - origin_global
+		if offset.length_squared() > r2:
+			continue
+		if offset.length_squared() < 0.0001:
+			continue
+		body.apply_central_impulse(offset.normalized() * strength)
+
 
 func _try_merge() -> void:
 	var merged := _merge.step_merge(_active_balls())
@@ -125,22 +133,7 @@ func _try_merge() -> void:
 	_turn_attack += delta
 	#if delta > 0:
 		#_pending_player_damage.append(delta)
-	var test = get_node("/root/Node2D/HSlider")
-	#print(test)
-	for node in get_tree().get_nodes_in_group("ball"):
-		if not is_instance_valid(node):
-			continue
-		var body := node as RigidBody2D
-		if body != self:
-			var direction = body.position - merged.position
-			direction.normalized()
-			body.apply_central_impulse(direction * test.value)
-		#if body != _merge:
-			#var jump_impulse = Vector2(100, -100 * test.value)
-		#if body != template and (not body.visible or body.set_up):
-			#pass
-	#var jump_impulse = Vector2(100, -100 * test.value)
-	#merged.apply_central_impulse(jump_impulse)
+	_burst_knock_on_balls(merged.global_position)
 
 
 func _process_pending_player_damage(dt: float) -> void:

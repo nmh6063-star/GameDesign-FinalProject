@@ -1,10 +1,1 @@
-res://scenes/map.tscn
-res://script/core/global.gd
-res://scenes/map_generator.gd
-res://scenes/map_tile.gd
-res://script/map/map_generator.gd
-res://script/map/map_tile.gd
-res://scenes/map_tile.tscn
-res://scenes/main.tscn
-res://script/card/card_manager.gd
-res://script/ball/game_ball.gd
+res://script/session/game_manager.gd
