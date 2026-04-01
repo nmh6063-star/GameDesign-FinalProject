@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
+[ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
 
 [sub_resource type="GDScript" id="GDScript_0wfyh"]
 script/source = "extends Node2D
@@ -488,9 +489,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = 8.0
-offset_top = 256.0
+offset_top = 568.0
 offset_right = 488.0
-offset_bottom = 326.0
+offset_bottom = 638.0
 grow_horizontal = 2
 
 [node name="DrawButton" type="Button" parent="UI/ActionBar" unique_id=1800000001]
@@ -528,6 +529,71 @@ offset_bottom = 394.0
 theme_override_font_sizes/font_size = 20
 text = "Energy
 "
+
+[node name="ShootAmmoHUD" type="Control" parent="UI" unique_id=901000000]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 552.0
+offset_top = 232.0
+offset_right = 852.0
+offset_bottom = 270.0
+script = ExtResource("15_shoothud")
+
+[node name="Row" type="HBoxContainer" parent="UI/ShootAmmoHUD" unique_id=901000001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="Meter" type="Control" parent="UI/ShootAmmoHUD/Row" unique_id=901000002]
+custom_minimum_size = Vector2(120, 14)
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Background" type="ColorRect" parent="UI/ShootAmmoHUD/Row/Meter" unique_id=901000003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.12, 0.12, 0.16, 1)
+
+[node name="Fill" type="ColorRect" parent="UI/ShootAmmoHUD/Row/Meter" unique_id=901000004]
+layout_mode = 0
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 1.0
+offset_bottom = 13.0
+color = Color(0.88, 0.62, 0.12, 1)
+
+[node name="BulletPips" type="HBoxContainer" parent="UI/ShootAmmoHUD/Row" unique_id=901000006]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 4
+
+[node name="Pip0" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000007]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+
+[node name="Pip1" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000008]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+
+[node name="Pip2" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000009]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+
+[node name="Pip3" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000010]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
+
+[node name="Pip4" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000011]
+custom_minimum_size = Vector2(14, 14)
+layout_mode = 2
 
 [node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000005]
 layout_mode = 3

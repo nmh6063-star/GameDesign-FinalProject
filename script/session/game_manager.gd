@@ -2,6 +2,7 @@ extends Node2D
 
 const GameBall := preload("res://script/ball/game_ball.gd")
 const CardManager := preload("res://script/card/card_manager.gd")
+const ShootAmmoT := preload("res://script/combat/shoot_ammo.gd")
 const MERGE_SETTLE_TIME := 1.0
 const POST_PLAYER_DAMAGE_UI_DELAY := 0.35
 const ENEMY_ATTACK_DELAY := 2.0
@@ -21,6 +22,7 @@ signal attack_calculated(amount: int)
 signal player_healed(amount: int)
 signal player_attacked(amount: int)
 signal energy_changed(current: int, max: int)
+signal shoot_ammo_changed(bullets: int, max_bullets: int, merge_progress: int, merges_per_bullet: int)
 signal enemy_turn_started
 signal player_turn_started
 signal turn_ended
@@ -35,6 +37,7 @@ var _attack_levels_by_id: Dictionary = {}
 var _pending_player_damage: Array[int] = []
 var _player_damage_apply_timer := 0.0
 var target
+var _shoot_ammo: RefCounted = ShootAmmoT.new()
 
 
 func _ready() -> void:
@@ -44,6 +47,20 @@ func _ready() -> void:
 	#change to some constant
 	#Global.player_energy = 5
 	energy_changed.emit(Global.player_energy, Global.player_energy_max)
+	_sync_shoot_ammo_ui()
+
+
+func emit_shoot_ammo_sync() -> void:
+	_sync_shoot_ammo_ui()
+
+
+func _sync_shoot_ammo_ui() -> void:
+	shoot_ammo_changed.emit(
+		_shoot_ammo.bullets,
+		ShootAmmoT.MAX_BULLETS,
+		_shoot_ammo.merge_progress,
+		ShootAmmoT.MERGES_PER_BULLET,
+	)
 
 
 func _physics_process(_delta: float) -> void:
@@ -68,8 +85,10 @@ func _physics_process(_delta: float) -> void:
 			_process_pending_player_damage(_delta)
 	"""
 	target.position = get_local_mouse_position()
-	target.visible = Input.is_action_pressed("shoot")
+	target.visible = Input.is_action_pressed("shoot") and _shoot_ammo.can_shoot()
 	if Input.is_action_just_pressed("shoot"):
+		if not _shoot_ammo.try_consume_shot():
+			return
 		var bodies = target.get_node("Area2D").get_overlapping_bodies()
 		var enemy := get_tree().get_first_node_in_group("enemy")
 		for body in bodies:
@@ -77,6 +96,7 @@ func _physics_process(_delta: float) -> void:
 				_combat.player_attack(enemy, body.level)
 				body.queue_free()
 		_burst_knock_on_balls(target.global_position, SHOOT_BURST_STRENGTH_MULT)
+		_sync_shoot_ammo_ui()
 
 
 func _keep_hand() -> void:
@@ -133,6 +153,8 @@ func _try_merge() -> void:
 	_turn_attack += delta
 	#if delta > 0:
 		#_pending_player_damage.append(delta)
+	_shoot_ammo.register_merge()
+	_sync_shoot_ammo_ui()
 	_burst_knock_on_balls(merged.global_position)
 
 
