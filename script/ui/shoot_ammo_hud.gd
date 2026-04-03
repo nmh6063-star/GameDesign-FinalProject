@@ -13,7 +13,7 @@ func _ready() -> void:
 	for p in _pips_parent.get_children():
 		if p is Panel:
 			_style_circle_panel(p as Panel, 7, _PIP_EMPTY)
-	var gm := get_node_or_null("/root/Node2D/GameManager")
+	var gm := get_node_or_null("/root/Main/GameManager")
 	if gm == null:
 		return
 	if gm.has_signal("shoot_ammo_changed"):

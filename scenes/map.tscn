@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://w50sb5yf7wx8" path="res://script/map/map_generator.gd" id="1_4xfga"]
 
-[node name="Node2D" type="Node2D" unique_id=843395142]
+[node name="MapWorld" type="Node2D" unique_id=843395142]
 
 [node name="map_manager" type="Node2D" parent="." unique_id=664129571]
 script = ExtResource("1_4xfga")

@@ -1,7 +1,6 @@
 extends Node2D
 
 const GameBall := preload("res://script/ball/game_ball.gd")
-const CardManager := preload("res://script/card/card_manager.gd")
 const ShootAmmoT := preload("res://script/combat/shoot_ammo.gd")
 const MERGE_SETTLE_TIME := 1.0
 const POST_PLAYER_DAMAGE_UI_DELAY := 0.35
@@ -12,7 +11,6 @@ const BURST_AREA_RADIUS := 320.0
 ## Extra multiplier on HSlider impulse when the burst comes from shooting (merge uses 1.0).
 const SHOOT_BURST_STRENGTH_MULT := 10.0
 
-@onready var card_manager: CardManager = get_node("/root/Node2D/CardManager")
 @onready var _ball_query := preload("res://script/ball/resolve/ball_query.gd").new()
 @onready var _merge := preload("res://script/ball/resolve/merge_resolver.gd").new()
 @onready var _specials := preload("res://script/ball/resolve/special_ball_resolver.gd").new()
@@ -42,7 +40,7 @@ var _shoot_ammo: RefCounted = ShootAmmoT.new()
 
 func _ready() -> void:
 	Global.player_energy = Global.player_energy_max
-	target = get_node("/root/Node2D/Target")
+	target = get_node("/root/Main/Target")
 	target.z_index = 999
 	#change to some constant
 	#Global.player_energy = 5
@@ -68,22 +66,6 @@ func _physics_process(_delta: float) -> void:
 	var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
 	if healed > 0:
 		player_healed.emit(healed)
-	match Global.phase:
-		Global.Phase.PLAY:
-			_keep_hand()
-	"""
-	match Global.phase:
-		Global.Phase.PLAY:
-			_keep_hand()
-		Global.Phase.RESOLVE:
-			if not _resolve_specials_done:
-				var healed := _specials.resolve(get_parent() as Node2D, _template_ball() as GameBall, Callable(get_parent(), &"wire_playfield_ball"))
-				if healed > 0:
-					player_healed.emit(healed)
-				_resolve_specials_done = true
-			#if not _combat_damage_phase:
-			_process_pending_player_damage(_delta)
-	"""
 	target.position = get_local_mouse_position()
 	target.visible = Input.is_action_pressed("shoot") and _shoot_ammo.can_shoot()
 	if Input.is_action_just_pressed("shoot"):
@@ -97,11 +79,6 @@ func _physics_process(_delta: float) -> void:
 				body.queue_free()
 		_burst_knock_on_balls(target.global_position, SHOOT_BURST_STRENGTH_MULT)
 		_sync_shoot_ammo_ui()
-
-
-func _keep_hand() -> void:
-	if Global.currentHand.size() < Global.handSize and card_manager.cardPlay:
-		card_manager.draw()
 
 
 func _template_ball() -> RigidBody2D:
@@ -125,7 +102,7 @@ func _active_balls() -> Array[RigidBody2D]:
 
 ## Radial push only for balls inside a circle around `origin_global`, scaled by HSlider × `strength_scale`.
 func _burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -> void:
-	var strength: float = ($"/root/Node2D/HSlider" as HSlider).value * strength_scale
+	var strength: float = ($"/root/Main/UI/HSlider" as HSlider).value * strength_scale
 	var r2: float = BURST_AREA_RADIUS * BURST_AREA_RADIUS
 	for node in get_tree().get_nodes_in_group("ball"):
 		if not is_instance_valid(node):
@@ -177,7 +154,6 @@ func finish_turn() -> void:
 		return
 	_resolving = true
 	Global.phase = Global.Phase.RESOLVE
-	card_manager.cardPlay = false
 	_turn_attack = 0
 	_attack_levels_by_id.clear()
 	_pending_player_damage.clear()

@@ -8,7 +8,7 @@ var current_health: int
 @onready var base = $AnimatedSprite2D.modulate
 @onready var timer2 = $Timer2
 @onready var startPos = self.position
-@onready var player = get_node("/root/Node2D/Player")
+@onready var player = get_node("/root/Main/PlayerHolder/Player")
 var time = 0.0
 signal player_attacked(amount: int)
 

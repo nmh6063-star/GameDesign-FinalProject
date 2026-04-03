@@ -120,47 +120,15 @@ func _physics_process(_delta: float) -> void:
 		gravity_scale = GRAVITY_SCALE
 		return
 	gravity_scale = 0.0
-	direction = int((get_node("/root/Node2D/Target").position.x - self.position.x)/abs(get_node("/root/Node2D/Target").position.x - self.position.x))
-	if abs(get_node("/root/Node2D/Target").position.x - self.position.x) < 15:
+	direction = int((get_node("/root/Main/Target").position.x - self.position.x)/abs(get_node("/root/Main/Target").position.x - self.position.x))
+	if abs(get_node("/root/Main/Target").position.x - self.position.x) < 15:
 		direction = 0
 	#direction = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
-	linear_velocity = Vector2(clamp(abs(get_node("/root/Node2D/Target").position.x - self.position.x) * 25, 0, 2500) * direction, 0)
+	linear_velocity = Vector2(clamp(abs(get_node("/root/Main/Target").position.x - self.position.x) * 25, 0, 2500) * direction, 0)
 	if Input.is_action_just_pressed("play_card"):
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()
-
-func _integrate_forces(state):
-	pass
-	"""
-	for i in range(state.get_contact_count()):
-		var collider = state.get_contact_collider_object(i)
-		if (collider == null or collider.name != "Box"):
-			continue
-		var normal: Vector2 = state.get_contact_local_normal(i)
-		var finalImpulse = Vector2.ZERO
-		print(normal)
-		if abs(normal.x) > 0.1:
-			finalImpulse.x = -sign(normal.x)
-		if abs(normal.y) > 0.1:
-			finalImpulse.y = sign(normal.y)
-		if finalImpulse == Vector2.ZERO:
-			continue
-		var impulse_strength = last_velocity
-		var impulse = finalImpulse * impulse_strength
-		if impulse.y == abs(last_velocity.y):
-			impulse.y = 0
-		if impulse.x > 0:
-			print("negative")
-		else:
-			print("positive")
-		if abs(impulse.x) > 0:
-			print(impulse)
-		#print(last_velocity)
-		print("HERE")
-		#bounce += 1
-		apply_central_impulse(impulse)
-	"""
 
 func _shake() -> void:
 	if get_colliding_bodies().size() > 0:

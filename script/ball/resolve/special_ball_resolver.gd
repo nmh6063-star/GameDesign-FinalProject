@@ -2,7 +2,7 @@ extends RefCounted
 
 const GameBall := preload("res://script/ball/game_ball.gd")
 const BallBehavior := preload("res://script/ball/behaviors/ball_behavior.gd")
-var tolerance := 4.0
+var tolerance := 12.0
 
 func _wake_playfield(root: Node2D) -> void:
 	for n in root.get_tree().get_nodes_in_group("ball"):
@@ -102,12 +102,11 @@ func _wave_dup(root: Node2D, template: GameBall, wire: Callable) -> bool:
 			if o != b:
 				others.append(o)
 		# D triggers when it touches at least 2 other balls.
-		for i in range(others.size()):
+		for i in range(others.size() - 1, -1, -1):
 			if others[i].behavior.kind == BallBehavior.Kind.DUPLICATION:
 				others.remove_at(i)
 		if others.size() < 2:
 			continue
-			print("wait")
 		for o in others:
 			for i in range(2):
 				var d := o.duplicate() as GameBall

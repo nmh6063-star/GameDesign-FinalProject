@@ -3,7 +3,7 @@ extends Node2D
 var tile = preload("res://scenes/map_tile.tscn")
 var gameState = "res://scenes/main.tscn"
 var currentTile = Vector2(0, 0)
-@onready var shopButton = $"/root/Node2D/CanvasLayer/Container/Button"
+@onready var shopButton = $"/root/MapWorld/CanvasLayer/Container/Button"
 
 func _ready() -> void:
 	shopButton.visible = false
