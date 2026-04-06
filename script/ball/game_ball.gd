@@ -2,6 +2,7 @@ extends RigidBody2D
 class_name GameBall
 
 const BallBehavior := preload("res://script/ball/behaviors/ball_behavior.gd")
+const SpecialBallBehavior := preload("res://script/ball/behaviors/special_ball_behavior.gd")
 
 signal dropped
 
@@ -22,6 +23,17 @@ const OUTLINE_POINTS := 64
 var last_velocity = Vector2.ZERO
 
 
+func special_or_null() -> SpecialBallBehavior:
+	if behavior is SpecialBallBehavior:
+		return behavior as SpecialBallBehavior
+	return null
+
+
+func has_special_effect(e: SpecialBallBehavior.Effect) -> bool:
+	var s := special_or_null()
+	return s != null and s.effect == e
+
+
 func _radius() -> float:
 	var radius := 20.0
 	if behavior != null and not behavior.participates_in_level_merge():
@@ -38,18 +50,9 @@ func get_radius() -> float:
 
 
 func _label_color() -> Color:
-	var base := Color(0.3 + 0.05 * level, 0.8 - 0.06 * level, 0.3)
 	if behavior == null:
-		return base
-	match behavior.kind:
-		BallBehavior.Kind.DUPLICATION:
-			return Color(0.75, 0.35, 0.95)
-		BallBehavior.Kind.MULTIPLICATION:
-			return Color(0.25, 0.55, 1.0)
-		BallBehavior.Kind.HEAL:
-			return Color(0.35, 0.92, 0.55)
-		_:
-			return base
+		return Color(0.3 + 0.05 * level, 0.8 - 0.06 * level, 0.3)
+	return behavior.display_color(level)
 
 
 func _ready() -> void:
@@ -101,21 +104,16 @@ func _physics_process(_delta: float) -> void:
 		physics_material_override.absorbent = true
 	else:
 		physics_material_override.absorbent = false
-	# Keep spare (hidden) balls from falling.
 	if not visible:
 		gravity_scale = 0.0
 		return
-	# Never allow visible balls to enter a sleeping physics state.
-	# This prevents them from staying "stuck" when supports disappear.
 	sleeping = false
 
-	# Always enable gravity during resolve/other phases.
 	if Global.phase != Global.Phase.PLAY:
 		set_up = false
 		gravity_scale = GRAVITY_SCALE
 		return
 
-	# PLAY phase: only control the ball while the player is aiming.
 	if not set_up:
 		gravity_scale = GRAVITY_SCALE
 		return
@@ -123,7 +121,6 @@ func _physics_process(_delta: float) -> void:
 	direction = int((get_node("/root/Main/Target").position.x - self.position.x)/abs(get_node("/root/Main/Target").position.x - self.position.x))
 	if abs(get_node("/root/Main/Target").position.x - self.position.x) < 15:
 		direction = 0
-	#direction = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
 	linear_velocity = Vector2(clamp(abs(get_node("/root/Main/Target").position.x - self.position.x) * 25, 0, 2500) * direction, 0)
 	if Input.is_action_just_pressed("play_card"):
 		gravity_scale = GRAVITY_SCALE

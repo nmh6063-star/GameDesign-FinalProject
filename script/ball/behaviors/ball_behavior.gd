@@ -3,29 +3,33 @@ class_name BallBehavior
 
 enum Kind { NORMAL, DUPLICATION, MULTIPLICATION, HEAL }
 
-@export var kind: Kind = Kind.NORMAL
-
-const _PATH := "res://script/ball/behaviors/ball_behavior.gd"
-
-
-static func from_kind(k: Kind) -> BallBehavior:
-	var scr := load(_PATH) as GDScript
-	var b: BallBehavior = scr.new() as BallBehavior
-	b.kind = k
-	return b
+const _PATH_ATTACK := "res://script/ball/behaviors/attack_ball_behavior.gd"
+const _PATH_SPECIAL := "res://script/ball/behaviors/special_ball_behavior.gd"
 
 
 func participates_in_level_merge() -> bool:
-	return kind == Kind.NORMAL
+	return false
 
 
-func display_label(lv: int) -> String:
-	match kind:
+func display_label(level: int) -> String:
+	return str(level)
+
+
+func display_color(level: int) -> Color:
+	return Color(0.5, 0.5, 0.5)
+
+
+static func from_kind(k: Kind) -> BallBehavior:
+	if k == Kind.NORMAL:
+		return load(_PATH_ATTACK).new() as BallBehavior
+	var inst: Resource = load(_PATH_SPECIAL).new() as Resource
+	match k:
 		Kind.DUPLICATION:
-			return "D"
+			inst.set("effect", 0)
 		Kind.MULTIPLICATION:
-			return "M"
+			inst.set("effect", 1)
 		Kind.HEAL:
-			return "H"
+			inst.set("effect", 2)
 		_:
-			return str(lv)
+			pass
+	return inst as BallBehavior

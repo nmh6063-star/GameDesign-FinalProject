@@ -1,7 +1,7 @@
 extends RefCounted
 
 const GameBall := preload("res://script/ball/game_ball.gd")
-const BallBehavior := preload("res://script/ball/behaviors/ball_behavior.gd")
+const SpecialBallBehavior := preload("res://script/ball/behaviors/special_ball_behavior.gd")
 var tolerance := 12.0
 
 func _wake_playfield(root: Node2D) -> void:
@@ -54,7 +54,7 @@ func _touching(seed: GameBall, pool: Array[GameBall]) -> Array[GameBall]:
 func _wave_heal(root: Node2D, template: GameBall) -> int:
 	var balls := _balls(root, template)
 	for b in balls:
-		if b.behavior.kind != BallBehavior.Kind.HEAL:
+		if not b.has_special_effect(SpecialBallBehavior.Effect.HEAL):
 			continue
 		var comp := _touching(b, balls)
 		if comp.size() == 0:
@@ -63,7 +63,6 @@ func _wave_heal(root: Node2D, template: GameBall) -> int:
 		for o in comp:
 			if o.behavior.participates_in_level_merge():
 				sum += o.level
-		# Heal deletes only numbered (NORMAL) balls, not other specials.
 		for o in comp:
 			if o.behavior.participates_in_level_merge():
 				_consume(o)
@@ -76,7 +75,7 @@ func _wave_heal(root: Node2D, template: GameBall) -> int:
 func _wave_mult(root: Node2D, template: GameBall) -> bool:
 	var balls := _balls(root, template)
 	for b in balls:
-		if b.behavior.kind != BallBehavior.Kind.MULTIPLICATION:
+		if not b.has_special_effect(SpecialBallBehavior.Effect.MULTIPLICATION):
 			continue
 		if _touching(b, balls).size() == 0:
 			continue
@@ -94,16 +93,15 @@ func _wave_mult(root: Node2D, template: GameBall) -> bool:
 func _wave_dup(root: Node2D, template: GameBall, wire: Callable) -> bool:
 	var balls := _balls(root, template)
 	for b in balls:
-		if b.behavior.kind != BallBehavior.Kind.DUPLICATION:
+		if not b.has_special_effect(SpecialBallBehavior.Effect.DUPLICATION):
 			continue
 		var comp := _touching(b, balls)
 		var others: Array[GameBall] = []
 		for o in comp:
 			if o != b:
 				others.append(o)
-		# D triggers when it touches at least 2 other balls.
 		for i in range(others.size() - 1, -1, -1):
-			if others[i].behavior.kind == BallBehavior.Kind.DUPLICATION:
+			if others[i].has_special_effect(SpecialBallBehavior.Effect.DUPLICATION):
 				others.remove_at(i)
 		if others.size() < 2:
 			continue
