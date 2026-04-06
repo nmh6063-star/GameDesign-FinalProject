@@ -10,7 +10,7 @@ const PLAYER_DAMAGE_APPLY_INTERVAL := 0.1
 ## Balls within this radius (pixels, global space) get knock-on impulse from merge or shoot.
 const BURST_AREA_RADIUS := 320.0
 ## Extra multiplier on HSlider impulse when the burst comes from shooting (merge uses 1.0).
-const SHOOT_BURST_STRENGTH_MULT := 10.0
+const SHOOT_BURST_STRENGTH_MULT := 100.0
 
 @onready var card_manager: CardManager = get_node("/root/Node2D/CardManager")
 @onready var _ball_query := preload("res://script/ball/resolve/ball_query.gd").new()
@@ -133,7 +133,8 @@ func _active_balls() -> Array[RigidBody2D]:
 
 ## Radial push only for balls inside a circle around `origin_global`, scaled by HSlider × `strength_scale`.
 func _burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -> void:
-	var strength: float = ($"/root/Node2D/HSlider" as HSlider).value * strength_scale
+	#var strength: float = ($"/root/Node2D/HSlider" as HSlider).value * strength_scale
+	var strength: float = 50.0 * sqrt(strength_scale)
 	var r2: float = BURST_AREA_RADIUS * BURST_AREA_RADIUS
 	for node in get_tree().get_nodes_in_group("ball"):
 		if not is_instance_valid(node):

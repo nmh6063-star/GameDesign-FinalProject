@@ -2,7 +2,7 @@ extends Node2D
 
 signal damaged(amount: int)
 
-@export var max_health: int = 50
+@export var max_health: int = 1000
 @export var attack_damage: int = 10
 var current_health: int
 @onready var base = $AnimatedSprite2D.modulate

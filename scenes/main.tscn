@@ -205,6 +205,9 @@ spacing_glyph = -2
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_surface"]
 friction = 2.5
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jkv2x"]
+size = Vector2(376, 39)
+
 [sub_resource type="AtlasTexture" id="AtlasTexture_jyhfs"]
 atlas = ExtResource("3_sugp2")
 region = Rect2(0, 25, 32, 25)
@@ -723,6 +726,10 @@ uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.
 position = Vector2(8, -3)
 scale = Vector2(7.6547318, 8.198811)
 polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Box" unique_id=1523926359]
+position = Vector2(12, -228.5)
+shape = SubResource("RectangleShape2D_jkv2x")
 
 [node name="Player" type="Node2D" parent="." unique_id=1652955601]
 position = Vector2(-144, -187)

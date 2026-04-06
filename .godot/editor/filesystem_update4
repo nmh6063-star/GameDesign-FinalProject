@@ -1,8 +1,3 @@
 res://scenes/main.tscn
-res://script/ball/game_ball.gd
 res://script/session/game_manager.gd
-res://script/ball/resolve/special_ball_resolver.gd
-res://script/core/global.gd
-res://scenes/map.tscn
-res://script/map/map_generator.gd
-res://script/card/library/card_library.gd
+res://script/entities/enemy.gd
