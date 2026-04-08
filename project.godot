@@ -18,7 +18,7 @@ config/icon="res://assets/CapsuleBall.png"
 
 [autoload]
 
-Global="*res://script/core/global.gd"
+RunState="*res://script/core/run_state.gd"
 
 [display]
 

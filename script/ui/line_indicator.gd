@@ -1,8 +1,7 @@
 extends Node2D
 
-const GameBall := preload("res://script/ball/game_ball.gd")
-
 var indicator = preload("res://scenes/indicator_sprite.tscn")
+var _ball
 
 func _ready() -> void:
 	var count = 0
@@ -12,15 +11,14 @@ func _ready() -> void:
 		count += 1
 		add_child(inst)
 
+
+func track_ball(ball) -> void:
+	_ball = ball
+
+
 func _physics_process(_delta: float) -> void:
-	if not is_instance_valid(Global.ballInPlay):
-		visible = false
-		return
-	var b: Node = Global.ballInPlay
-	if b is GameBall and (b as GameBall).set_up:
+	if is_instance_valid(_ball) and _ball.set_up:
 		visible = true
-		if b is Node2D:
-			position.x = (b as Node2D).position.x
+		position.x = _ball.position.x
 	else:
 		visible = false
-		

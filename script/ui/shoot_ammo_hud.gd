@@ -13,13 +13,6 @@ func _ready() -> void:
 	for p in _pips_parent.get_children():
 		if p is Panel:
 			_style_circle_panel(p as Panel, 7, _PIP_EMPTY)
-	var gm := get_node_or_null("/root/Main/GameManager")
-	if gm == null:
-		return
-	if gm.has_signal("shoot_ammo_changed"):
-		gm.shoot_ammo_changed.connect(_on_shoot_ammo_changed)
-	if gm.has_method("emit_shoot_ammo_sync"):
-		gm.emit_shoot_ammo_sync()
 
 
 func _style_circle_panel(p: Panel, corner_radius: int, col: Color) -> void:
@@ -29,9 +22,7 @@ func _style_circle_panel(p: Panel, corner_radius: int, col: Color) -> void:
 	p.add_theme_stylebox_override("panel", sb)
 
 
-func _on_shoot_ammo_changed(
-	bullets: int, max_bullets: int, merge_progress: int, merges_per_bullet: int
-) -> void:
+func sync_state(bullets: int, merge_progress: int, merges_per_bullet: int) -> void:
 	_meter_fill.size.x = maxf(
 		0.0, _METER_INNER_WIDTH * float(merge_progress) / float(max(merges_per_bullet, 1))
 	)

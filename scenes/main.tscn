@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://tt07u0d3npdi"]
 
 [ext_resource type="Script" uid="uid://bu5eudvsydkcp" path="res://script/ball/game_ball.gd" id="1_o5qli"]
-[ext_resource type="Script" uid="uid://d4aeon1ejqkxx" path="res://script/session/game_manager.gd" id="2_gm"]
+[ext_resource type="Script" path="res://script/battle/battle_controller.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cb5hmafbmxhfj" path="res://assets/WoodBack.png" id="3_o6xl0"]
 [ext_resource type="Texture2D" uid="uid://c705s3lh6osjc" path="res://assets/slime-Sheet.png" id="3_sugp2"]
 [ext_resource type="Texture2D" uid="uid://dxxvadmvkcnn5" path="res://assets/grassland.png" id="3_tipki"]
@@ -14,158 +14,9 @@
 [ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
-
-[sub_resource type="GDScript" id="GDScript_0wfyh"]
-script/source = "extends Node2D
-
-const GameBall := preload(\"res://script/ball/game_ball.gd\")
-
-@onready var template_ball: Node = $Ball
-@onready var player_fill := $UI/PlayerHealthBar/Fill
-@onready var player_hp_top := $UI/TopBar/PlayerHPText
-@onready var energy_label := get_node_or_null(\"UI/EnergyLabel\")
-@onready var energy_badge_text := get_node_or_null(\"UI/CostBadge/CostText\")
-@onready var result_label := $UI/ResultLabel
-@onready var game_manager := $GameManager
-@onready var enemy_node := $EnemyHolder/Enemy
-@onready var player_damage_anchor := $UI/PlayerHealthBar
-@onready var damage_anchor_player := get_node_or_null(\"UI/DamageAnchorPlayer\")
-@onready var damage_anchor_enemy := get_node_or_null(\"UI/DamageAnchorEnemy\")
-
-var spawn_position: Vector2
-
-func _ready() -> void:
-	randomize()
-	spawn_position = (template_ball as Node2D).position
-	template_ball.connect(\"dropped\", _on_ball_dropped)
-	((template_ball as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = true
-	game_manager.attack_calculated.connect(_on_attack_calculated)
-	enemy_node.player_attacked.connect(_on_player_attacked)
-	game_manager.player_healed.connect(_on_player_healed)
-	game_manager.turn_ended.connect(_on_turn_ended)
-	game_manager.energy_changed.connect(_on_energy_changed)
-	if enemy_node and enemy_node.has_signal(\"damaged\"):
-		enemy_node.damaged.connect(_on_enemy_damaged)
-	game_manager.game_over.connect(_on_game_over)
-	game_manager.game_clear.connect(_on_game_clear)
-	_update_player_bar()
-	update_energy_ui()
-	result_label.visible = false
-	ensure_ball_in_play()
-
-func _on_ball_dropped() -> void:
-	if Global.phase != Global.Phase.PLAY:
-		return
-	await get_tree().create_timer(1.0).timeout
-	_spawn_ball()
-
-func wire_playfield_ball(b: GameBall) -> void:
-	if not b.dropped.is_connected(_on_ball_dropped):
-		b.dropped.connect(_on_ball_dropped)
-
-func _on_player_healed(_amount: int) -> void:
-	_update_player_bar()
-
-func _spawn_ball() -> void:
-	var b := template_ball.duplicate() as GameBall
-	Global.ballInPlay = b
-	(b as Node2D).position = spawn_position
-	b.reset_for_spawn()
-	_randomize_ball(b)
-	b.gravity_scale = 0.0
-	((b as Node).get_node(\"CollisionShape2D\") as CollisionShape2D).disabled = false
-	wire_playfield_ball(b)
-	add_child(b)
-	b.visible = true
-	b.set_up = true
-	b._update_collision()
-	b.queue_redraw()
-
-func _randomize_ball(b: GameBall) -> void:
-	var BallBehavior := preload(\"res://script/ball/behaviors/ball_behavior.gd\")
-	var roll := randi() % 6
-	if roll < 4:
-		b.behavior = BallBehavior.from_kind(BallBehavior.Kind.NORMAL)
-		b.level = roll + 1
-	elif roll == 4:
-		b.behavior = BallBehavior.from_kind(BallBehavior.Kind.DUPLICATION)
-		b.level = 1
-	else:
-		b.behavior = BallBehavior.from_kind(BallBehavior.Kind.MULTIPLICATION)
-		b.level = 1
-
-func ensure_ball_in_play() -> void:
-	if Global.phase != Global.Phase.PLAY:
-		return
-	if is_instance_valid(Global.ballInPlay) and Global.ballInPlay != template_ball:
-		return
-	_spawn_ball()
-
-func _on_turn_ended() -> void:
-	ensure_ball_in_play()
-
-
-func _on_attack_calculated(amount: int) -> void:
-	pass
-
-func _on_player_attacked(_amount: int) -> void:
-	$PlayerHolder/Player._flash()
-	_update_player_bar()
-	if damage_anchor_player:
-		_spawn_damage_floater_on_node(_amount, damage_anchor_player, Color(1, 0.3, 0.3))
-	else:
-		_spawn_damage_floater_on_node(_amount, player_damage_anchor, Color(1, 0.3, 0.3))
-
-func _on_enemy_damaged(amount: int) -> void:
-	$EnemyHolder/Enemy._flash()
-	if damage_anchor_enemy:
-		_spawn_damage_floater_on_node(amount, damage_anchor_enemy, Color(0.92, 0.58, 0.06))
-	else:
-		_spawn_damage_floater_on_node(amount, enemy_node, Color(0.92, 0.58, 0.06))
-
-func _on_energy_changed(_current: int, _max: int) -> void:
-	update_energy_ui()
-
-func _spawn_damage_floater_on_node(amount: int, target: Node, color: Color) -> void:
-	if amount <= 0 or target == null:
-		return
-	var floater := preload(\"res://scenes/damage_floater.tscn\").instantiate()
-	$UI.add_child(floater)
-	var pos := Vector2.ZERO
-	if target is Node2D:
-		pos = (target as Node2D).global_position
-	elif target is Control:
-		pos = (target as Control).global_position
-	(floater as Label).global_position = pos
-	if floater.has_method(\"play\"):
-		floater.play(amount, color)
-
-
-func _update_player_bar() -> void:
-	player_fill.size.x = 100.0 * float(Global.player_health) / float(Global.player_max_health)
-	var hp_text := $UI/PlayerHealthBar/HPText
-	if hp_text:
-		hp_text.text = \"%d/%d\" % [Global.player_health, Global.player_max_health]
-	if player_hp_top:
-		player_hp_top.text = \"%d/%d\" % [Global.player_health, Global.player_max_health]
-
-func update_energy_ui() -> void:
-	if energy_label:
-		energy_label.visible = true
-		energy_label.text = \"Energy\"
-	if energy_badge_text:
-		energy_badge_text.text = \"%d/%d\" % [Global.player_energy, Global.player_energy_max]
-
-func _on_game_over() -> void:
-	_show_result(\"Game Over\")
-
-func _on_game_clear() -> void:
-	_show_result(\"Game Clear\")
-
-func _show_result(text: String) -> void:
-	result_label.text = text
-	result_label.visible = true
-"
+[ext_resource type="Resource" path="res://content/balls/attack_ball.tres" id="16_attack_ball"]
+[ext_resource type="Resource" path="res://content/enemies/slime.tres" id="17_enemy_data"]
+[ext_resource type="Script" path="res://script/ui/timer_ring.gd" id="18_timer_ring"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
@@ -351,9 +202,8 @@ friction = 2.5
 
 [node name="Main" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
-script = SubResource("GDScript_0wfyh")
 
-[node name="GameManager" type="Node2D" parent="." unique_id=1775782920]
+[node name="BattleController" type="Node2D" parent="." unique_id=1775782920]
 script = ExtResource("2_gm")
 
 [node name="LineIndicator" type="Node2D" parent="." unique_id=692861044]
@@ -372,6 +222,7 @@ max_contacts_reported = 1
 linear_damp = 4.0
 angular_damp = 4.0
 script = ExtResource("1_o5qli")
+data = ExtResource("16_attack_ball")
 
 [node name="Sprite2D" type="Sprite2D" parent="Ball" unique_id=1556687559]
 texture_filter = 1
@@ -642,6 +493,7 @@ one_shot = true
 [node name="Enemy" type="Node2D" parent="EnemyHolder" unique_id=144872954]
 position = Vector2(0, -230)
 script = ExtResource("4_enemy")
+data = ExtResource("17_enemy_data")
 
 [node name="HealthBar" type="Control" parent="EnemyHolder/Enemy" unique_id=9001001]
 layout_mode = 3
@@ -694,10 +546,22 @@ frame_progress = 0.18569645
 [node name="Timer" type="Timer" parent="EnemyHolder/Enemy" unique_id=1336342294]
 wait_time = 0.1
 
-[node name="Timer2" type="Timer" parent="EnemyHolder/Enemy" unique_id=421151047]
-wait_time = 5.0
+[node name="AttackCooldown" type="Timer" parent="EnemyHolder/Enemy"]
 one_shot = true
-autostart = true
+
+[node name="CooldownRing" type="Node2D" parent="EnemyHolder/Enemy"]
+position = Vector2(620, 118)
+script = ExtResource("18_timer_ring")
+
+[node name="Label" type="Label" parent="EnemyHolder/Enemy/CooldownRing"]
+offset_left = -12.0
+offset_top = -9.0
+offset_right = 12.0
+offset_bottom = 9.0
+theme_override_font_sizes/font_size = 10
+text = "20"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Assets" type="Node2D" parent="." unique_id=1116332561]
 
@@ -738,4 +602,4 @@ polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.1
 
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
 [connection signal="timeout" from="EnemyHolder/Enemy/Timer" to="EnemyHolder/Enemy" method="_on_timer_timeout"]
-[connection signal="timeout" from="EnemyHolder/Enemy/Timer2" to="EnemyHolder/Enemy" method="_on_timer_2_timeout"]
+[connection signal="timeout" from="EnemyHolder/Enemy/AttackCooldown" to="EnemyHolder/Enemy" method="_on_attack_cooldown_timeout"]

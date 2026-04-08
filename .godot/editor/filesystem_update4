@@ -1,0 +1,17 @@
+res://script/ball/game_ball.gd
+res://script/ball/behaviors/ball_behavior.gd
+res://script/ball/resolve/special_ball_resolver.gd
+res://script/entities/enemy.gd
+res://script/entities/player.gd
+res://script/map/map_generator.gd
+res://script/map/map_tile.gd
+res://script/ui/line_indicator.gd
+res://script/ui/shoot_ammo_hud.gd
+res://script/core/run_state.gd
+res://script/battle/battle_state.gd
+res://script/battle/battle_context.gd
+res://script/battle/battle_controller.gd
+res://content/enemies/slime.tres
+res://script/enemy/enemy_data.gd
+res://script/enemy/actions/direct_attack_action.gd
+res://script/battle/battle_rules.gd

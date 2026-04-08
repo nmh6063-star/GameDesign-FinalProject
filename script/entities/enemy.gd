@@ -1,55 +1,86 @@
 extends Node2D
+class_name BattleEnemy
 
 signal damaged(amount: int)
+signal defeated
+signal action_requested
 
-@export var max_health: int = 50
-@export var attack_damage: int = 10
-var current_health: int
-@onready var base = $AnimatedSprite2D.modulate
-@onready var timer2 = $Timer2
-@onready var startPos = self.position
-@onready var player = get_node("/root/Main/PlayerHolder/Player")
-var time = 0.0
-signal player_attacked(amount: int)
+@export var data: EnemyData
 
+var current_health := 0
+
+@onready var _base_modulate: Color = $AnimatedSprite2D.modulate
+@onready var _attack_cooldown := $AttackCooldown as Timer
+@onready var _cooldown_ring = $CooldownRing
 
 const BAR_WIDTH := 98.0
-const BAR_HEIGHT := 10.0
+
 
 func _ready() -> void:
 	add_to_group("enemy")
-	current_health = max_health
-	_update_bar()
+	reset()
 
-func apply_attack(amount: int) -> void:
+
+func setup() -> void:
+	reset()
+
+
+func reset() -> void:
+	current_health = data.max_health
+	($AnimatedSprite2D as AnimatedSprite2D).play("idle")
+	_update_bar()
+	_restart_attack_cooldown()
+
+
+func apply_damage(amount: int) -> void:
+	if amount <= 0 or current_health <= 0:
+		return
 	damaged.emit(amount)
 	current_health = max(current_health - amount, 0)
 	_update_bar()
-	if current_health <= 0:
-		(get_node("AnimatedSprite2D") as AnimatedSprite2D).play("die")
+	if current_health == 0:
+		_attack_cooldown.stop()
+		_cooldown_ring.visible = false
+		($AnimatedSprite2D as AnimatedSprite2D).play("die")
+		defeated.emit()
+
 
 func _update_bar() -> void:
-	(get_node("HealthBar/Fill") as ColorRect).size.x = BAR_WIDTH * float(current_health) / float(max_health)
-	var hp_text := get_node_or_null("HealthBar/HPText") as Label
-	if hp_text:
-		hp_text.text = "%d/%d" % [current_health, max_health]
+	($HealthBar/Fill as ColorRect).size.x = BAR_WIDTH * float(current_health) / float(data.max_health)
+	($HealthBar/HPText as Label).text = "%d/%d" % [current_health, data.max_health]
 
-func _flash():
+
+func flash() -> void:
 	$AnimatedSprite2D.modulate = Color(18.892, 0.0, 0.0)
 	$Timer.start()
 
 
 func _on_timer_timeout() -> void:
-	$AnimatedSprite2D.modulate = base
+	$AnimatedSprite2D.modulate = _base_modulate
 
-func _physics_process(delta: float) -> void:
-	time += delta
-	var weight = time / 5.0
-	position = startPos.lerp(Vector2(player.position.x * 5, self.position.y), weight)
-	
-func _on_timer_2_timeout() -> void:
-	player_attacked.emit(10)
-	Global.player_health = max(Global.player_health - 10, 0)
-	self.position = startPos
-	time = 0
-	timer2.start()
+
+func _process(_delta: float) -> void:
+	if current_health <= 0:
+		return
+	_update_cooldown_ring()
+
+
+func _restart_attack_cooldown() -> void:
+	if data.attack_interval <= 0.0:
+		_attack_cooldown.stop()
+		_cooldown_ring.visible = false
+		return
+	_attack_cooldown.wait_time = data.attack_interval
+	_attack_cooldown.start()
+	_update_cooldown_ring()
+
+
+func _update_cooldown_ring() -> void:
+	_cooldown_ring.sync(_attack_cooldown.time_left, data.attack_interval)
+
+
+func _on_attack_cooldown_timeout() -> void:
+	if current_health <= 0:
+		return
+	action_requested.emit()
+	_restart_attack_cooldown()
