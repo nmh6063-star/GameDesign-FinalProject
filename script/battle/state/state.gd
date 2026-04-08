@@ -1,7 +1,7 @@
 extends RefCounted
 class_name BattleState
 
-const ShootAmmo := preload("res://script/combat/shoot_ammo.gd")
+const ShootAmmo := preload("res://script/battle/state/ammo.gd")
 
 enum Phase { PLAY, RESOLVE }
 
