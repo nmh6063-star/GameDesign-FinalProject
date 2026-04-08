@@ -14,6 +14,7 @@ script = ExtResource("3_ball_effect")
 script = ExtResource("1_ball_data")
 id = "ball_heal"
 display_name = "Heal Ball"
+description = "Consumes touched normal balls and heals you by their total value."
 tags = PackedStringArray("heal")
 spawn_weight = 1
 spawn_levels = PackedInt32Array(1)

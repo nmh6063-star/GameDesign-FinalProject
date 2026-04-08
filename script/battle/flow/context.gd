@@ -43,6 +43,14 @@ func duplicate_ball(source, offset: Vector2 = Vector2.ZERO):
 	return controller.spawn_ball_copy(source, offset)
 
 
+func spawn_ball(scene_path: String, origin_global: Vector2, impulse: Vector2 = Vector2.ZERO, level: int = 1):
+	return controller.spawn_ball(scene_path, origin_global, impulse, level)
+
+
+func drop_ball_in_box(scene_path: String, level: int = 1):
+	return controller.drop_ball_in_box(scene_path, level)
+
+
 func wake_playfield() -> void:
 	controller.wake_playfield()
 

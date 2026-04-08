@@ -10,6 +10,5 @@ script = ExtResource("2_enemy_action")
 [resource]
 script = ExtResource("1_enemy_data")
 id = "enemy1"
-display_name = "Slime"
-attack_interval = 20.0
+display_name = "Enemy1"
 actions = Array[ExtResource("1_b8o6g")]([SubResource("DirectAttackAction_1")])

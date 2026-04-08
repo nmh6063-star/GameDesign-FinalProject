@@ -27,3 +27,9 @@ res://script/map/map_controller.gd
 res://script/map/map_generator.gd
 res://script/run/run_state.gd
 res://scenes/reward.tscn
+res://scenes/damage_floater.tscn
+res://script/ui/damage_floater.gd
+res://script/battle/contracts/ball_effect.gd
+res://scenes/reward_selection.tscn
+res://script/ui/reward_selection.gd
+res://script/enemy/actions/bomb_drop_action.gd

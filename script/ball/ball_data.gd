@@ -5,6 +5,7 @@ const NO_COLOR_STEP := Color(0, 0, 0, 0)
 
 @export var id := ""
 @export var display_name := ""
+@export_multiline var description := ""
 @export var tags: PackedStringArray = []
 @export var spawn_weight := 1
 @export var spawn_levels := PackedInt32Array([1])

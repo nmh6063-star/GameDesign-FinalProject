@@ -9,13 +9,14 @@ const BattleHud := preload("res://script/battle/ui/hud.gd")
 const BattleState := preload("res://script/battle/state/state.gd")
 const BattleContext := preload("res://script/battle/flow/context.gd")
 const BattleRules := preload("res://script/battle/flow/rules.gd")
+const REWARD_SELECTION_SCENE := preload("res://scenes/reward_selection.tscn")
 
+const ATTACK_CLOCK_MODE = BattleEnemy.AttackClock.PER_BALL_DROP
 const BALL_SCENE_DIR := "res://scenes/balls"
 const MERGE_SETTLE_TIME := 0.5
 const BURST_AREA_RADIUS := 320.0
 const SHOOT_BURST_STRENGTH_MULT := 10.0
 const BURST_STRENGTH := 35.0
-const AMPLIFIER_SHOT_MULT := 1.5
 const PLAYER_DAMAGE_COLOR := Color(1, 0.3, 0.3)
 const ENEMY_DAMAGE_COLOR := Color(0.92, 0.58, 0.06)
 const HEAL_COLOR := Color(0.35, 0.92, 0.55)
@@ -47,7 +48,31 @@ func _ready() -> void:
 func _initialize() -> void:
 	randomize()
 	_state.reset_for_battle()
-	_box = BattleBox.new(_root, _ball_placeholder, _state, _target, _on_ball_dropped, BALL_SCENE_DIR)
+	_show_reward_selection()
+
+
+func _show_reward_selection() -> void:
+	var reward: RewardSelectionOverlay = REWARD_SELECTION_SCENE.instantiate() as RewardSelectionOverlay
+	_root.add_child(reward)
+	reward.continued.connect(_on_reward_selection_continued)
+
+
+func _on_reward_selection_continued(scene_paths: Array[String]) -> void:
+	for scene_path in scene_paths:
+		RunState.add_ball_to_pool(scene_path)
+	_start_stage()
+
+
+func _start_stage() -> void:
+	_box = BattleBox.new(
+		_root,
+		_ball_placeholder,
+		_state,
+		_target,
+		_on_ball_dropped,
+		BALL_SCENE_DIR,
+		RunState.ball_pool_paths()
+	)
 	_spawn_enemies()
 	_target.z_index = 999
 	_hud.clear_result()
@@ -94,6 +119,9 @@ func consume_ball(ball: GameBall) -> void:
 	_box.consume(ball)
 
 func spawn_ball_copy(source: GameBall, offset: Vector2 = Vector2.ZERO) -> GameBall: return _box.spawn_copy(source, offset)
+func spawn_ball(scene_path: String, origin_global: Vector2, impulse: Vector2 = Vector2.ZERO, level: int = 1) -> GameBall:
+	return _box.spawn_scene(scene_path, level, origin_global, impulse)
+func drop_ball_in_box(scene_path: String, level: int = 1) -> GameBall: return _box.drop_scene(scene_path, level)
 func wake_playfield() -> void: _box.wake()
 
 func heal_player(amount: int) -> void:
@@ -160,8 +188,8 @@ func _shoot() -> void:
 		var ball: GameBall = body as GameBall
 		hit_balls.append(ball)
 		damage_total += ball.level
-		if ball.has_tag("amplifier"):
-			damage_mult *= AMPLIFIER_SHOT_MULT
+		for effect in ball.data.effects:
+			damage_mult *= effect.shot_multiplier(ball)
 	if damage_total > 0:
 		damage_enemy(int(round(float(damage_total) * damage_mult)), target_enemy)
 	for ball in hit_balls:
@@ -178,6 +206,8 @@ func _on_ball_dropped() -> void:
 	_state.begin_resolution()
 	await get_tree().create_timer(MERGE_SETTLE_TIME).timeout
 	_state.lock_resolution()
+	_advance_enemy_attack_clocks()
+	_sync_enemy_views()
 	if _hud.has_result():
 		_turn_running = false
 		return
@@ -221,8 +251,17 @@ func _step_enemy_selection(step: int) -> void:
 
 func _spawn_enemies() -> void:
 	for holder in _enemy_holders:
-		var enemy: BattleEnemy = holder.spawn_enemy()
+		var enemy: BattleEnemy = holder.spawn_enemy(ATTACK_CLOCK_MODE)
 		if enemy != null: enemy.action_requested.connect(_on_enemy_action_requested.bind(enemy))
+
+func _advance_enemy_attack_clocks() -> void:
+	if ATTACK_CLOCK_MODE != BattleEnemy.AttackClock.PER_BALL_DROP:
+		return
+	for holder in _enemy_holders:
+		if _hud.has_result():
+			return
+		if holder.enemy != null:
+			holder.enemy.advance_attack_clock()
 
 func _sync_player_bar() -> void:
 	_player_fill.size.x = _player_bar.size.x * float(RunState.player_health) / float(RunState.player_max_health)

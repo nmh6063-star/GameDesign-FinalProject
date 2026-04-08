@@ -14,6 +14,7 @@ script = ExtResource("3_ball_effect")
 script = ExtResource("1_ball_data")
 id = "ball_duplication"
 display_name = "Duplication Ball"
+description = "When it touches enough normal balls, it creates copies of them."
 tags = PackedStringArray("duplicate")
 spawn_weight = 1
 spawn_levels = PackedInt32Array(1)

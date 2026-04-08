@@ -12,19 +12,23 @@ var _target: Node2D
 var _on_ball_dropped: Callable
 var _spawn_pool: Array = []
 var _queue: Array = []
+var _drop_left_x: float
+var _drop_right_x: float
+var _drop_y: float
 
-func _init(root: Node2D, ball_placeholder: GameBall, state, target: Node2D, on_ball_dropped: Callable, scene_dir: String) -> void:
+func _init(root: Node2D, ball_placeholder: GameBall, state, target: Node2D, on_ball_dropped: Callable, scene_dir: String, scene_paths: Array[String] = []) -> void:
 	_root = root
 	_ball_parent = ball_placeholder.get_parent()
 	_ball_placeholder = ball_placeholder
 	_state = state
 	_target = target
 	_on_ball_dropped = on_ball_dropped
-	_spawn_pool = _load_ball_pool(scene_dir)
+	_spawn_pool = _load_ball_pool(scene_dir, scene_paths)
 	assert(not _spawn_pool.is_empty(), "No ball scenes found in %s" % scene_dir)
 	_fill_queue()
 	_ball_placeholder.set_runtime(_state, _target)
 	_ball_placeholder.set_collision_enabled(false)
+	_capture_drop_bounds()
 
 
 func active() -> Array:
@@ -48,6 +52,34 @@ func consume(ball: GameBall) -> void:
 
 func spawn_copy(source: GameBall, offset: Vector2 = Vector2.ZERO) -> GameBall:
 	return _spawn_instance(source.duplicate() as GameBall, source.data, source.level, source.position + offset, false)
+
+
+func spawn_scene(scene_path: String, level: int, global_position: Vector2, impulse: Vector2 = Vector2.ZERO) -> GameBall:
+	var scene := load(scene_path) as PackedScene
+	if scene == null:
+		return null
+	var ball := scene.instantiate() as GameBall
+	if ball == null or ball.data == null:
+		return null
+	var spawned := _spawn_instance(ball, ball.data, level, _ball_placeholder.position, false)
+	spawned.global_position = global_position
+	spawned.apply_central_impulse(impulse)
+	spawned.sleeping = false
+	return spawned
+
+
+func drop_scene(scene_path: String, level: int = 1) -> GameBall:
+	var scene := load(scene_path) as PackedScene
+	if scene == null:
+		return null
+	var ball := scene.instantiate() as GameBall
+	if ball == null or ball.data == null:
+		return null
+	var radius: float = ball.data.radius_for_level(level)
+	var x: float = randf_range(_drop_left_x + radius, _drop_right_x - radius)
+	var spawned := _spawn_instance(ball, ball.data, level, Vector2(x, _drop_y), false)
+	spawned.sleeping = false
+	return spawned
 
 
 func spawn_setup_ball() -> GameBall:
@@ -82,12 +114,15 @@ func _spawn_instance(ball: GameBall, data, level: int, position: Vector2, is_set
 	return ball
 
 
-func _load_ball_pool(scene_dir: String) -> Array:
+func _load_ball_pool(scene_dir: String, scene_paths: Array[String]) -> Array:
 	var pool: Array = []
-	for file_name in DirAccess.get_files_at(scene_dir):
-		if not file_name.ends_with(".tscn"):
-			continue
-		var scene := load("%s/%s" % [scene_dir, file_name]) as PackedScene
+	var paths: Array[String] = scene_paths.duplicate()
+	if paths.is_empty():
+		for file_name in DirAccess.get_files_at(scene_dir):
+			if file_name.ends_with(".tscn"):
+				paths.append("%s/%s" % [scene_dir, file_name])
+	for scene_path in paths:
+		var scene := load(scene_path) as PackedScene
 		if scene == null:
 			continue
 		var ball := scene.instantiate() as GameBall
@@ -121,3 +156,17 @@ func _roll_ball_entry() -> Dictionary:
 			return {"scene": entry["scene"], "data": entry["data"], "level": entry["data"].random_spawn_level()}
 	var entry: Dictionary = _spawn_pool[0]
 	return {"scene": entry["scene"], "data": entry["data"], "level": entry["data"].random_spawn_level()}
+
+
+func _capture_drop_bounds() -> void:
+	_drop_y = _ball_placeholder.position.y
+	var interior := _root.get_node("Background/Box/Interior") as Polygon2D
+	var points := interior.polygon
+	_drop_left_x = INF
+	_drop_right_x = -INF
+	for point in points:
+		var x: float = interior.to_global(point).x
+		_drop_left_x = minf(_drop_left_x, x)
+		_drop_right_x = maxf(_drop_right_x, x)
+	_drop_left_x -= _root.global_position.x
+	_drop_right_x -= _root.global_position.x

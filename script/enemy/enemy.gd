@@ -1,6 +1,8 @@
 extends Node2D
 class_name BattleEnemy
 
+enum AttackClock { REAL_TIME, PER_BALL_DROP }
+
 signal damaged(amount: int)
 signal defeated
 signal action_requested
@@ -8,6 +10,8 @@ signal action_requested
 @export var data: EnemyData
 
 var current_health := 0
+var _attack_clock_mode: int = AttackClock.REAL_TIME
+var _drop_cooldown_left: float = 0.0
 
 @onready var _base_modulate: Color = $AnimatedSprite2D.modulate
 @onready var _attack_cooldown := $AttackCooldown as Timer
@@ -17,7 +21,8 @@ func _ready() -> void:
 	reset()
 
 
-func setup() -> void:
+func setup(attack_clock_mode: int = AttackClock.REAL_TIME) -> void:
+	_attack_clock_mode = attack_clock_mode
 	reset()
 
 
@@ -36,6 +41,7 @@ func apply_damage(amount: int) -> void:
 	damaged.emit(applied)
 	current_health -= applied
 	if current_health == 0:
+		_drop_cooldown_left = 0.0
 		_attack_cooldown.stop()
 		$Timer.stop()
 		($AnimatedSprite2D as AnimatedSprite2D).stop()
@@ -45,7 +51,22 @@ func apply_damage(amount: int) -> void:
 
 
 func cooldown_left() -> float:
+	if _attack_clock_mode == AttackClock.PER_BALL_DROP:
+		return _drop_cooldown_left
 	return _attack_cooldown.time_left
+
+
+func cooldown_total() -> float:
+	return data.attack_interval
+
+
+func advance_attack_clock(steps: float = 1.0) -> void:
+	if _attack_clock_mode != AttackClock.PER_BALL_DROP or current_health <= 0 or data.attack_interval <= 0.0:
+		return
+	_drop_cooldown_left -= steps
+	while current_health > 0 and _drop_cooldown_left <= 0.0:
+		action_requested.emit()
+		_drop_cooldown_left += data.attack_interval
 
 
 func flash() -> void:
@@ -58,7 +79,11 @@ func _on_timer_timeout() -> void:
 
 
 func _restart_attack_cooldown() -> void:
+	_drop_cooldown_left = data.attack_interval
 	if data.attack_interval <= 0.0:
+		_attack_cooldown.stop()
+		return
+	if _attack_clock_mode == AttackClock.PER_BALL_DROP:
 		_attack_cooldown.stop()
 		return
 	_attack_cooldown.wait_time = data.attack_interval
@@ -66,7 +91,7 @@ func _restart_attack_cooldown() -> void:
 
 
 func _on_attack_cooldown_timeout() -> void:
-	if current_health <= 0:
+	if _attack_clock_mode != AttackClock.REAL_TIME or current_health <= 0:
 		return
 	action_requested.emit()
 	_restart_attack_cooldown()

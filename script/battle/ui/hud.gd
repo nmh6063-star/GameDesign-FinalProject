@@ -1,10 +1,12 @@
 extends CanvasLayer
 class_name BattleHud
 
-const DAMAGE_FLOATER_SCENE := preload("res://scenes/damage_floater.tscn")
 const GameBall := preload("res://script/ball/game_ball.gd")
 const ShootAmmo := preload("res://script/battle/state/ammo.gd")
 const QUEUE_SIZE := 5
+const DAMAGE_RISE_PX := 60.0
+const DAMAGE_DURATION := 0.8
+const DAMAGE_FONT_PX := 46
 
 var _has_result := false
 var _queue_keys: Array[String] = []
@@ -55,10 +57,21 @@ func sync_shoot_ammo(bullets: int, merge_progress: int) -> void:
 func show_damage(amount: int, anchor: Marker2D, color: Color) -> void:
 	if amount <= 0:
 		return
-	var floater = DAMAGE_FLOATER_SCENE.instantiate()
+	var floater := Label.new()
 	add_child(floater)
-	(floater as Label).global_position = anchor.global_position
-	floater.play(amount, color)
+	floater.global_position = anchor.global_position
+	floater.text = str(amount)
+	floater.modulate = color
+	floater.modulate.a = 1.0
+	floater.scale = Vector2.ONE
+	floater.add_theme_font_size_override("font_size", DAMAGE_FONT_PX)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(floater, "position", floater.position + Vector2(0, -DAMAGE_RISE_PX), DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "scale", Vector2(1.48, 1.48), DAMAGE_DURATION * 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "modulate:a", 0.0, DAMAGE_DURATION).set_delay(DAMAGE_DURATION * 0.15)
+	tween.set_parallel(false)
+	tween.tween_callback(floater.queue_free)
 
 
 func clear_result() -> void:

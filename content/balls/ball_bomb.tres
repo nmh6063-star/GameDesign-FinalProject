@@ -14,6 +14,7 @@ script = ExtResource("3_ball_effect")
 script = ExtResource("1_ball_data")
 id = "ball_bomb"
 display_name = "Bomb Ball"
+description = "Starts blinking after drop. After 3 seconds, it destroys all balls in a radius."
 tags = PackedStringArray("bomb")
 spawn_weight = 1
 spawn_levels = PackedInt32Array(1)

@@ -10,6 +10,7 @@ script = ExtResource("2_merge_rule")
 script = ExtResource("1_ball_data")
 id = "ball_normal"
 display_name = "Normal Ball"
+description = "Basic ball. Merge equal levels together to grow bigger numbers."
 tags = PackedStringArray("normal")
 spawn_weight = 4
 spawn_levels = PackedInt32Array(1, 2, 3, 4)
