@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
-[ext_resource type="Resource" uid="uid://c41q4ecxfm1pc" path="res://content/balls/attack_ball.tres" id="16_attack_ball"]
+[ext_resource type="Resource" uid="uid://c41q4ecxfm1pc" path="res://content/balls/ball_normal.tres" id="16_attack_ball"]
 [ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
 [ext_resource type="Script" uid="uid://b7jt8672nor2y" path="res://script/enemy/holder.gd" id="18_holder"]

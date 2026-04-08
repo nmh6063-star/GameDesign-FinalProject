@@ -17,6 +17,7 @@ var ui_preview := false
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
 const OUTLINE_POINTS := 64
+const FALLBACK_RADIUS := 20.0
 
 
 func _ready() -> void:
@@ -54,6 +55,8 @@ func set_preview(ball_data: BallData, ball_level: int) -> void:
 
 
 func refresh() -> void:
+	if data == null:
+		return
 	_update_collision()
 	queue_redraw()
 
@@ -68,15 +71,15 @@ func set_playfield_state(is_set_up: bool) -> void:
 
 
 func participates_in_level_merge() -> bool:
-	return data.participates_in_level_merge()
+	return data != null and data.participates_in_level_merge()
 
 
 func has_tag(tag: String) -> bool:
-	return data.has_tag(tag)
+	return data != null and data.has_tag(tag)
 
 
 func get_radius() -> float:
-	return data.radius_for_level(level)
+	return FALLBACK_RADIUS if data == null else data.radius_for_level(level)
 
 
 func _update_collision() -> void:
@@ -94,9 +97,11 @@ func merge_into_me() -> void:
 
 
 func _draw() -> void:
+	if data == null:
+		return
 	var radius := get_radius()
 	var color := data.display_color(level)
-	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, color, OUTLINE_WIDTH, true)
+	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(level), OUTLINE_WIDTH, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale

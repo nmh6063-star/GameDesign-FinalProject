@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://ol0vho2704ta"]
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://ccm0sfixdaq8o"]
 
 [ext_resource type="Script" uid="uid://bcjr8w352653g" path="res://script/battle/contracts/enemy_action.gd" id="1_b8o6g"]
 [ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/enemy/enemy_data.gd" id="1_enemy_data"]
@@ -9,7 +9,7 @@ script = ExtResource("2_enemy_action")
 
 [resource]
 script = ExtResource("1_enemy_data")
-id = "slime"
+id = "enemy1"
 display_name = "Slime"
 attack_interval = 20.0
 actions = Array[ExtResource("1_b8o6g")]([SubResource("DirectAttackAction_1")])

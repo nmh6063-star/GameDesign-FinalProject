@@ -33,10 +33,10 @@ func sync_ball_queue(items: Array) -> void:
 		var item: Dictionary = items[i]
 		var ball: GameBall = (item["scene"] as PackedScene).instantiate() as GameBall
 		ball.ui_preview = true
+		ball.set_preview(item["data"], item["level"])
 		root.add_child(ball)
 		ball.position = Vector2.ZERO
 		ball.scale = Vector2.ONE * 0.72
-		ball.set_preview(item["data"], item["level"])
 	_queue_keys = next_keys
 
 

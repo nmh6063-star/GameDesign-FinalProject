@@ -1,7 +1,6 @@
 [gd_resource type="Resource" script_class="BallData" format=3 uid="uid://c41q4ecxfm1pc"]
 
 [ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/ball/ball_data.gd" id="1_ball_data"]
-[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/battle/contracts/ball_effect.gd" id="1_ftoij"]
 [ext_resource type="Script" uid="uid://bswwfy6pwsle3" path="res://script/ball/merge_rules/level_merge_rule.gd" id="2_merge_rule"]
 
 [sub_resource type="Resource" id="LevelMergeRule_1"]
@@ -9,8 +8,8 @@ script = ExtResource("2_merge_rule")
 
 [resource]
 script = ExtResource("1_ball_data")
-id = "attack_ball"
-display_name = "Attack Ball"
+id = "ball_normal"
+display_name = "Normal Ball"
 spawn_weight = 4
 spawn_levels = PackedInt32Array(1, 2, 3, 4)
 tint = Color(0.35, 0.74, 0.3, 1)

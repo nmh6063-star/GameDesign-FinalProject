@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://script/ball/game_ball.gd" id="1_ball"]
 [ext_resource type="Texture2D" path="res://assets/CapsuleBall.png" id="2_texture"]
 [ext_resource type="FontFile" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_font"]
-[ext_resource type="Resource" path="res://content/balls/attack_ball.tres" id="4_data"]
+[ext_resource type="Resource" path="res://content/balls/ball_normal.tres" id="4_data"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5

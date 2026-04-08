@@ -10,6 +10,7 @@ const NO_COLOR_STEP := Color(0, 0, 0, 0)
 @export var spawn_levels := PackedInt32Array([1])
 @export var symbol := ""
 @export var tint := Color(0.5, 0.5, 0.5)
+@export var outline_tint := NO_COLOR_STEP
 @export var level_tint_step := NO_COLOR_STEP
 @export var base_radius := 20.0
 @export var merge_growth := 5.0
@@ -33,6 +34,10 @@ func display_color(level: int) -> Color:
 	if not participates_in_level_merge():
 		return tint
 	return tint + level_tint_step * float(level - 1)
+
+
+func display_outline_color(level: int) -> Color:
+	return display_color(level) if outline_tint.a == 0.0 else outline_tint
 
 
 func radius_for_level(level: int) -> float:

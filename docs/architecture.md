@@ -43,12 +43,14 @@ Godot `.uid` files are omitted here because they are metadata, not gameplay arch
 res://
   content/
     balls/
-      attack_ball.tres
-      duplicate_ball.tres
-      heal_ball.tres
-      multiply_ball.tres
+      ball_bomb.tres
+      ball_duplication.tres
+      ball_heal.tres
+      ball_multiplication.tres
+      ball_normal.tres
     enemies/
-      slime.tres
+      enemy1.tres
+      enemy2.tres
 
   scenes/
     damage_floater.tscn
@@ -61,6 +63,7 @@ res://
       ball_data.gd
       game_ball.gd
       effects/
+        bomb_touching_effect.gd
         duplicate_touching_effect.gd
         heal_touching_effect.gd
         multiply_touching_effect.gd
@@ -113,11 +116,13 @@ res://
 
 ### 4.1 Content Resources
 
-- `content/balls/attack_ball.tres`: default mergeable attack ball. It participates in level merges, appears often, and has no special effect.
-- `content/balls/duplicate_ball.tres`: special utility ball that does not merge by level and duplicates nearby valid targets.
-- `content/balls/heal_ball.tres`: special utility ball that consumes touching mergeable balls and heals the player. Its current `spawn_weight` is `0`, so it is defined content but not part of the random spawn pool.
-- `content/balls/multiply_ball.tres`: special utility ball that doubles the level of touching mergeable balls.
-- `content/enemies/slime.tres`: current enemy definition. It sets HP, damage, action list, and a wall-clock attack interval of `20.0` seconds.
+- `content/balls/ball_normal.tres`: default mergeable ball. It participates in level merges, appears often, and has no special effect.
+- `content/balls/ball_duplication.tres`: special utility ball that does not merge by level and duplicates nearby valid targets.
+- `content/balls/ball_heal.tres`: special utility ball that consumes touching mergeable balls and heals the player. Its current `spawn_weight` is `0`, so it is defined content but not part of the random spawn pool.
+- `content/balls/ball_multiplication.tres`: special utility ball that doubles the level of touching mergeable balls.
+- `content/balls/ball_bomb.tres`: special utility ball with a red body, black outline, and `B` symbol. It doubles nearby mergeable balls, then removes itself.
+- `content/enemies/enemy1.tres`: enemy1 resource used by `enemy1.tscn`. It currently defines the slime enemy with its HP, damage, action list, and a wall-clock attack interval of `20.0` seconds.
+- `content/enemies/enemy2.tres`: enemy2 resource used by `enemy2.tscn`. It keeps the same HP but uses a slower, heavier attack profile.
 
 ### 4.2 Scenes
 

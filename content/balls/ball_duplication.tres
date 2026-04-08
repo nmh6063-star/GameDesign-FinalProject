@@ -2,22 +2,22 @@
 
 [ext_resource type="Script" path="res://script/ball/ball_data.gd" id="1_ball_data"]
 [ext_resource type="Script" path="res://script/ball/merge_rules/no_merge_rule.gd" id="2_merge_rule"]
-[ext_resource type="Script" path="res://script/ball/effects/multiply_touching_effect.gd" id="3_ball_effect"]
+[ext_resource type="Script" path="res://script/ball/effects/duplicate_touching_effect.gd" id="3_ball_effect"]
 
 [sub_resource type="Resource" id="NoMergeRule_1"]
 script = ExtResource("2_merge_rule")
 
-[sub_resource type="Resource" id="MultiplyTouchingEffect_1"]
+[sub_resource type="Resource" id="DuplicateTouchingEffect_1"]
 script = ExtResource("3_ball_effect")
 
 [resource]
 script = ExtResource("1_ball_data")
-id = "multiply_ball"
-display_name = "Multiply Ball"
-tags = PackedStringArray("multiply")
+id = "ball_duplication"
+display_name = "Duplication Ball"
+tags = PackedStringArray("duplicate")
 spawn_weight = 1
 spawn_levels = PackedInt32Array(1)
-symbol = "M"
-tint = Color(0.25, 0.55, 1, 1)
+symbol = "D"
+tint = Color(0.75, 0.35, 0.95, 1)
 merge_rule = SubResource("NoMergeRule_1")
-effects = [SubResource("MultiplyTouchingEffect_1")]
+effects = [SubResource("DuplicateTouchingEffect_1")]

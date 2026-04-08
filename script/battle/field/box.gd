@@ -71,10 +71,10 @@ func wake() -> void:
 
 
 func _spawn_instance(ball: GameBall, data, level: int, position: Vector2, is_set_up: bool) -> GameBall:
+	ball.configure(data, level, _state, _target)
 	_ball_parent.add_child(ball)
 	ball.position = position
 	ball.visible = true
-	ball.configure(data, level, _state, _target)
 	ball.set_collision_enabled(true)
 	ball.set_playfield_state(is_set_up)
 	if is_set_up:

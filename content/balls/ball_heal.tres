@@ -12,7 +12,7 @@ script = ExtResource("3_ball_effect")
 
 [resource]
 script = ExtResource("1_ball_data")
-id = "heal_ball"
+id = "ball_heal"
 display_name = "Heal Ball"
 tags = PackedStringArray("heal")
 spawn_weight = 0
