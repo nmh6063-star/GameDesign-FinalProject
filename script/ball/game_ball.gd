@@ -1,7 +1,7 @@
 extends RigidBody2D
 class_name GameBall
 
-const BattleState := preload("res://script/battle/battle_state.gd")
+const BattleState := preload("res://script/battle/state/state.gd")
 const BallData := preload("res://script/ball/ball_data.gd")
 
 signal dropped
