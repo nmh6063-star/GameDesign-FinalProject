@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bdoo1vsi5jcwo"]
 
-[ext_resource type="Script" path="res://script/map/map_controller.gd" id="1_4xfga"]
+[ext_resource type="Script" uid="uid://bxwf3jdk7pdya" path="res://script/map/map_controller.gd" id="1_4xfga"]
 
 [node name="MapWorld" type="Node2D" unique_id=843395142]
 

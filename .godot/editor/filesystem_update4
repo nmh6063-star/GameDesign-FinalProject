@@ -23,3 +23,6 @@ res://content/balls/heavy_ball.tres
 res://scenes/camera_script.gd
 res://script/run/run_state.gd
 res://script/ball/effects/bomb_touching_effect.gd
+res://scenes/map.tscn
+res://script/map/map_generator.gd
+res://script/map/map_controller.gd

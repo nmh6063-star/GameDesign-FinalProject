@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="ProfessorPinballsCastle"
-run/main_scene="uid://tt07u0d3npdi"
+run/main_scene="uid://bdoo1vsi5jcwo"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 boot_splash/bg_color=Color(0, 0.133333, 0.764706, 1)
 config/icon="res://assets/CapsuleBall.png"
