@@ -12,6 +12,9 @@ var battle_state: BattleState
 var aim_target: Node2D
 var set_up := false
 var level := 1
+var fade = false
+var last_vel = Vector2.ZERO
+var exploded = false
 
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
@@ -86,11 +89,16 @@ func _draw() -> void:
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale
 	sprite.modulate = color
-	($RichTextLabel as RichTextLabel).text = "[b]%s[/b]" % data.display_label(level)
+	($RichTextLabel as RichTextLabel).text = "[font_size=14][b]%s[/b][/font_size]" % data.display_label(level)
 
 
 func _physics_process(_delta: float) -> void:
-	physics_material_override.absorbent = linear_velocity.y <= 1.0
+
+	if fade:
+		modulate.a -= 0.05
+		self.scale += Vector2(0.05, 0.05)
+		return
+	last_vel = linear_velocity
 	if not visible:
 		gravity_scale = 0.0
 		return
@@ -106,8 +114,25 @@ func _physics_process(_delta: float) -> void:
 	gravity_scale = 0.0
 	var delta_x := aim_target.position.x - position.x
 	var direction := 0.0 if absf(delta_x) < 15.0 else signf(delta_x)
-	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0, 0.0, 2500.0) * direction, 0.0)
+	var block := 0.0 if (self.position.x > 107 and direction > 0) or (self.position.x < -163 and direction < 0) else 1.0
+	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0 * block, 0.0, 2500.0) * direction, 0.0)
 	if Input.is_action_just_pressed("play_card"):
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()
+
+func _on_body_entered(_body):
+	if(abs(last_vel.y) <= 0.5):
+		linear_velocity.y = 0.0
+
+func _consumed():
+	fade = true
+	freeze = true
+	get_node("Timer").start()
+	get_node("Particles").visible = true
+	get_node("Particles").color = get_node("Sprite2D").modulate
+	get_node("CollisionShape2D").disabled = true
+
+
+func _on_timer_timeout() -> void:
+	queue_free()

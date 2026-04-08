@@ -38,6 +38,12 @@ func consume_ball(ball) -> void:
 func duplicate_ball(source, offset: Vector2 = Vector2.ZERO):
 	return controller.spawn_ball_copy(source, offset)
 
+func explode_ball(source, offset):
+	print("run")
+	return controller._default_spawn(source.position, offset)
+
+func magnetize(ball, source):
+	controller._magnetize(ball, source)
 
 func wake_playfield() -> void:
 	controller.wake_playfield()

@@ -7,7 +7,7 @@ const NO_COLOR_STEP := Color(0, 0, 0, 0)
 @export var display_name := ""
 @export var tags: PackedStringArray = []
 @export var spawn_weight := 1
-@export var spawn_levels := PackedInt32Array([1])
+#@export var spawn_levels := [PackedInt32Array([1])]
 @export var symbol := ""
 @export var tint := Color(0.5, 0.5, 0.5)
 @export var level_tint_step := NO_COLOR_STEP
@@ -40,9 +40,10 @@ func radius_for_level(level: int) -> float:
 	if not participates_in_level_merge():
 		return radius
 	for i in range(1, level):
-		radius += merge_growth / float(i)
+		radius += merge_growth/sqrt(i)
 	return radius
 
 
 func random_spawn_level() -> int:
+	var spawn_levels = [1, 2, 4]
 	return int(spawn_levels[randi() % spawn_levels.size()])

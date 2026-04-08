@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://d27y3ru23olje"]
+
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/battle/contracts/ball_effect.gd" id="1_r3wxj"]
+[ext_resource type="Script" uid="uid://ch12n7tfei18b" path="res://script/ball/effects/magnet_touching_effect.gd" id="2_r3wxj"]
+[ext_resource type="Script" uid="uid://ccx0gjb4i14p3" path="res://script/ball/merge_rules/no_merge_rule.gd" id="3_afnub"]
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/ball/ball_data.gd" id="4_rcpjk"]
+
+[sub_resource type="Resource" id="Resource_ns3bl"]
+script = ExtResource("2_r3wxj")
+metadata/_custom_type_script = "uid://ch12n7tfei18b"
+
+[sub_resource type="Resource" id="NoMergeRule_1"]
+script = ExtResource("3_afnub")
+
+[resource]
+script = ExtResource("4_rcpjk")
+id = "magnet_ball"
+display_name = "Magnet Ball"
+tags = ["magnet"]
+symbol = "M"
+tint = Color(0.48, 0.48, 0.48, 1)
+merge_rule = SubResource("NoMergeRule_1")
+effects = Array[ExtResource("1_r3wxj")]([SubResource("Resource_ns3bl")])

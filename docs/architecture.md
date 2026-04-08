@@ -42,72 +42,72 @@ Godot `.uid` files are omitted here because they are metadata, not gameplay arch
 ```text
 res://
   content/
-    balls/
-      attack_ball.tres
-      duplicate_ball.tres
-      heal_ball.tres
-      multiply_ball.tres
-    enemies/
-      slime.tres
+	balls/
+	  attack_ball.tres
+	  duplicate_ball.tres
+	  heal_ball.tres
+	  multiply_ball.tres
+	enemies/
+	  slime.tres
 
   scenes/
-    damage_floater.tscn
-    indicator_sprite.tscn
-    main.tscn
-    map.tscn
-    map_tile.tscn
+	damage_floater.tscn
+	indicator_sprite.tscn
+	main.tscn
+	map.tscn
+	map_tile.tscn
 
   script/
-    ball/
-      ball_data.gd
-      game_ball.gd
-      effects/
-        duplicate_touching_effect.gd
-        heal_touching_effect.gd
-        multiply_touching_effect.gd
-      merge_rules/
-        level_merge_rule.gd
-        no_merge_rule.gd
+	ball/
+	  ball_data.gd
+	  game_ball.gd
+	  effects/
+		duplicate_touching_effect.gd
+		heal_touching_effect.gd
+		multiply_touching_effect.gd
+	  merge_rules/
+		level_merge_rule.gd
+		no_merge_rule.gd
 
-    battle/
-      contracts/
-        ball_effect.gd
-        enemy_action.gd
-        merge_rule.gd
-      field/
-        box.gd
-      flow/
-        context.gd
-        controller.gd
-        rules.gd
-      state/
-        ammo.gd
-        state.gd
-      ui/
-        hud.gd
+	battle/
+	  contracts/
+		ball_effect.gd
+		enemy_action.gd
+		merge_rule.gd
+	  field/
+		box.gd
+	  flow/
+		context.gd
+		controller.gd
+		rules.gd
+	  state/
+		ammo.gd
+		state.gd
+	  ui/
+		hud.gd
 
-    enemy/
-      enemy.gd
-      enemy_data.gd
-      actions/
-        direct_attack_action.gd
+	enemy/
+	  enemy.gd
+	  enemy_data.gd
+	  actions/
+		direct_attack_action.gd
 
-    player/
-      player.gd
+	player/
+	  player.gd
 
-    run/
-      run_state.gd
+	run/
+	  run_state.gd
 
-    map/
-      map_controller.gd
-      map_generator.gd
-      map_tile.gd
+	map/
+	  map_controller.gd
+	  map_generator.gd
+	  map_tile.gd
 
-    ui/
-      damage_floater.gd
-      line_indicator.gd
-      shoot_ammo_hud.gd
-      timer_ring.gd
+	ui/
+	  damage_floater.gd
+	  line_indicator.gd
+	  shoot_ammo_hud.gd
+	  timer_ring.gd
 ```
 
 ## 4. File Responsibilities

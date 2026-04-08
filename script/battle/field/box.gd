@@ -3,25 +3,26 @@ class_name BattleBox
 
 const GameBall := preload("res://script/ball/game_ball.gd")
 const BallData := preload("res://script/ball/ball_data.gd")
+const _template_ball := preload("res://scenes/ball.tscn")
 
 var _root: Node2D
-var _template_ball: GameBall
 var _state
 var _target: Node2D
 var _on_ball_dropped: Callable
 var _spawn_pool: Array[BallData] = []
+var start_pos = Vector2(-8, -91)
 
 
-func _init(root: Node2D, template_ball: GameBall, state, target: Node2D, on_ball_dropped: Callable, content_dir: String) -> void:
+func _init(root: Node2D, state, target: Node2D, on_ball_dropped: Callable, content_dir: String) -> void:
 	_root = root
-	_template_ball = template_ball
+	#_template_ball = template_ball
 	_state = state
 	_target = target
 	_on_ball_dropped = on_ball_dropped
 	_spawn_pool = _load_ball_pool(content_dir)
 	assert(not _spawn_pool.is_empty(), "No ball content found in %s" % content_dir)
-	_template_ball.set_runtime(_state, _target)
-	_template_ball.set_collision_enabled(false)
+	#_template_ball.set_runtime(_state, _target)
+	#_template_ball.set_collision_enabled(false)
 
 
 func active() -> Array:
@@ -37,10 +38,10 @@ func active() -> Array:
 
 
 func consume(ball: GameBall) -> void:
-	ball.visible = false
+	#ball.visible = false
 	ball.set_up = false
 	ball.remove_from_group("ball")
-	ball.queue_free()
+	ball._consumed()
 
 
 func spawn_copy(source: GameBall, offset: Vector2 = Vector2.ZERO) -> GameBall:
@@ -49,7 +50,7 @@ func spawn_copy(source: GameBall, offset: Vector2 = Vector2.ZERO) -> GameBall:
 
 func spawn_setup_ball() -> GameBall:
 	var data := _roll_ball_data()
-	return _spawn(data, data.random_spawn_level(), _template_ball.position, true)
+	return _spawn(data, data.random_spawn_level(), start_pos, true)
 
 
 func wake() -> void:
@@ -59,8 +60,7 @@ func wake() -> void:
 
 
 func _spawn(data: BallData, level: int, position: Vector2, is_set_up: bool) -> GameBall:
-	var ball := _template_ball.duplicate() as GameBall
-	_root.add_child(ball)
+	var ball := _template_ball.instantiate() as GameBall
 	ball.position = position
 	ball.visible = true
 	ball.configure(data, level, _state, _target)
@@ -68,6 +68,7 @@ func _spawn(data: BallData, level: int, position: Vector2, is_set_up: bool) -> G
 	ball.set_playfield_state(is_set_up)
 	if is_set_up:
 		ball.dropped.connect(_on_ball_dropped)
+	_root.add_child(ball)
 	return ball
 
 

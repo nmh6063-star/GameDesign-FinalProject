@@ -1,22 +1,23 @@
 [gd_resource type="Resource" script_class="BallData" format=3 uid="uid://2nqny3ay1hlp"]
 
 [ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/ball/ball_data.gd" id="1_ball_data"]
-[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/battle/contracts/ball_effect.gd" id="1_ws1e3"]
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/battle/contracts/ball_effect.gd" id="1_l85rv"]
+[ext_resource type="Script" uid="uid://dlk5t4mf3ii6x" path="res://script/ball/effects/exploding_touching_effect.gd" id="2_65nfa"]
 [ext_resource type="Script" uid="uid://ccx0gjb4i14p3" path="res://script/ball/merge_rules/no_merge_rule.gd" id="2_merge_rule"]
-[ext_resource type="Script" uid="uid://ba841uhod4tjo" path="res://script/ball/effects/multiply_touching_effect.gd" id="3_ball_effect"]
 
 [sub_resource type="Resource" id="Resource_l85rv"]
-script = ExtResource("3_ball_effect")
-metadata/_custom_type_script = "uid://ba841uhod4tjo"
+script = ExtResource("2_65nfa")
+metadata/_custom_type_script = "uid://dlk5t4mf3ii6x"
 
 [sub_resource type="Resource" id="NoMergeRule_1"]
 script = ExtResource("2_merge_rule")
 
 [resource]
 script = ExtResource("1_ball_data")
-id = "multiply_ball"
-display_name = "Multiply Ball"
-symbol = "M"
-tint = Color(0.25, 0.55, 1, 1)
+id = "exploding_ball"
+display_name = "Exploding Ball"
+tags = ["explode"]
+symbol = "E"
+tint = Color(1, 0, 0, 1)
 merge_rule = SubResource("NoMergeRule_1")
-effects = Array[ExtResource("1_ws1e3")]([SubResource("Resource_l85rv")])
+effects = Array[ExtResource("1_l85rv")]([SubResource("Resource_l85rv")])

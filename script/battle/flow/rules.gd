@@ -23,8 +23,9 @@ func resolve_ball_effects(ctx: BattleContext) -> void:
 			for effect in ball.data.effects:
 				if effect.can_trigger(ctx, ball):
 					effect.apply(ctx, ball)
-					applied = true
-					break
+					if not ball.has_tag("magnet"):
+						applied = true
+						break
 			if applied:
 				break
 		if not applied:
