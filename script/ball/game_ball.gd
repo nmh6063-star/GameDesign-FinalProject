@@ -1,65 +1,67 @@
 extends RigidBody2D
 class_name GameBall
 
-const BallBehavior := preload("res://script/ball/behaviors/ball_behavior.gd")
+const BattleState := preload("res://script/battle/battle_state.gd")
+const BallData := preload("res://script/ball/ball_data.gd")
 
 signal dropped
 
-@export var behavior: BallBehavior
+@export var data: BallData
 
-var set_up: bool = false
-var move_speed: float = 200.0
-var direction: int = 0
-var level: int = 1
-var reset: bool = false
-var bounce = 1
+var battle_state: BattleState
+var aim_target: Node2D
+var set_up := false
+var level := 1
 
 const GRAVITY_SCALE := 2.0
-
 const OUTLINE_WIDTH := 2.0
 const OUTLINE_POINTS := 64
 
-var last_velocity = Vector2.ZERO
+
+func _ready() -> void:
+	add_to_group("ball")
+	gravity_scale = 0.0
+	contact_monitor = true
+	max_contacts_reported = 10
+	refresh()
 
 
-func _radius() -> float:
-	var radius := 20.0
-	if behavior != null and not behavior.participates_in_level_merge():
-		return radius
-	if reset:
-		return radius
-	for i in range(1, level):
-		radius += 5.0 / i
-	return radius
+func set_runtime(state: BattleState, target: Node2D) -> void:
+	battle_state = state
+	aim_target = target
+
+
+func configure(ball_data: BallData, ball_level: int, state: BattleState, target: Node2D) -> void:
+	data = ball_data
+	level = ball_level
+	set_runtime(state, target)
+	refresh()
+
+
+func refresh() -> void:
+	_update_collision()
+	queue_redraw()
+
+
+func set_collision_enabled(enabled: bool) -> void:
+	($CollisionShape2D as CollisionShape2D).disabled = not enabled
+
+
+func set_playfield_state(is_set_up: bool) -> void:
+	set_up = is_set_up
+	gravity_scale = 0.0 if set_up else GRAVITY_SCALE
+
+
+func participates_in_level_merge() -> bool:
+	return data.participates_in_level_merge()
+
+
+func has_tag(tag: String) -> bool:
+	return data.has_tag(tag)
 
 
 func get_radius() -> float:
-	return _radius()
-
-
-func _label_color() -> Color:
-	var base := Color(0.3 + 0.05 * level, 0.8 - 0.06 * level, 0.3)
-	if behavior == null:
-		return base
-	match behavior.kind:
-		BallBehavior.Kind.DUPLICATION:
-			return Color(0.75, 0.35, 0.95)
-		BallBehavior.Kind.MULTIPLICATION:
-			return Color(0.25, 0.55, 1.0)
-		BallBehavior.Kind.HEAL:
-			return Color(0.35, 0.92, 0.55)
-		_:
-			return base
-
-
-func _ready() -> void:
-	behavior = behavior if behavior != null else BallBehavior.from_kind(BallBehavior.Kind.NORMAL)
-	add_to_group("ball")
-	gravity_scale = 0.0
-	_update_collision()
-	queue_redraw()
-	contact_monitor = true
-	max_contacts_reported = 10
+	return data.radius_for_level(level)
 
 
 func _update_collision() -> void:
@@ -67,101 +69,45 @@ func _update_collision() -> void:
 	if col == null or not col.shape is CircleShape2D:
 		return
 	var circle := (col.shape as CircleShape2D).duplicate()
-	circle.radius = _radius()
+	circle.radius = get_radius()
 	col.shape = circle
 
 
 func merge_into_me() -> void:
-	if not behavior.participates_in_level_merge():
-		return
 	level *= 2
-	_update_collision()
-	queue_redraw()
-
-
-func reset_for_spawn() -> void:
-	level = 1
-	behavior = BallBehavior.from_kind(BallBehavior.Kind.NORMAL)
+	refresh()
 
 
 func _draw() -> void:
-	var radius := _radius()
-	var color := _label_color()
+	var radius := get_radius()
+	var color := data.display_color(level)
 	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, color, OUTLINE_WIDTH, true)
 	var sprite := $Sprite2D as Sprite2D
-	var tw := sprite.texture.get_width()
-	sprite.scale = Vector2((radius * 2.0) / tw, (radius * 2.0) / tw)
+	var scale := (radius * 2.0) / float(sprite.texture.get_width())
+	sprite.scale = Vector2.ONE * scale
 	sprite.modulate = color
-	var label: String = behavior.display_label(level)
-	$RichTextLabel.text = "[b]%s[/b]" % label
+	($RichTextLabel as RichTextLabel).text = "[b]%s[/b]" % data.display_label(level)
 
 
 func _physics_process(_delta: float) -> void:
-	if linear_velocity.y <= 1:
-		physics_material_override.absorbent = true
-	else:
-		physics_material_override.absorbent = false
-	# Keep spare (hidden) balls from falling.
+	physics_material_override.absorbent = linear_velocity.y <= 1.0
 	if not visible:
 		gravity_scale = 0.0
 		return
-	# Never allow visible balls to enter a sleeping physics state.
-	# This prevents them from staying "stuck" when supports disappear.
 	sleeping = false
 
-	# Always enable gravity during resolve/other phases.
-	if Global.phase != Global.Phase.PLAY:
+	if battle_state.phase != BattleState.Phase.PLAY:
 		set_up = false
 		gravity_scale = GRAVITY_SCALE
 		return
-
-	# PLAY phase: only control the ball while the player is aiming.
 	if not set_up:
 		gravity_scale = GRAVITY_SCALE
 		return
 	gravity_scale = 0.0
-	direction = int((get_node("/root/Node2D/Target").position.x - self.position.x)/abs(get_node("/root/Node2D/Target").position.x - self.position.x))
-	if abs(get_node("/root/Node2D/Target").position.x - self.position.x) < 15:
-		direction = 0
-	#direction = int(Input.is_action_pressed("right")) - int(Input.is_action_pressed("left"))
-	linear_velocity = Vector2(clamp(abs(get_node("/root/Node2D/Target").position.x - self.position.x) * 25, 0, 2500) * direction, 0)
+	var delta_x := aim_target.position.x - position.x
+	var direction := 0.0 if absf(delta_x) < 15.0 else signf(delta_x)
+	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0, 0.0, 2500.0) * direction, 0.0)
 	if Input.is_action_just_pressed("play_card"):
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()
-
-func _integrate_forces(state):
-	pass
-	"""
-	for i in range(state.get_contact_count()):
-		var collider = state.get_contact_collider_object(i)
-		if (collider == null or collider.name != "Box"):
-			continue
-		var normal: Vector2 = state.get_contact_local_normal(i)
-		var finalImpulse = Vector2.ZERO
-		print(normal)
-		if abs(normal.x) > 0.1:
-			finalImpulse.x = -sign(normal.x)
-		if abs(normal.y) > 0.1:
-			finalImpulse.y = sign(normal.y)
-		if finalImpulse == Vector2.ZERO:
-			continue
-		var impulse_strength = last_velocity
-		var impulse = finalImpulse * impulse_strength
-		if impulse.y == abs(last_velocity.y):
-			impulse.y = 0
-		if impulse.x > 0:
-			print("negative")
-		else:
-			print("positive")
-		if abs(impulse.x) > 0:
-			print(impulse)
-		#print(last_velocity)
-		print("HERE")
-		#bounce += 1
-		apply_central_impulse(impulse)
-	"""
-
-func _shake() -> void:
-	if get_colliding_bodies().size() > 0:
-		apply_central_impulse(Vector2(randi_range(-1, 1), randi_range(-1, 1)) * 500.0)
