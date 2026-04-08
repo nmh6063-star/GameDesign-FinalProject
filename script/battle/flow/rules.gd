@@ -31,8 +31,8 @@ func resolve_ball_effects(ctx: BattleContext) -> void:
 			return
 
 
-func resolve_enemy_turn(ctx: BattleContext) -> void:
-	var enemy = ctx.active_enemy()
+func resolve_enemy_turn(ctx: BattleContext, enemy = null) -> void:
+	enemy = ctx.active_enemy() if enemy == null else enemy
 	if enemy == null or enemy.current_health <= 0:
 		return
 	for action in enemy.data.actions:

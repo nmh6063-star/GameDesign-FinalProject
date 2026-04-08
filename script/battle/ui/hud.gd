@@ -1,68 +1,77 @@
 extends CanvasLayer
 class_name BattleHud
 
-const ShootAmmo := preload("res://script/battle/state/ammo.gd")
 const DAMAGE_FLOATER_SCENE := preload("res://scenes/damage_floater.tscn")
-const PLAYER_DAMAGE_COLOR := Color(1, 0.3, 0.3)
-const ENEMY_DAMAGE_COLOR := Color(0.92, 0.58, 0.06)
-const HEAL_COLOR := Color(0.35, 0.92, 0.55)
+const GameBall := preload("res://script/ball/game_ball.gd")
+const ShootAmmo := preload("res://script/battle/state/ammo.gd")
+const QUEUE_SIZE := 5
 
-@onready var _player_fill: ColorRect = $PlayerHealthBar/Fill
-@onready var _player_hp_text: Label = $PlayerHealthBar/HPText
-@onready var _player_hp_top: Label = $TopBar/PlayerHPText
-@onready var _energy_label: Label = $EnergyLabel
-@onready var _energy_badge_text: Label = $CostBadge/CostText
-@onready var _result_label: Label = $ResultLabel
+var _has_result := false
+var _queue_keys: Array[String] = []
+
+@onready var _top_frame: Control = $BallQueue/Center/Slots/Slot0/TopFrame
+@onready var _queue_roots: Array[Node2D] = [
+	$BallQueue/Center/Slots/Slot0/PreviewRoot, $BallQueue/Center/Slots/Slot1/PreviewRoot, $BallQueue/Center/Slots/Slot2/PreviewRoot, $BallQueue/Center/Slots/Slot3/PreviewRoot, $BallQueue/Center/Slots/Slot4/PreviewRoot,
+]
 @onready var _shoot_ammo_hud = $ShootAmmoHUD
-@onready var _damage_anchor_player: Marker2D = $DamageAnchorPlayer
-@onready var _damage_anchor_enemy: Marker2D = $DamageAnchorEnemy
+@onready var _game_over: Control = $GameOver
+@onready var _stage_clear: Control = $StageClear
+
+func sync_ball_queue(items: Array) -> void:
+	var next_keys: Array[String] = _queue_item_keys(items)
+	_top_frame.visible = not items.is_empty()
+	if next_keys == _queue_keys:
+		return
+	for i in range(QUEUE_SIZE):
+		if i < next_keys.size() and i < _queue_keys.size() and next_keys[i] == _queue_keys[i]:
+			continue
+		var root: Node2D = _queue_roots[i]
+		for child in root.get_children():
+			child.queue_free()
+		if i >= items.size():
+			continue
+		var item: Dictionary = items[i]
+		var ball: GameBall = (item["scene"] as PackedScene).instantiate() as GameBall
+		ball.ui_preview = true
+		root.add_child(ball)
+		ball.position = Vector2.ZERO
+		ball.scale = Vector2.ONE * 0.72
+		ball.set_preview(item["data"], item["level"])
+	_queue_keys = next_keys
 
 
-func sync_player(health: int, max_health: int) -> void:
-	var text := "%d/%d" % [health, max_health]
-	_player_fill.size.x = 100.0 * float(health) / float(max_health)
-	_player_hp_text.text = text
-	_player_hp_top.text = text
-
-
-func sync_energy(current: int, max_value: int) -> void:
-	_energy_label.visible = true
-	_energy_badge_text.text = "%d/%d" % [current, max_value]
+func _queue_item_keys(items: Array) -> Array[String]:
+	var keys: Array[String] = []
+	for item_value in items:
+		var item: Dictionary = item_value
+		keys.append("%s:%s:%d" % [(item["scene"] as PackedScene).resource_path, (item["data"] as Resource).resource_path, item["level"]])
+	return keys
 
 
 func sync_shoot_ammo(bullets: int, merge_progress: int) -> void:
 	_shoot_ammo_hud.sync_state(bullets, merge_progress, ShootAmmo.MERGES_PER_BULLET)
 
 
-func show_player_damage(amount: int) -> void:
-	_show_damage(amount, _damage_anchor_player, PLAYER_DAMAGE_COLOR)
-
-
-func show_enemy_damage(amount: int) -> void:
-	_show_damage(amount, _damage_anchor_enemy, ENEMY_DAMAGE_COLOR)
-
-
-func show_heal(amount: int) -> void:
-	_show_damage(amount, _damage_anchor_player, HEAL_COLOR)
-
-
-func clear_result() -> void:
-	_result_label.visible = false
-
-
-func show_result(text: String) -> void:
-	_result_label.text = text
-	_result_label.visible = true
-
-
-func has_result() -> bool:
-	return _result_label.visible
-
-
-func _show_damage(amount: int, anchor: Marker2D, color: Color) -> void:
+func show_damage(amount: int, anchor: Marker2D, color: Color) -> void:
 	if amount <= 0:
 		return
 	var floater = DAMAGE_FLOATER_SCENE.instantiate()
 	add_child(floater)
 	(floater as Label).global_position = anchor.global_position
 	floater.play(amount, color)
+
+
+func clear_result() -> void:
+	_has_result = false
+	_game_over.visible = false
+	_stage_clear.visible = false
+
+
+func show_result(text: String) -> void:
+	_has_result = true
+	_game_over.visible = text == "Game Over"
+	_stage_clear.visible = text == "Stage Clear" or text == "Game Clear"
+
+
+func has_result() -> bool:
+	return _has_result

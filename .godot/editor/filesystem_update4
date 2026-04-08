@@ -1,0 +1,15 @@
+res://script/ui/line_indicator.gd
+res://scenes/enemies/enemy1.tscn
+res://content/enemies/slime.tres
+res://content/balls/attack_ball.tres
+res://scenes/enemies/enemy2.tscn
+res://scenes/main.tscn
+res://script/battle/flow/controller.gd
+res://script/enemy/enemy.gd
+res://script/enemy/holder.gd
+res://script/player/player.gd
+res://script/ball/game_ball.gd
+res://script/battle/field/box.gd
+res://script/battle/ui/hud.gd
+res://script/ui/shoot_ammo_hud.gd
+res://content/enemies/enemy2.tres

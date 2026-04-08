@@ -1,23 +1,23 @@
 [gd_scene format=3 uid="uid://tt07u0d3npdi"]
 
 [ext_resource type="Script" uid="uid://bu5eudvsydkcp" path="res://script/ball/game_ball.gd" id="1_o5qli"]
-[ext_resource type="Script" path="res://script/battle/flow/controller.gd" id="2_gm"]
-[ext_resource type="Texture2D" uid="uid://cb5hmafbmxhfj" path="res://assets/WoodBack.png" id="3_o6xl0"]
-[ext_resource type="Texture2D" uid="uid://c705s3lh6osjc" path="res://assets/slime-Sheet.png" id="3_sugp2"]
-[ext_resource type="Texture2D" uid="uid://dxxvadmvkcnn5" path="res://assets/grassland.png" id="3_tipki"]
-[ext_resource type="Script" uid="uid://3vgvq8and53h" path="res://script/enemy/enemy.gd" id="4_enemy"]
+[ext_resource type="Script" uid="uid://hj3v8j6743p5" path="res://script/battle/flow/controller.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
-[ext_resource type="Texture2D" uid="uid://qtn02f1n8vj8" path="res://assets/Sample.png" id="9_eb6dy"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
-[ext_resource type="PackedScene" uid="uid://dyoj8165ej3ax" path="res://scenes/indicator_sprite.tscn" id="12_eb6dy"]
+[ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
-[ext_resource type="Resource" path="res://content/balls/attack_ball.tres" id="16_attack_ball"]
-[ext_resource type="Resource" path="res://content/enemies/slime.tres" id="17_enemy_data"]
-[ext_resource type="Script" path="res://script/ui/timer_ring.gd" id="18_timer_ring"]
-[ext_resource type="Script" path="res://script/battle/ui/hud.gd" id="19_battle_ui"]
+[ext_resource type="Resource" uid="uid://c41q4ecxfm1pc" path="res://content/balls/attack_ball.tres" id="16_attack_ball"]
+[ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
+[ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
+[ext_resource type="Script" uid="uid://b7jt8672nor2y" path="res://script/enemy/holder.gd" id="18_holder"]
+[ext_resource type="Script" uid="uid://ccemeyn0nolwt" path="res://script/enemy/spawn.gd" id="18_spawn"]
+[ext_resource type="Script" uid="uid://b8cw14yjubvx3" path="res://script/battle/ui/hud.gd" id="19_battle_ui"]
+[ext_resource type="PackedScene" uid="uid://baw4nous1qt4i" path="res://scenes/enemies/enemy1.tscn" id="19_slime"]
+[ext_resource type="PackedScene" uid="uid://yl1vssn0sivb" path="res://scenes/enemies/enemy2.tscn" id="20_enemy2"]
+[ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="21_ring"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
@@ -30,173 +30,54 @@ radius = 20.0
 base_font = ExtResource("6_choun")
 spacing_glyph = -2
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_bg"]
+bg_color = Color(0.54901963, 0.4509804, 0.6313726, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_slot"]
+bg_color = Color(1, 1, 1, 0)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_focus"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.17254902, 0.14901961, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_result"]
+bg_color = Color(0.15, 0.08, 0.2, 0.94)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.93, 0.93, 0.93, 1)
+corner_radius_top_left = 28
+corner_radius_top_right = 28
+corner_radius_bottom_right = 28
+corner_radius_bottom_left = 28
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_jkv2x"]
 radius = 40.311287
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_jyhfs"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(0, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tbgi4"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(32, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tefeu"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(64, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_o6xl0"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(96, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_tipki"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(128, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_85g3d"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(160, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_choun"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(192, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_ya4ey"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(224, 25, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_eb6dy"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(0, 50, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_trceg"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(32, 50, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_a8y0u"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(64, 50, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_jkv2x"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(96, 50, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_jbj1t"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(128, 50, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_muem4"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(0, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_dp3eg"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(32, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_0ld40"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(64, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_gqmmt"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(96, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_yc10j"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(128, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_jscy8"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(160, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_pm3ni"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(192, 0, 32, 25)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_y6deb"]
-atlas = ExtResource("3_sugp2")
-region = Rect2(224, 0, 32, 25)
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_og1vs"]
-animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jyhfs")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tbgi4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tefeu")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_o6xl0")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_tipki")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_85g3d")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_choun")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_ya4ey")
-}],
-"loop": true,
-"name": &"attack",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_eb6dy")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_trceg")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_a8y0u")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jkv2x")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jbj1t")
-}],
-"loop": true,
-"name": &"die",
-"speed": 5.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_muem4")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_dp3eg")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_0ld40")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_gqmmt")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_yc10j")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_jscy8")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_pm3ni")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_y6deb")
-}],
-"loop": true,
-"name": &"idle",
-"speed": 5.0
-}]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selection"]
+bg_color = Color(1, 1, 1, 0)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.92, 0.32, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_surface"]
 friction = 2.5
@@ -204,16 +85,13 @@ friction = 2.5
 [node name="Main" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
 
-[node name="BattleController" type="Node2D" parent="." unique_id=1775782920]
-script = ExtResource("2_gm")
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1533831879]
+position = Vector2(248, 0)
 
-[node name="LineIndicator" type="Node2D" parent="." unique_id=692861044]
-position = Vector2(0, -35)
-script = ExtResource("11_ya4ey")
+[node name="BallHolder" type="Node2D" parent="." unique_id=1860811735]
+z_index = 1
 
-[node name="IndicatorSprite" parent="LineIndicator" unique_id=722041512 instance=ExtResource("12_eb6dy")]
-
-[node name="Ball" type="RigidBody2D" parent="." unique_id=1860811735]
+[node name="BallPlaceholder" type="RigidBody2D" parent="BallHolder" unique_id=1860811736]
 visible = false
 position = Vector2(0, -83)
 physics_material_override = SubResource("PhysicsMaterial_ball")
@@ -225,18 +103,18 @@ angular_damp = 4.0
 script = ExtResource("1_o5qli")
 data = ExtResource("16_attack_ball")
 
-[node name="Sprite2D" type="Sprite2D" parent="Ball" unique_id=1556687559]
+[node name="Sprite2D" type="Sprite2D" parent="BallHolder/BallPlaceholder" unique_id=1556687559]
 texture_filter = 1
 scale = Vector2(1.25, 1.25)
 texture = ExtResource("5_85g3d")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Ball" unique_id=186235093]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BallHolder/BallPlaceholder" unique_id=186235093]
 shape = SubResource("CircleShape2D_o5qli")
 debug_color = Color(0.99310964, 0, 0.24909496, 0.41960785)
 
-[node name="Polygon2D" type="Polygon2D" parent="Ball" unique_id=1960507745]
+[node name="Polygon2D" type="Polygon2D" parent="BallHolder/BallPlaceholder" unique_id=1960507745]
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Ball" unique_id=366601379]
+[node name="RichTextLabel" type="RichTextLabel" parent="BallHolder/BallPlaceholder" unique_id=366601379]
 offset_left = -20.0
 offset_top = -20.0
 offset_right = 20.0
@@ -249,66 +127,185 @@ scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=1533831879]
-position = Vector2(248, 0)
+[node name="LineIndicator" type="Node2D" parent="BallHolder" unique_id=692861044]
+position = Vector2(0, -35)
+script = ExtResource("11_ya4ey")
+
+[node name="Indicator0" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=904600577]
+modulate = Color(1, 1, 1, 0.5019608)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator1" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=1996945942]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(0, 56)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator2" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=499207096]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(0, 112)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator3" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=418435843]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(0, 168)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator4" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=2087160603]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(0, 224)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator5" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=1431413002]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(0, 280)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="BattleController" type="Node2D" parent="BallHolder" unique_id=1775782920]
+script = ExtResource("2_gm")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
 script = ExtResource("19_battle_ui")
 
-[node name="TopBar" type="Panel" parent="UI" unique_id=1800000030]
-anchors_preset = 10
-anchor_right = 1.0
-offset_bottom = 48.0
-grow_horizontal = 2
+[node name="BallQueue" type="Panel" parent="UI" unique_id=1041509987]
+offset_left = 56.0
+offset_top = 220.0
+offset_right = 136.0
+offset_bottom = 624.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_bg")
 
-[node name="PlayerHPText" type="Label" parent="UI/TopBar" unique_id=1800000031]
-layout_mode = 0
-offset_left = 115.0
-offset_top = 6.0
-offset_right = 319.0
-offset_bottom = 38.0
-theme_override_font_sizes/font_size = 22
-text = "100/100"
-
-[node name="PlayerHP" type="Label" parent="UI" unique_id=1800000004]
-offset_left = 16.0
-offset_top = 8.0
-offset_right = 156.0
-offset_bottom = 34.0
-theme_override_font_sizes/font_size = 18
-text = "Player HP"
-
-[node name="EnergyLabel" type="Label" parent="UI" unique_id=1800000011]
-visible = false
-offset_left = 584.0
-offset_top = 335.0
-offset_right = 768.0
-offset_bottom = 394.0
-theme_override_font_sizes/font_size = 20
-text = "Energy
-"
-
-[node name="ShootAmmoHUD" type="Control" parent="UI" unique_id=901000000]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 552.0
-offset_top = 232.0
-offset_right = 852.0
-offset_bottom = 270.0
-script = ExtResource("15_shoothud")
-
-[node name="Row" type="HBoxContainer" parent="UI/ShootAmmoHUD" unique_id=901000001]
+[node name="Center" type="CenterContainer" parent="UI/BallQueue" unique_id=1000005001]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Slots" type="VBoxContainer" parent="UI/BallQueue/Center" unique_id=1000005002]
+custom_minimum_size = Vector2(68, 380)
+layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Meter" type="Control" parent="UI/ShootAmmoHUD/Row" unique_id=901000002]
-custom_minimum_size = Vector2(120, 14)
+[node name="Slot0" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=2104974235]
+custom_minimum_size = Vector2(68, 68)
 layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot0" unique_id=484554664]
+position = Vector2(34, 34)
+
+[node name="TopFrame" type="Panel" parent="UI/BallQueue/Center/Slots/Slot0" unique_id=1885310689]
+modulate = Color(1, 1, 1, 0.627451)
+layout_mode = 0
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 72.0
+offset_bottom = 72.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_focus")
+
+[node name="Slot1" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=1248755655]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot1" unique_id=1252669065]
+position = Vector2(34, 34)
+
+[node name="Slot2" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=1863335542]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot2" unique_id=1771129353]
+position = Vector2(34, 34)
+
+[node name="Slot3" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=1329058807]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot3" unique_id=347683052]
+position = Vector2(34, 34)
+
+[node name="Slot4" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=2088297033]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot4" unique_id=194895819]
+position = Vector2(34, 34)
+
+[node name="ShootAmmoHUD" type="Control" parent="UI" unique_id=901000000]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 736.0
+offset_top = 352.0
+offset_right = 1076.0
+offset_bottom = 384.0
+script = ExtResource("15_shoothud")
+
+[node name="Row" type="VBoxContainer" parent="UI/ShootAmmoHUD" unique_id=901000001]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_bottom = 12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 8
+
+[node name="BulletPips" type="HBoxContainer" parent="UI/ShootAmmoHUD/Row" unique_id=901000006]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 12
+
+[node name="Pip0" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000007]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip1" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000008]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip2" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000009]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip3" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000010]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip4" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000011]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip5" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000012]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip6" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000013]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip7" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000014]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Meter" type="Control" parent="UI/ShootAmmoHUD/Row" unique_id=901000002]
+custom_minimum_size = Vector2(122, 14)
+layout_mode = 2
+size_flags_horizontal = 0
 size_flags_vertical = 4
 
 [node name="Background" type="ColorRect" parent="UI/ShootAmmoHUD/Row/Meter" unique_id=901000003]
@@ -318,7 +315,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.12, 0.12, 0.16, 1)
+color = Color(0.12, 0.08, 0.02, 1)
 
 [node name="Fill" type="ColorRect" parent="UI/ShootAmmoHUD/Row/Meter" unique_id=901000004]
 layout_mode = 0
@@ -326,282 +323,398 @@ offset_left = 1.0
 offset_top = 1.0
 offset_right = 1.0
 offset_bottom = 13.0
-color = Color(0.88, 0.62, 0.12, 1)
+color = Color(0.96, 0.8, 0.12, 1)
 
-[node name="BulletPips" type="HBoxContainer" parent="UI/ShootAmmoHUD/Row" unique_id=901000006]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 4
-
-[node name="Pip0" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000007]
-custom_minimum_size = Vector2(14, 14)
-layout_mode = 2
-
-[node name="Pip1" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000008]
-custom_minimum_size = Vector2(14, 14)
-layout_mode = 2
-
-[node name="Pip2" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000009]
-custom_minimum_size = Vector2(14, 14)
-layout_mode = 2
-
-[node name="Pip3" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000010]
-custom_minimum_size = Vector2(14, 14)
-layout_mode = 2
-
-[node name="Pip4" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000011]
-custom_minimum_size = Vector2(14, 14)
-layout_mode = 2
-
-[node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000005]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 135.0
-offset_top = 168.0
-offset_right = 235.0
-offset_bottom = 180.0
-
-[node name="Background" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000006]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.2, 0, 0, 1)
-
-[node name="Fill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000007]
-layout_mode = 1
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 99.0
-offset_bottom = 11.0
-color = Color(0, 0.8, 0.2, 1)
-
-[node name="HPText" type="Label" parent="UI/PlayerHealthBar" unique_id=1800000010]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -3.0
-offset_top = -2.5
-offset_right = -3.0
-offset_bottom = 2.5
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 12
-text = "100/100"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ResultLabel" type="Label" parent="UI" unique_id=1800000008]
-offset_left = 256.0
-offset_top = 96.0
-offset_right = 660.0
-offset_bottom = 144.0
-theme_override_font_sizes/font_size = 36
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="MarginContainer" type="MarginContainer" parent="UI" unique_id=651569895]
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="TextureRect" type="TextureRect" parent="UI/MarginContainer" unique_id=299898437]
-layout_mode = 2
-
-[node name="CostBadge" type="Node2D" parent="UI" unique_id=2081867748]
+[node name="GameOver" type="CenterContainer" parent="UI" unique_id=555100001]
 visible = false
-z_index = -1
-position = Vector2(688, 352)
-scale = Vector2(1.5, 1.5)
+offset_right = 1152.0
+offset_bottom = 648.0
 
-[node name="SunPoly" type="Polygon2D" parent="UI/CostBadge" unique_id=2089877567]
-scale = Vector2(1.4, 1.4)
-color = Color(0.972549, 0.54902, 0.176471, 1)
-polygon = PackedVector2Array(0, -14, 3.8, -7.6, 11.3, -11.3, 7.6, -3.8, 14, 0, 7.6, 3.8, 11.3, 11.3, 3.8, 7.6, 0, 14, -3.8, 7.6, -11.3, 11.3, -7.6, 3.8, -14, 0, -7.6, -3.8, -11.3, -11.3, -3.8, -7.6)
+[node name="Panel" type="Panel" parent="UI/GameOver" unique_id=555100002]
+custom_minimum_size = Vector2(320, 140)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_result")
 
-[node name="Sphere" type="Polygon2D" parent="UI/CostBadge" unique_id=488056572]
-scale = Vector2(1.4, 1.4)
-color = Color(1, 0.713726, 0.301961, 1)
-polygon = PackedVector2Array(8, 0, 7.391, 3.061, 5.657, 5.657, 3.061, 7.391, 0, 8, -3.061, 7.391, -5.657, 5.657, -7.391, 3.061, -8, 0, -7.391, -3.061, -5.657, -5.657, -3.061, -7.391, 0, -8, 3.061, -7.391, 5.657, -5.657, 7.391, -3.061)
-
-[node name="CostText" type="Label" parent="UI/CostBadge" unique_id=2081867749]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -10.0
-offset_top = -9.333328
-offset_right = 31.333313
-offset_bottom = 26.666672
+[node name="Margin" type="MarginContainer" parent="UI/GameOver/Panel" unique_id=555100003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-scale = Vector2(0.5, 0.5)
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
+
+[node name="Column" type="VBoxContainer" parent="UI/GameOver/Panel/Margin" unique_id=555100004]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="UI/GameOver/Panel/Margin/Column" unique_id=555100005]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 22
-text = "3/3"
+text = "GAME OVER"
 horizontal_alignment = 1
-vertical_alignment = 1
 
-[node name="HSlider" type="HSlider" parent="UI" unique_id=756710493]
-offset_left = 888.0
-offset_top = 365.0
-offset_right = 1032.0
-offset_bottom = 381.0
+[node name="Caption" type="Label" parent="UI/GameOver/Panel/Margin/Column" unique_id=555100006]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 12
+text = "All health lost."
+horizontal_alignment = 1
 
-[node name="HSlider2" type="HSlider" parent="UI" unique_id=1124735120]
-offset_left = 888.0
-offset_top = 335.0
-offset_right = 1032.0
-offset_bottom = 351.0
+[node name="StageClear" type="CenterContainer" parent="UI" unique_id=555100007]
+visible = false
+offset_right = 1152.0
+offset_bottom = 648.0
 
-[node name="DamageAnchorPlayer" type="Marker2D" parent="UI" unique_id=1800000040]
-position = Vector2(416, 174)
+[node name="Panel" type="Panel" parent="UI/StageClear" unique_id=555100008]
+custom_minimum_size = Vector2(320, 140)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_result")
 
-[node name="DamageAnchorEnemy" type="Marker2D" parent="UI" unique_id=1800000041]
-position = Vector2(992, 191)
+[node name="Margin" type="MarginContainer" parent="UI/StageClear/Panel" unique_id=555100009]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 16.0
+offset_right = -20.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="Target" type="Node2D" parent="." unique_id=2058900465]
+[node name="Column" type="VBoxContainer" parent="UI/StageClear/Panel/Margin" unique_id=555100010]
+layout_mode = 2
+theme_override_constants/separation = 10
 
-[node name="Area2D" type="Area2D" parent="Target" unique_id=1811101269]
+[node name="Title" type="Label" parent="UI/StageClear/Panel/Margin/Column" unique_id=555100011]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 22
+text = "STAGE CLEAR"
+horizontal_alignment = 1
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Target/Area2D" unique_id=1870874704]
+[node name="Caption" type="Label" parent="UI/StageClear/Panel/Margin/Column" unique_id=555100012]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 12
+text = "All enemies defeated."
+horizontal_alignment = 1
+
+[node name="Aim" type="Node2D" parent="." unique_id=2058900465]
+
+[node name="Area2D" type="Area2D" parent="Aim" unique_id=1811101269]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Aim/Area2D" unique_id=1870874704]
 shape = SubResource("CircleShape2D_jkv2x")
 
-[node name="Sprite2D" type="Sprite2D" parent="Target" unique_id=1555519289]
+[node name="Sprite2D" type="Sprite2D" parent="Aim" unique_id=1555519289]
 scale = Vector2(0.15, 0.15)
 texture = ExtResource("14_a8y0u")
 
 [node name="PlayerHolder" type="Node2D" parent="." unique_id=269755286]
+position = Vector2(16, -243)
 
 [node name="Player" type="Node2D" parent="PlayerHolder" unique_id=1652955601]
-position = Vector2(-144, -187)
+position = Vector2(152, -96)
 script = ExtResource("9_trceg")
-
-[node name="Sprite2D" type="Sprite2D" parent="PlayerHolder/Player" unique_id=271390611]
-scale = Vector2(3, 3)
-texture = ExtResource("9_eb6dy")
 
 [node name="Timer" type="Timer" parent="PlayerHolder/Player" unique_id=321131043]
 wait_time = 0.1
 one_shot = true
 
-[node name="EnemyHolder" type="Node2D" parent="." unique_id=1616682388]
-
-[node name="Enemy" type="Node2D" parent="EnemyHolder" unique_id=144872954]
-position = Vector2(0, -230)
-script = ExtResource("4_enemy")
-data = ExtResource("17_enemy_data")
-
-[node name="HealthBar" type="Control" parent="EnemyHolder/Enemy" unique_id=9001001]
+[node name="PlayerHealthBar" type="Control" parent="PlayerHolder" unique_id=1800000008]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 526.0
-offset_top = 83.0
-offset_right = 626.0
-offset_bottom = 95.0
+offset_left = 392.0
+offset_top = 232.0
+offset_right = 740.0
+offset_bottom = 262.0
 
-[node name="Background" type="ColorRect" parent="EnemyHolder/Enemy/HealthBar" unique_id=9001002]
+[node name="Background" type="ColorRect" parent="PlayerHolder/PlayerHealthBar" unique_id=1800000009]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.2, 0, 0, 1)
+color = Color(0, 0, 0, 1)
 
-[node name="Fill" type="ColorRect" parent="EnemyHolder/Enemy/HealthBar" unique_id=9001003]
-layout_mode = 1
-offset_left = 1.0
-offset_top = 1.0
-offset_right = 99.0
-offset_bottom = 11.0
-color = Color(1, 0, 0, 1)
+[node name="Fill" type="ColorRect" parent="PlayerHolder/PlayerHealthBar" unique_id=1800000014]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 30.0
+color = Color(0, 0.7607843, 0, 1)
 
-[node name="HPText" type="Label" parent="EnemyHolder/Enemy/HealthBar" unique_id=9001004]
-layout_mode = 1
-anchors_preset = 15
+[node name="Label" type="Label" parent="PlayerHolder/PlayerHealthBar" unique_id=832688741]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -2.0
-offset_bottom = 2.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 12
-text = "100/100"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="EnemyHolder/Enemy" unique_id=48224419]
-texture_filter = 1
-position = Vector2(576, 31.999996)
-scale = Vector2(3, 3)
-sprite_frames = SubResource("SpriteFrames_og1vs")
-animation = &"idle"
-autoplay = "idle"
-frame_progress = 0.18569645
+[node name="DamageAnchorPlayer" type="Marker2D" parent="PlayerHolder" unique_id=1800000040]
+position = Vector2(584, 424)
 
-[node name="Timer" type="Timer" parent="EnemyHolder/Enemy" unique_id=1336342294]
-wait_time = 0.1
+[node name="EnemySlot" type="Node2D" parent="." unique_id=1614701798]
+z_index = 1
 
-[node name="AttackCooldown" type="Timer" parent="EnemyHolder/Enemy"]
-one_shot = true
+[node name="EnemyHolder1" type="Node2D" parent="EnemySlot" unique_id=1616682388]
+position = Vector2(344, -227)
+script = ExtResource("18_holder")
 
-[node name="CooldownRing" type="Node2D" parent="EnemyHolder/Enemy"]
-position = Vector2(620, 118)
-script = ExtResource("18_timer_ring")
+[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=1800000041]
+position = Vector2(32, -32)
 
-[node name="Label" type="Label" parent="EnemyHolder/Enemy/CooldownRing"]
-offset_left = -12.0
-offset_top = -9.0
-offset_right = 12.0
-offset_bottom = 9.0
+[node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
+position = Vector2(9, -8)
+script = ExtResource("18_spawn")
+enemy_scene = ExtResource("19_slime")
+
+[node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder1" unique_id=1419468956]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 56.0
+offset_right = 308.0
+offset_bottom = 86.0
+scale = Vector2(0.3, 0.5)
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyHealthBar" unique_id=1556571405]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyHealthBar" unique_id=1834186187]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 30.0
+color = Color(1, 0.039215688, 0.12941177, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder1/EnemyHealthBar" unique_id=1749696390]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 10
-text = "20"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Assets" type="Node2D" parent="." unique_id=1116332561]
+[node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder1" unique_id=440001001]
+offset_left = -48.0
+offset_top = -64.0
+offset_right = 68.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
-[node name="WoodBack" type="Sprite2D" parent="Assets" unique_id=1221723363]
+[node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder1" unique_id=978039901]
+position = Vector2(88, 63)
+script = ExtResource("21_ring")
+radius = 14.0
+base_color = Color(0.18, 0.12, 0.1, 0.9)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder1/CooldownRing" unique_id=1963528516]
+offset_left = -12.0
+offset_top = -8.0
+offset_right = 12.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyHolder2" type="Node2D" parent="EnemySlot" unique_id=1419468957]
+position = Vector2(520, -227)
+script = ExtResource("18_holder")
+
+[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1800000042]
+position = Vector2(46, -32)
+
+[node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
+position = Vector2(12, -8)
+script = ExtResource("18_spawn")
+enemy_scene = ExtResource("20_enemy2")
+
+[node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder2" unique_id=1419468958]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 56.0
+offset_right = 308.0
+offset_bottom = 86.0
+scale = Vector2(0.3, 0.5)
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyHealthBar" unique_id=1556571406]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyHealthBar" unique_id=1834186188]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 30.0
+color = Color(1, 0.039215688, 0.12941177, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder2/EnemyHealthBar" unique_id=2070921703]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder2" unique_id=440001002]
+offset_left = -48.0
+offset_top = -64.0
+offset_right = 68.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
+
+[node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder2" unique_id=1777201990]
+position = Vector2(91, 64)
+script = ExtResource("21_ring")
+radius = 14.0
+base_color = Color(0.18, 0.12, 0.1, 0.9)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder2/CooldownRing" unique_id=603321408]
+offset_left = -12.0
+offset_top = -8.0
+offset_right = 12.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyHolder3" type="Node2D" parent="EnemySlot" unique_id=1419468959]
+position = Vector2(701, -227)
+script = ExtResource("18_holder")
+
+[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=1800000043]
+position = Vector2(43, -32)
+
+[node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=144872956]
+position = Vector2(3, -8)
+script = ExtResource("18_spawn")
+
+[node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder3" unique_id=1419468960]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -45.0
+offset_top = 56.0
+offset_right = 303.0
+offset_bottom = 86.0
+scale = Vector2(0.3, 0.5)
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyHealthBar" unique_id=1556571407]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyHealthBar" unique_id=1834186189]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 30.0
+color = Color(1, 0.039215688, 0.12941177, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder3/EnemyHealthBar" unique_id=672710158]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder3" unique_id=440001003]
+offset_left = -53.0
+offset_top = -64.0
+offset_right = 63.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
+
+[node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder3" unique_id=222874641]
+position = Vector2(91, 64)
+script = ExtResource("21_ring")
+radius = 14.0
+base_color = Color(0.18, 0.12, 0.1, 0.9)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder3/CooldownRing" unique_id=707203193]
+offset_left = -12.0
+offset_top = -8.0
+offset_right = 12.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Background" type="Node2D" parent="." unique_id=1116332561]
+
+[node name="Cave" type="Sprite2D" parent="Background" unique_id=1221723363]
 z_index = -1
+texture_filter = 1
 position = Vector2(248, 0)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("3_o6xl0")
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("17_dp3eg")
 
-[node name="Overworld" type="Sprite2D" parent="Assets" unique_id=1512669767]
-z_index = -1
-position = Vector2(248, 0)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("3_tipki")
-
-[node name="Box" type="StaticBody2D" parent="Assets" unique_id=953407219]
-position = Vector2(-40, 109)
+[node name="Box" type="StaticBody2D" parent="Background" unique_id=953407219]
+position = Vector2(56, 109)
 physics_material_override = SubResource("PhysicsMaterial_surface")
 
-[node name="box_left2" type="Polygon2D" parent="Assets/Box" unique_id=1908746544]
+[node name="Interior" type="Polygon2D" parent="Background/Box" unique_id=1908746543]
+position = Vector2(8, -5)
+color = Color(0.24, 0.06, 0.31, 1)
+polygon = PackedVector2Array(-174, -218, 176, -218, 176, 168, -174, 168)
+
+[node name="box_left2" type="Polygon2D" parent="Background/Box" unique_id=1908746544]
 position = Vector2(14, -226)
 scale = Vector2(1, 10.75)
-color = Color(0.4, 0.4, 0.4, 1)
+color = Color(0.55, 0.45, 0.63, 1)
 polygon = PackedVector2Array(-198, 0.6511631, -166, 0.6511631, -166, 37.860466, 162, 37.860466, 162, 0.6511631, 194, 0.6511631, 194, 40.83721, -198, 40.83721)
 uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
 
-[node name="box_left3" type="Polygon2D" parent="Assets/Box" unique_id=1522180883]
+[node name="box_left3" type="Polygon2D" parent="Background/Box" unique_id=1522180883]
 position = Vector2(17, -632)
 scale = Vector2(1, 10.75)
-color = Color(0.4, 0.4, 0.4, 1)
+color = Color(0.55, 0.45, 0.63, 1)
 polygon = PackedVector2Array(-199, 34.25, -167, 36.75, -166, 37.860466, 162, 37.860466, 160, 36.75, 194.5, 35.75, 194, 40.83721, -198, 40.83721)
 uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
 
-[node name="collision_left" type="CollisionPolygon2D" parent="Assets/Box" unique_id=2092186238]
+[node name="collision_left" type="CollisionPolygon2D" parent="Background/Box" unique_id=2092186238]
 position = Vector2(8, -3)
 scale = Vector2(7.6547318, 8.198811)
 polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
 
+[node name="gun" type="Sprite2D" parent="Background" unique_id=672488835]
+position = Vector2(512, 188.99998)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("16_jbj1t")
+region_enabled = true
+region_rect = Rect2(731.8239, 332.31876, 454.1761, 387.68124)
+
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
-[connection signal="timeout" from="EnemyHolder/Enemy/Timer" to="EnemyHolder/Enemy" method="_on_timer_timeout"]
-[connection signal="timeout" from="EnemyHolder/Enemy/AttackCooldown" to="EnemyHolder/Enemy" method="_on_attack_cooldown_timeout"]

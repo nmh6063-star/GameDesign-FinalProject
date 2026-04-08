@@ -52,7 +52,6 @@ res://
 
   scenes/
     damage_floater.tscn
-    indicator_sprite.tscn
     main.tscn
     map.tscn
     map_tile.tscn
@@ -126,7 +125,6 @@ res://
 - `scenes/map.tscn`: map scene. It hosts the map controller, camera, and simple map UI.
 - `scenes/map_tile.tscn`: reusable scene for one map tile instance.
 - `scenes/damage_floater.tscn`: reusable floating-number scene for combat text.
-- `scenes/indicator_sprite.tscn`: reusable visual segment used by the aiming line.
 
 ### 4.3 Ball Scripts
 

@@ -2,26 +2,29 @@ extends RefCounted
 class_name BattleBox
 
 const GameBall := preload("res://script/ball/game_ball.gd")
-const BallData := preload("res://script/ball/ball_data.gd")
+const QUEUE_SIZE := 5
 
 var _root: Node2D
-var _template_ball: GameBall
+var _ball_parent: Node
+var _ball_placeholder: GameBall
 var _state
 var _target: Node2D
 var _on_ball_dropped: Callable
-var _spawn_pool: Array[BallData] = []
+var _spawn_pool: Array = []
+var _queue: Array = []
 
-
-func _init(root: Node2D, template_ball: GameBall, state, target: Node2D, on_ball_dropped: Callable, content_dir: String) -> void:
+func _init(root: Node2D, ball_placeholder: GameBall, state, target: Node2D, on_ball_dropped: Callable, scene_dir: String) -> void:
 	_root = root
-	_template_ball = template_ball
+	_ball_parent = ball_placeholder.get_parent()
+	_ball_placeholder = ball_placeholder
 	_state = state
 	_target = target
 	_on_ball_dropped = on_ball_dropped
-	_spawn_pool = _load_ball_pool(content_dir)
-	assert(not _spawn_pool.is_empty(), "No ball content found in %s" % content_dir)
-	_template_ball.set_runtime(_state, _target)
-	_template_ball.set_collision_enabled(false)
+	_spawn_pool = _load_ball_pool(scene_dir)
+	assert(not _spawn_pool.is_empty(), "No ball scenes found in %s" % scene_dir)
+	_fill_queue()
+	_ball_placeholder.set_runtime(_state, _target)
+	_ball_placeholder.set_collision_enabled(false)
 
 
 func active() -> Array:
@@ -30,7 +33,7 @@ func active() -> Array:
 		if not node is GameBall:
 			continue
 		var ball := node as GameBall
-		if ball == _template_ball or ball.set_up or not ball.visible or ball.is_queued_for_deletion():
+		if ball == _ball_placeholder or ball.set_up or not ball.visible or ball.is_queued_for_deletion():
 			continue
 		out.append(ball)
 	return out
@@ -44,12 +47,21 @@ func consume(ball: GameBall) -> void:
 
 
 func spawn_copy(source: GameBall, offset: Vector2 = Vector2.ZERO) -> GameBall:
-	return _spawn(source.data, source.level, source.position + offset, false)
+	return _spawn_instance(source.duplicate() as GameBall, source.data, source.level, source.position + offset, false)
 
 
 func spawn_setup_ball() -> GameBall:
-	var data := _roll_ball_data()
-	return _spawn(data, data.random_spawn_level(), _template_ball.position, true)
+	var entry := _take_queue_entry()
+	return _spawn_instance(entry["scene"].instantiate() as GameBall, entry["data"], entry["level"], _ball_placeholder.position, true)
+
+
+func preview() -> Array:
+	var items: Array = []
+	for entry in _queue:
+		if items.size() == QUEUE_SIZE:
+			break
+		items.append(entry)
+	return items
 
 
 func wake() -> void:
@@ -58,9 +70,8 @@ func wake() -> void:
 			(node as RigidBody2D).sleeping = false
 
 
-func _spawn(data: BallData, level: int, position: Vector2, is_set_up: bool) -> GameBall:
-	var ball := _template_ball.duplicate() as GameBall
-	_root.add_child(ball)
+func _spawn_instance(ball: GameBall, data, level: int, position: Vector2, is_set_up: bool) -> GameBall:
+	_ball_parent.add_child(ball)
 	ball.position = position
 	ball.visible = true
 	ball.configure(data, level, _state, _target)
@@ -71,24 +82,42 @@ func _spawn(data: BallData, level: int, position: Vector2, is_set_up: bool) -> G
 	return ball
 
 
-func _load_ball_pool(content_dir: String) -> Array[BallData]:
-	var pool: Array[BallData] = []
-	for file_name in DirAccess.get_files_at(content_dir):
-		if not file_name.ends_with(".tres"):
+func _load_ball_pool(scene_dir: String) -> Array:
+	var pool: Array = []
+	for file_name in DirAccess.get_files_at(scene_dir):
+		if not file_name.ends_with(".tscn"):
 			continue
-		var data := load("%s/%s" % [content_dir, file_name]) as BallData
-		if data.spawn_weight > 0:
-			pool.append(data)
+		var scene := load("%s/%s" % [scene_dir, file_name]) as PackedScene
+		if scene == null:
+			continue
+		var ball := scene.instantiate() as GameBall
+		if ball != null and ball.data != null and ball.data.spawn_weight > 0:
+			pool.append({"scene": scene, "data": ball.data})
+		if ball != null:
+			ball.free()
 	return pool
 
 
-func _roll_ball_data() -> BallData:
+func _take_queue_entry() -> Dictionary:
+	_fill_queue()
+	var entry: Dictionary = _queue.pop_front()
+	_fill_queue()
+	return entry
+
+
+func _fill_queue() -> void:
+	while _queue.size() < QUEUE_SIZE:
+		_queue.append(_roll_ball_entry())
+
+
+func _roll_ball_entry() -> Dictionary:
 	var total_weight := 0
-	for data in _spawn_pool:
-		total_weight += data.spawn_weight
+	for entry in _spawn_pool:
+		total_weight += entry["data"].spawn_weight
 	var roll := randi_range(1, total_weight)
-	for data in _spawn_pool:
-		roll -= data.spawn_weight
+	for entry in _spawn_pool:
+		roll -= entry["data"].spawn_weight
 		if roll <= 0:
-			return data
-	return _spawn_pool[0]
+			return {"scene": entry["scene"], "data": entry["data"], "level": entry["data"].random_spawn_level()}
+	var entry: Dictionary = _spawn_pool[0]
+	return {"scene": entry["scene"], "data": entry["data"], "level": entry["data"].random_spawn_level()}

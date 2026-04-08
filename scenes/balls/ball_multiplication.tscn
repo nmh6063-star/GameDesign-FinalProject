@@ -1,0 +1,50 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://script/ball/game_ball.gd" id="1_ball"]
+[ext_resource type="Texture2D" path="res://assets/CapsuleBall.png" id="2_texture"]
+[ext_resource type="FontFile" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_font"]
+[ext_resource type="Resource" path="res://content/balls/multiply_ball.tres" id="4_data"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
+friction = 2.5
+bounce = 0.9
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ball"]
+radius = 20.0
+
+[sub_resource type="FontVariation" id="FontVariation_ball"]
+base_font = ExtResource("3_font")
+spacing_glyph = -2
+
+[node name="BallMultiplication" type="RigidBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_ball")
+gravity_scale = 0.0
+contact_monitor = true
+max_contacts_reported = 1
+linear_damp = 4.0
+angular_damp = 4.0
+script = ExtResource("1_ball")
+data = ExtResource("4_data")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(1.25, 1.25)
+texture = ExtResource("2_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_ball")
+
+[node name="Polygon2D" type="Polygon2D" parent="."]
+
+[node name="RichTextLabel" type="RichTextLabel" parent="."]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+theme_override_fonts/bold_font = SubResource("FontVariation_ball")
+theme_override_font_sizes/bold_font_size = 8
+bbcode_enabled = true
+text = "[b]1[/b]"
+scroll_active = false
+horizontal_alignment = 1
+vertical_alignment = 1

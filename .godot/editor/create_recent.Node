@@ -1,8 +1,9 @@
+Sprite2D
+AnimatedSprite2D
 Node2D
 Container
 Button
 CanvasLayer
-Sprite2D
 Camera2D
 Polygon2D
 Timer
@@ -11,4 +12,3 @@ Area2D
 HSlider
 RichTextLabel
 Label
-Control

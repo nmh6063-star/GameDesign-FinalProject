@@ -12,6 +12,7 @@ var battle_state: BattleState
 var aim_target: Node2D
 var set_up := false
 var level := 1
+var ui_preview := false
 
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
@@ -19,10 +20,16 @@ const OUTLINE_POINTS := 64
 
 
 func _ready() -> void:
-	add_to_group("ball")
-	gravity_scale = 0.0
-	contact_monitor = true
-	max_contacts_reported = 10
+	if ui_preview:
+		gravity_scale = 0.0
+		contact_monitor = false
+		set_collision_enabled(false)
+		set_physics_process(false)
+	else:
+		add_to_group("ball")
+		gravity_scale = 0.0
+		contact_monitor = true
+		max_contacts_reported = 10
 	refresh()
 
 
@@ -35,6 +42,14 @@ func configure(ball_data: BallData, ball_level: int, state: BattleState, target:
 	data = ball_data
 	level = ball_level
 	set_runtime(state, target)
+	refresh()
+
+
+func set_preview(ball_data: BallData, ball_level: int) -> void:
+	ui_preview = true
+	data = ball_data
+	level = ball_level
+	set_collision_enabled(false)
 	refresh()
 
 
@@ -107,7 +122,7 @@ func _physics_process(_delta: float) -> void:
 	var delta_x := aim_target.position.x - position.x
 	var direction := 0.0 if absf(delta_x) < 15.0 else signf(delta_x)
 	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0, 0.0, 2500.0) * direction, 0.0)
-	if Input.is_action_just_pressed("play_card"):
+	if Input.is_action_just_pressed("drop"):
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()

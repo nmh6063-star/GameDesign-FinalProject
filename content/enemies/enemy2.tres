@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://1s2kaskro12m"]
+
+[ext_resource type="Script" uid="uid://bcjr8w352653g" path="res://script/battle/contracts/enemy_action.gd" id="1_b8o6g"]
+[ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/enemy/enemy_data.gd" id="1_enemy_data"]
+[ext_resource type="Script" uid="uid://cw4hlvxifwn8g" path="res://script/enemy/actions/direct_attack_action.gd" id="2_enemy_action"]
+
+[sub_resource type="Resource" id="DirectAttackAction_1"]
+script = ExtResource("2_enemy_action")
+
+[resource]
+script = ExtResource("1_enemy_data")
+id = "enemy2"
+display_name = "Enemy 2"
+max_health = 100
+attack_damage = 20
+attack_interval = 40.0
+actions = Array[ExtResource("1_b8o6g")]([SubResource("DirectAttackAction_1")])
