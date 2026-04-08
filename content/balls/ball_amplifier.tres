@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="BallData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://script/ball/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" path="res://script/ball/merge_rules/no_merge_rule.gd" id="2_merge_rule"]
+
+[sub_resource type="Resource" id="NoMergeRule_1"]
+script = ExtResource("2_merge_rule")
+
+[resource]
+script = ExtResource("1_ball_data")
+id = "ball_amplifier"
+display_name = "Amplifier Ball"
+tags = PackedStringArray("amplifier")
+spawn_weight = 1
+spawn_levels = PackedInt32Array(1)
+symbol = "X"
+tint = Color(0.92, 0.86, 0.5, 1)
+merge_rule = SubResource("NoMergeRule_1")

@@ -14,6 +14,10 @@ func active_balls() -> Array:
 	return controller.active_balls()
 
 
+func effect_balls() -> Array:
+	return controller.effect_balls()
+
+
 func active_enemy():
 	return controller.active_enemy()
 

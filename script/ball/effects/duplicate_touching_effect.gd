@@ -10,7 +10,7 @@ class_name DuplicateTouchingEffect
 func _targets(ctx: BattleContext, source) -> Array:
 	var out: Array = []
 	for ball in ctx.touching_balls(source, tolerance):
-		if not ball.has_tag("duplicate"):
+		if ball.has_tag("normal"):
 			out.append(ball)
 	return out
 

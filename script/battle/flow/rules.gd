@@ -28,7 +28,11 @@ func resolve_ball_effects(ctx: BattleContext) -> void:
 			if applied:
 				break
 		if not applied:
-			return
+			break
+	for ball in ctx.effect_balls():
+		for effect in ball.data.effects:
+			if effect.has_method("tick"):
+				effect.tick(ctx, ball)
 
 
 func resolve_enemy_turn(ctx: BattleContext, enemy = null) -> void:

@@ -15,6 +15,7 @@ const MERGE_SETTLE_TIME := 0.5
 const BURST_AREA_RADIUS := 320.0
 const SHOOT_BURST_STRENGTH_MULT := 10.0
 const BURST_STRENGTH := 35.0
+const AMPLIFIER_SHOT_MULT := 1.5
 const PLAYER_DAMAGE_COLOR := Color(1, 0.3, 0.3)
 const ENEMY_DAMAGE_COLOR := Color(0.92, 0.58, 0.06)
 const HEAL_COLOR := Color(0.35, 0.92, 0.55)
@@ -76,6 +77,12 @@ func _physics_process(_delta: float) -> void:
 		_shoot()
 
 func active_balls() -> Array: return _box.active()
+func effect_balls() -> Array:
+	var balls := active_balls()
+	var current := _state.current_ball as GameBall
+	if is_instance_valid(current) and current.visible and not current.is_queued_for_deletion():
+		balls.append(current)
+	return balls
 func active_enemy() -> BattleEnemy:
 	var holder: EnemyHolderSlot = _selected_enemy_holder()
 	return holder.enemy if holder != null else null
@@ -101,9 +108,10 @@ func damage_enemy(amount: int, enemy: BattleEnemy = null) -> void:
 	if amount <= 0 or target == null or target.current_health <= 0:
 		return
 	var applied := mini(amount, target.current_health)
+	var holder: EnemyHolderSlot = _enemy_holder(target)
 	target.flash()
 	target.apply_damage(applied)
-	_hud.show_damage(applied, _enemy_holder(target).damage_anchor, ENEMY_DAMAGE_COLOR)
+	holder.show_damage(applied, ENEMY_DAMAGE_COLOR)
 	if _alive_enemy_holders().is_empty():
 		_finish_battle("Stage Clear")
 
@@ -143,11 +151,21 @@ func _shoot() -> void:
 	if _state.phase != BattleState.Phase.PLAY or not _state.shoot_ammo.try_consume_shot():
 		return
 	var target_enemy: BattleEnemy = active_enemy()
+	var hit_balls: Array[GameBall] = []
+	var damage_total := 0
+	var damage_mult := 1.0
 	for body in _target_area.get_overlapping_bodies():
 		if not body is GameBall:
 			continue
-		damage_enemy((body as GameBall).level, target_enemy)
-		consume_ball(body as GameBall)
+		var ball: GameBall = body as GameBall
+		hit_balls.append(ball)
+		damage_total += ball.level
+		if ball.has_tag("amplifier"):
+			damage_mult *= AMPLIFIER_SHOT_MULT
+	if damage_total > 0:
+		damage_enemy(int(round(float(damage_total) * damage_mult)), target_enemy)
+	for ball in hit_balls:
+		consume_ball(ball)
 	burst_knock_on_balls(_target.global_position, SHOOT_BURST_STRENGTH_MULT)
 	sync_shoot_ammo_hud()
 

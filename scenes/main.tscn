@@ -9,11 +9,10 @@
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
-[ext_resource type="Resource" uid="uid://c41q4ecxfm1pc" path="res://content/balls/ball_normal.tres" id="16_attack_ball"]
 [ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
-[ext_resource type="Script" uid="uid://b7jt8672nor2y" path="res://script/enemy/holder.gd" id="18_holder"]
-[ext_resource type="Script" uid="uid://ccemeyn0nolwt" path="res://script/enemy/spawn.gd" id="18_spawn"]
+[ext_resource type="Script" path="res://script/enemy/holder.gd" id="18_holder"]
+[ext_resource type="Script" path="res://script/enemy/spawn.gd" id="18_spawn"]
 [ext_resource type="Script" uid="uid://b8cw14yjubvx3" path="res://script/battle/ui/hud.gd" id="19_battle_ui"]
 [ext_resource type="PackedScene" uid="uid://baw4nous1qt4i" path="res://scenes/enemies/enemy1.tscn" id="19_slime"]
 [ext_resource type="PackedScene" uid="uid://yl1vssn0sivb" path="res://scenes/enemies/enemy2.tscn" id="20_enemy2"]
@@ -22,6 +21,9 @@
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
 bounce = 0.9
+
+[sub_resource type="Resource" id="Resource_muem4"]
+metadata/__load_path__ = "res://content/balls/attack_ball.tres"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
@@ -101,7 +103,7 @@ max_contacts_reported = 1
 linear_damp = 4.0
 angular_damp = 4.0
 script = ExtResource("1_o5qli")
-data = ExtResource("16_attack_ball")
+data = SubResource("Resource_muem4")
 
 [node name="Sprite2D" type="Sprite2D" parent="BallHolder/BallPlaceholder" unique_id=1556687559]
 texture_filter = 1
@@ -471,11 +473,13 @@ z_index = 1
 position = Vector2(344, -227)
 script = ExtResource("18_holder")
 
+[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder1"]
+
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=1800000041]
-position = Vector2(32, -32)
+position = Vector2(40, -32)
 
 [node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
-position = Vector2(9, -8)
+position = Vector2(12, -8)
 script = ExtResource("18_spawn")
 enemy_scene = ExtResource("19_slime")
 
@@ -522,7 +526,7 @@ offset_bottom = 52.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
 [node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder1" unique_id=978039901]
-position = Vector2(88, 63)
+position = Vector2(91, 64)
 script = ExtResource("21_ring")
 radius = 14.0
 base_color = Color(0.18, 0.12, 0.1, 0.9)
@@ -540,8 +544,10 @@ vertical_alignment = 1
 position = Vector2(520, -227)
 script = ExtResource("18_holder")
 
+[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder2"]
+
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1800000042]
-position = Vector2(46, -32)
+position = Vector2(40, -32)
 
 [node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
 position = Vector2(12, -8)
@@ -609,19 +615,21 @@ vertical_alignment = 1
 position = Vector2(701, -227)
 script = ExtResource("18_holder")
 
+[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder3"]
+
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=1800000043]
-position = Vector2(43, -32)
+position = Vector2(40, -32)
 
 [node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=144872956]
-position = Vector2(3, -8)
+position = Vector2(12, -8)
 script = ExtResource("18_spawn")
 
 [node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder3" unique_id=1419468960]
 layout_mode = 3
 anchors_preset = 0
-offset_left = -45.0
+offset_left = -40.0
 offset_top = 56.0
-offset_right = 303.0
+offset_right = 308.0
 offset_bottom = 86.0
 scale = Vector2(0.3, 0.5)
 
@@ -652,9 +660,9 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder3" unique_id=440001003]
-offset_left = -53.0
+offset_left = -48.0
 offset_top = -64.0
-offset_right = 63.0
+offset_right = 68.0
 offset_bottom = 52.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
