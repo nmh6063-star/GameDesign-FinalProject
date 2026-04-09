@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://fwvlxgv10w5a"]
 
-[ext_resource type="Script" uid="uid://cimpqxsx8056k" path="res://script/ui/reward_selection.gd" id="1_script"]
+[ext_resource type="Script" path="res://script/battle/controllers/reward_selection_controller.gd" id="1_reward"]
+
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
@@ -47,7 +48,7 @@ corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
 [node name="RewardSelection" type="CanvasLayer" unique_id=1144266803]
-script = ExtResource("1_script")
+script = ExtResource("1_reward")
 
 [node name="Overlay" type="Control" parent="." unique_id=134457163]
 layout_mode = 3
@@ -246,10 +247,10 @@ autowrap_mode = 3
 
 [node name="Continue" type="Button" parent="Overlay/Card" unique_id=120422054]
 layout_mode = 0
-offset_left = 406.0
-offset_top = 498.0
-offset_right = 578.0
-offset_bottom = 546.0
+offset_left = 408.0
+offset_top = 496.0
+offset_right = 580.0
+offset_bottom = 544.0
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_continue")

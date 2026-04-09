@@ -1,2 +1,0 @@
-extends MergeRule
-class_name NoMergeRule

@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://tt07u0d3npdi"]
 
-[ext_resource type="Script" uid="uid://bu5eudvsydkcp" path="res://script/ball/game_ball.gd" id="1_o5qli"]
-[ext_resource type="Script" uid="uid://hj3v8j6743p5" path="res://script/battle/flow/controller.gd" id="2_gm"]
+[ext_resource type="Script" uid="uid://bu5eudvsydkcp" path="res://script/entities/balls/ball_base.gd" id="1_o5qli"]
+[ext_resource type="Script" path="res://script/battle/core/battle_loop.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
@@ -11,19 +11,11 @@
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
 [ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
-[ext_resource type="Script" path="res://script/enemy/holder.gd" id="18_holder"]
-[ext_resource type="Script" path="res://script/enemy/spawn.gd" id="18_spawn"]
-[ext_resource type="Script" uid="uid://b8cw14yjubvx3" path="res://script/battle/ui/hud.gd" id="19_battle_ui"]
-[ext_resource type="PackedScene" uid="uid://baw4nous1qt4i" path="res://scenes/enemies/enemy1.tscn" id="19_slime"]
-[ext_resource type="PackedScene" uid="uid://yl1vssn0sivb" path="res://scenes/enemies/enemy2.tscn" id="20_enemy2"]
 [ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="21_ring"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
 bounce = 0.9
-
-[sub_resource type="Resource" id="Resource_muem4"]
-metadata/__load_path__ = "res://content/balls/attack_ball.tres"
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
@@ -103,7 +95,6 @@ max_contacts_reported = 1
 linear_damp = 4.0
 angular_damp = 4.0
 script = ExtResource("1_o5qli")
-data = SubResource("Resource_muem4")
 
 [node name="Sprite2D" type="Sprite2D" parent="BallHolder/BallPlaceholder" unique_id=1556687559]
 texture_filter = 1
@@ -172,7 +163,6 @@ texture = ExtResource("12_indicator")
 script = ExtResource("2_gm")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
-script = ExtResource("19_battle_ui")
 
 [node name="BallQueue" type="Panel" parent="UI" unique_id=1041509987]
 offset_left = 56.0
@@ -252,9 +242,9 @@ position = Vector2(34, 34)
 layout_mode = 3
 anchors_preset = 0
 offset_left = 736.0
-offset_top = 352.0
+offset_top = 392.0
 offset_right = 1076.0
-offset_bottom = 384.0
+offset_bottom = 436.0
 script = ExtResource("15_shoothud")
 
 [node name="Row" type="VBoxContainer" parent="UI/ShootAmmoHUD" unique_id=901000001]
@@ -262,7 +252,6 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_bottom = 12.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
@@ -326,6 +315,222 @@ offset_top = 1.0
 offset_right = 1.0
 offset_bottom = 13.0
 color = Color(0.96, 0.8, 0.12, 1)
+
+[node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000008]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 736.0
+offset_top = 344.0
+offset_right = 1084.0
+offset_bottom = 374.0
+
+[node name="Background" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000009]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000014]
+layout_mode = 0
+offset_right = 240.0
+offset_bottom = 30.0
+color = Color(0, 0.7607843, 0, 1)
+
+[node name="Label" type="Label" parent="UI/PlayerHealthBar" unique_id=832688741]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyUi" type="Node2D" parent="UI" unique_id=1810001000]
+
+[node name="EnemyHolder1" type="Node2D" parent="UI/EnemyUi" unique_id=1810001001]
+
+[node name="DamageFloaters" type="Node2D" parent="UI/EnemyUi/EnemyHolder1" unique_id=970867613]
+
+[node name="EnemyHealthBar" type="Control" parent="UI/EnemyUi/EnemyHolder1" unique_id=1419468956]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 56.0
+offset_right = 64.0
+offset_bottom = 71.0
+
+[node name="Background" type="ColorRect" parent="UI/EnemyUi/EnemyHolder1/EnemyHealthBar" unique_id=1556571405]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="UI/EnemyUi/EnemyHolder1/EnemyHealthBar" unique_id=1834186187]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(1, 0.039215688, 0.12941177, 1)
+
+[node name="Label" type="Label" parent="UI/EnemyUi/EnemyHolder1/EnemyHealthBar" unique_id=1749696390]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionBox" type="Panel" parent="UI/EnemyUi/EnemyHolder1" unique_id=440001001]
+offset_left = -48.0
+offset_top = -64.0
+offset_right = 68.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
+
+[node name="CooldownRing" type="Node2D" parent="UI/EnemyUi/EnemyHolder1" unique_id=978039901]
+position = Vector2(91, 64)
+script = ExtResource("21_ring")
+radius = 14.0
+base_color = Color(0.18, 0.12, 0.1, 0.9)
+
+[node name="Label" type="Label" parent="UI/EnemyUi/EnemyHolder1/CooldownRing" unique_id=1963528516]
+offset_left = -12.0
+offset_top = -8.0
+offset_right = 12.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyHolder2" type="Node2D" parent="UI/EnemyUi" unique_id=1810001002]
+
+[node name="DamageFloaters" type="Node2D" parent="UI/EnemyUi/EnemyHolder2" unique_id=1709527943]
+
+[node name="EnemyHealthBar" type="Control" parent="UI/EnemyUi/EnemyHolder2" unique_id=1419468958]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 56.0
+offset_right = 64.0
+offset_bottom = 71.0
+
+[node name="Background" type="ColorRect" parent="UI/EnemyUi/EnemyHolder2/EnemyHealthBar" unique_id=1556571406]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="UI/EnemyUi/EnemyHolder2/EnemyHealthBar" unique_id=1834186188]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(1, 0.039215688, 0.12941177, 1)
+
+[node name="Label" type="Label" parent="UI/EnemyUi/EnemyHolder2/EnemyHealthBar" unique_id=2070921703]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionBox" type="Panel" parent="UI/EnemyUi/EnemyHolder2" unique_id=440001002]
+offset_left = -48.0
+offset_top = -64.0
+offset_right = 68.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
+
+[node name="CooldownRing" type="Node2D" parent="UI/EnemyUi/EnemyHolder2" unique_id=1777201990]
+position = Vector2(91, 64)
+script = ExtResource("21_ring")
+radius = 14.0
+base_color = Color(0.18, 0.12, 0.1, 0.9)
+
+[node name="Label" type="Label" parent="UI/EnemyUi/EnemyHolder2/CooldownRing" unique_id=603321408]
+offset_left = -12.0
+offset_top = -8.0
+offset_right = 12.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyHolder3" type="Node2D" parent="UI/EnemyUi" unique_id=1810001003]
+
+[node name="DamageFloaters" type="Node2D" parent="UI/EnemyUi/EnemyHolder3" unique_id=1165527090]
+
+[node name="EnemyHealthBar" type="Control" parent="UI/EnemyUi/EnemyHolder3" unique_id=1419468960]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 56.0
+offset_right = 64.0
+offset_bottom = 71.0
+
+[node name="Background" type="ColorRect" parent="UI/EnemyUi/EnemyHolder3/EnemyHealthBar" unique_id=1556571407]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="UI/EnemyUi/EnemyHolder3/EnemyHealthBar" unique_id=1834186189]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(1, 0.039215688, 0.12941177, 1)
+
+[node name="Label" type="Label" parent="UI/EnemyUi/EnemyHolder3/EnemyHealthBar" unique_id=672710158]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SelectionBox" type="Panel" parent="UI/EnemyUi/EnemyHolder3" unique_id=440001003]
+offset_left = -48.0
+offset_top = -64.0
+offset_right = 68.0
+offset_bottom = 52.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
+
+[node name="CooldownRing" type="Node2D" parent="UI/EnemyUi/EnemyHolder3" unique_id=222874641]
+position = Vector2(91, 64)
+script = ExtResource("21_ring")
+radius = 14.0
+base_color = Color(0.18, 0.12, 0.1, 0.9)
+
+[node name="Label" type="Label" parent="UI/EnemyUi/EnemyHolder3/CooldownRing" unique_id=707203193]
+offset_left = -12.0
+offset_top = -8.0
+offset_right = 12.0
+offset_bottom = 8.0
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="GameOver" type="CenterContainer" parent="UI" unique_id=555100001]
 visible = false
@@ -429,40 +634,6 @@ script = ExtResource("9_trceg")
 wait_time = 0.1
 one_shot = true
 
-[node name="PlayerHealthBar" type="Control" parent="PlayerHolder" unique_id=1800000008]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 392.0
-offset_top = 232.0
-offset_right = 740.0
-offset_bottom = 262.0
-
-[node name="Background" type="ColorRect" parent="PlayerHolder/PlayerHealthBar" unique_id=1800000009]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
-[node name="Fill" type="ColorRect" parent="PlayerHolder/PlayerHealthBar" unique_id=1800000014]
-layout_mode = 0
-offset_right = 240.0
-offset_bottom = 30.0
-color = Color(0, 0.7607843, 0, 1)
-
-[node name="Label" type="Label" parent="PlayerHolder/PlayerHealthBar" unique_id=832688741]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_choun")
-theme_override_font_sizes/font_size = 12
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="DamageAnchorPlayer" type="Marker2D" parent="PlayerHolder" unique_id=1800000040]
 position = Vector2(584, 424)
 
@@ -471,212 +642,30 @@ z_index = 1
 
 [node name="EnemyHolder1" type="Node2D" parent="EnemySlot" unique_id=1616682388]
 position = Vector2(344, -227)
-script = ExtResource("18_holder")
-
-[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder1"]
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=1800000041]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
+[node name="EnemySpawn_enemy1" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
 position = Vector2(12, -8)
-script = ExtResource("18_spawn")
-enemy_scene = ExtResource("19_slime")
-
-[node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder1" unique_id=1419468956]
-layout_mode = 3
-anchors_preset = 0
-offset_left = -40.0
-offset_top = 56.0
-offset_right = 64.0
-offset_bottom = 71.0
-
-[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyHealthBar" unique_id=1556571405]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
-[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyHealthBar" unique_id=1834186187]
-layout_mode = 0
-offset_right = 104.0
-offset_bottom = 15.0
-color = Color(1, 0.039215688, 0.12941177, 1)
-
-[node name="Label" type="Label" parent="EnemySlot/EnemyHolder1/EnemyHealthBar" unique_id=1749696390]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_choun")
-theme_override_font_sizes/font_size = 9
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder1" unique_id=440001001]
-offset_left = -48.0
-offset_top = -64.0
-offset_right = 68.0
-offset_bottom = 52.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
-
-[node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder1" unique_id=978039901]
-position = Vector2(91, 64)
-script = ExtResource("21_ring")
-radius = 14.0
-base_color = Color(0.18, 0.12, 0.1, 0.9)
-
-[node name="Label" type="Label" parent="EnemySlot/EnemyHolder1/CooldownRing" unique_id=1963528516]
-offset_left = -12.0
-offset_top = -8.0
-offset_right = 12.0
-offset_bottom = 8.0
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="EnemyHolder2" type="Node2D" parent="EnemySlot" unique_id=1419468957]
 position = Vector2(520, -227)
-script = ExtResource("18_holder")
-
-[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder2"]
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1800000042]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
+[node name="EnemySpawn_enemy2" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
 position = Vector2(12, -8)
-script = ExtResource("18_spawn")
-enemy_scene = ExtResource("20_enemy2")
-
-[node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder2" unique_id=1419468958]
-layout_mode = 3
-anchors_preset = 0
-offset_left = -40.0
-offset_top = 56.0
-offset_right = 64.0
-offset_bottom = 71.0
-
-[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyHealthBar" unique_id=1556571406]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
-[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyHealthBar" unique_id=1834186188]
-layout_mode = 0
-offset_right = 104.0
-offset_bottom = 15.0
-color = Color(1, 0.039215688, 0.12941177, 1)
-
-[node name="Label" type="Label" parent="EnemySlot/EnemyHolder2/EnemyHealthBar" unique_id=2070921703]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_choun")
-theme_override_font_sizes/font_size = 9
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder2" unique_id=440001002]
-offset_left = -48.0
-offset_top = -64.0
-offset_right = 68.0
-offset_bottom = 52.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
-
-[node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder2" unique_id=1777201990]
-position = Vector2(91, 64)
-script = ExtResource("21_ring")
-radius = 14.0
-base_color = Color(0.18, 0.12, 0.1, 0.9)
-
-[node name="Label" type="Label" parent="EnemySlot/EnemyHolder2/CooldownRing" unique_id=603321408]
-offset_left = -12.0
-offset_top = -8.0
-offset_right = 12.0
-offset_bottom = 8.0
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="EnemyHolder3" type="Node2D" parent="EnemySlot" unique_id=1419468959]
 position = Vector2(701, -227)
-script = ExtResource("18_holder")
-
-[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder3"]
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=1800000043]
 position = Vector2(40, -32)
 
 [node name="EnemySpawn" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=144872956]
 position = Vector2(12, -8)
-script = ExtResource("18_spawn")
-
-[node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder3" unique_id=1419468960]
-layout_mode = 3
-anchors_preset = 0
-offset_left = -40.0
-offset_top = 56.0
-offset_right = 64.0
-offset_bottom = 71.0
-
-[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyHealthBar" unique_id=1556571407]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0, 0, 0, 1)
-
-[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyHealthBar" unique_id=1834186189]
-layout_mode = 0
-offset_right = 104.0
-offset_bottom = 15.0
-color = Color(1, 0.039215688, 0.12941177, 1)
-
-[node name="Label" type="Label" parent="EnemySlot/EnemyHolder3/EnemyHealthBar" unique_id=672710158]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("6_choun")
-theme_override_font_sizes/font_size = 9
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="SelectionBox" type="Panel" parent="EnemySlot/EnemyHolder3" unique_id=440001003]
-offset_left = -48.0
-offset_top = -64.0
-offset_right = 68.0
-offset_bottom = 52.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
-
-[node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder3" unique_id=222874641]
-position = Vector2(91, 64)
-script = ExtResource("21_ring")
-radius = 14.0
-base_color = Color(0.18, 0.12, 0.1, 0.9)
-
-[node name="Label" type="Label" parent="EnemySlot/EnemyHolder3/CooldownRing" unique_id=707203193]
-offset_left = -12.0
-offset_top = -8.0
-offset_right = 12.0
-offset_bottom = 8.0
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="Background" type="Node2D" parent="." unique_id=1116332561]
 

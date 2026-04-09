@@ -18,7 +18,9 @@ config/icon="res://assets/CapsuleBall.png"
 
 [autoload]
 
-RunState="*res://script/run/run_state.gd"
+BattleLoadout="*res://script/state/battle_loadout.gd"
+MapState="*res://script/state/map_state.gd"
+PlayerState="*res://script/state/player_state.gd"
 
 [display]
 

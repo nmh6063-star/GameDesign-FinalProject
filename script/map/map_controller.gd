@@ -15,10 +15,10 @@ var _current_tile := Vector2i.ZERO
 
 func _ready() -> void:
 	_shop_button.visible = false
-	if RunState.map_layout.is_empty():
-		RunState.map_layout = _generator.build(RunState.map_size)
+	if MapState.map_layout.is_empty():
+		MapState.map_layout = _generator.build(MapState.map_size)
 	_draw_map()
-	_current_tile = RunState.current_tile if RunState.current_tile.x >= 0 else Vector2i.ZERO
+	_current_tile = MapState.current_tile if MapState.current_tile.x >= 0 else Vector2i.ZERO
 	if not _tiles.has(_current_tile):
 		_current_tile = Vector2i.ZERO
 	_refresh_selection()
@@ -34,10 +34,10 @@ func _physics_process(_delta: float) -> void:
 
 
 func _draw_map() -> void:
-	for position in RunState.map_layout.keys():
+	for position in MapState.map_layout.keys():
 		var tile := MAP_TILE_SCENE.instantiate()
 		tile.position = Vector2(position.x * 80, position.y * 80)
-		tile.setup(RunState.map_layout[position])
+		tile.setup(MapState.map_layout[position])
 		_tiles[position] = tile
 		add_child(tile)
 
@@ -61,7 +61,7 @@ func _enter_tile() -> void:
 
 
 func _refresh_selection() -> void:
-	if _tiles.has(RunState.current_tile):
-		(_tiles[RunState.current_tile] as CanvasItem).modulate = Color.WHITE
+	if _tiles.has(MapState.current_tile):
+		(_tiles[MapState.current_tile] as CanvasItem).modulate = Color.WHITE
 	(_tiles[_current_tile] as CanvasItem).modulate = Color(0.502, 0.502, 0.502)
-	RunState.current_tile = _current_tile
+	MapState.current_tile = _current_tile

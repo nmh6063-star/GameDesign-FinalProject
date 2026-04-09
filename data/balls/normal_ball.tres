@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://c41q4ecxfm1pc"]
+
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" path="res://script/entities/balls/elemental_balls/level_merge_rule.gd" id="2_merge_rule"]
+
+[sub_resource type="Resource" id="LevelMergeRule_1"]
+script = ExtResource("2_merge_rule")
+
+[resource]
+script = ExtResource("1_ball_data")
+id = "ball_normal"
+display_name = "Normal Ball"
+description = "Basic ball. Merge equal levels together to grow bigger numbers."
+tags = PackedStringArray("normal")
+spawn_weight = 4
+spawn_levels = PackedInt32Array(1, 2, 3, 4)
+tint = Color(0.35, 0.74, 0.3, 1)
+level_tint_step = Color(0.05, -0.06, 0, 0)
+merge_rule = SubResource("LevelMergeRule_1")

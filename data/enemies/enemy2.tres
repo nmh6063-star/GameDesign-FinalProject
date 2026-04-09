@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://1s2kaskro12m"]
+
+[ext_resource type="Script" uid="uid://bcjr8w352653g" path="res://script/entities/enemies/actions/enemy_action_base.gd" id="1_enemy_action_base"]
+[ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/entities/enemies/enemy_data.gd" id="2_enemy_data"]
+[ext_resource type="Script" uid="uid://c03m8gh3h3y3p" path="res://script/entities/enemies/actions/bomb_drop_action.gd" id="3_enemy_action"]
+[ext_resource type="Texture2D" uid="uid://ble65dyseu6oh" path="res://assets/enemy1.png" id="4_texture"]
+
+[sub_resource type="Resource" id="BombDropAction_1"]
+script = ExtResource("3_enemy_action")
+
+[resource]
+script = ExtResource("2_enemy_data")
+id = "enemy2"
+display_name = "Enemy 2"
+sprite_texture = ExtResource("4_texture")
+sprite_region = Rect2(300, 300, 720, 720)
+sprite_scale = Vector2(0.15, 0.15)
+max_health = 100
+attack_damage = 20
+attack_interval = 10.0
+actions = Array[ExtResource("1_enemy_action_base")]([SubResource("BombDropAction_1")])

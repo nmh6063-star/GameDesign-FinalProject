@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallData" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" path="res://script/entities/balls/effects/shot_amplifier_effect.gd" id="3_ball_effect"]
+
+[sub_resource type="Resource" id="AmplifierShotEffect_1"]
+script = ExtResource("3_ball_effect")
+
+[resource]
+script = ExtResource("1_ball_data")
+id = "ball_amplifier"
+display_name = "Amplifier Ball"
+description = "Stays on the board. If a shot hits it, that shot deals 1.5x damage."
+tags = PackedStringArray("amplifier")
+spawn_weight = 1
+spawn_levels = PackedInt32Array(1)
+symbol = "X"
+tint = Color(0.92, 0.86, 0.5, 1)
+effects = [SubResource("AmplifierShotEffect_1")]
