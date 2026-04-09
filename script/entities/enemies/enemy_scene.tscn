@@ -1,17 +1,17 @@
-[gd_scene format=3]
+[gd_scene format=3 uid="uid://b8wgnsbx3lust"]
 
-[ext_resource type="Script" path="res://script/entities/enemies/enemy_base.gd" id="1_enemy"]
+[ext_resource type="Script" uid="uid://3vgvq8and53h" path="res://script/entities/enemies/enemy_base.gd" id="1_enemy"]
 
-[node name="Enemy" type="Node2D"]
+[node name="Enemy" type="Node2D" unique_id=1587241477]
 script = ExtResource("1_enemy")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=402481037]
 texture_filter = 1
 
-[node name="Timer" type="Timer" parent="."]
+[node name="Timer" type="Timer" parent="." unique_id=1322452554]
 wait_time = 0.1
 
-[node name="AttackCooldown" type="Timer" parent="."]
+[node name="AttackCooldown" type="Timer" parent="." unique_id=412371879]
 one_shot = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

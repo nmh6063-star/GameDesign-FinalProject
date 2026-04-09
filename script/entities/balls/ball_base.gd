@@ -2,6 +2,7 @@ extends RigidBody2D
 class_name BallBase
 
 const BattleContext := preload("res://script/battle/core/battle_context.gd")
+const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const BallData := preload("res://script/entities/balls/ball_data.gd")
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
@@ -124,7 +125,7 @@ func tick_board_behavior(ctx: BattleContext) -> void:
 
 
 func shot_base_damage() -> int:
-	return level if has_tag("normal") else 0
+	return level if data != null and data.id == BallCatalog.NORMAL_BALL_ID else 0
 
 
 func shot_damage_multiplier() -> float:

@@ -1,7 +1,8 @@
-[gd_resource type="Resource" script_class="BallData" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://bv6rklayljbn"]
 
-[ext_resource type="Script" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
-[ext_resource type="Script" path="res://script/entities/balls/effects/multiply_effect.gd" id="3_ball_effect"]
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/entities/balls/effects/ball_effect_base.gd" id="1_ugqa0"]
+[ext_resource type="Script" uid="uid://ba841uhod4tjo" path="res://script/entities/balls/effects/multiply_effect.gd" id="3_ball_effect"]
 
 [sub_resource type="Resource" id="MultiplyTouchingEffect_1"]
 script = ExtResource("3_ball_effect")
@@ -11,9 +12,7 @@ script = ExtResource("1_ball_data")
 id = "ball_multiplication"
 display_name = "Multiplication Ball"
 description = "Doubles the level of touched normal balls."
-tags = PackedStringArray("multiply")
-spawn_weight = 1
 spawn_levels = PackedInt32Array(1)
 symbol = "M"
 tint = Color(0.25, 0.55, 1, 1)
-effects = [SubResource("MultiplyTouchingEffect_1")]
+effects = Array[ExtResource("1_ugqa0")]([SubResource("MultiplyTouchingEffect_1")])
