@@ -34,7 +34,6 @@ func _init(slot: Node2D, spawn: Marker2D, enemy_id: String) -> void:
 	_bar.visible = false
 	_cooldown_ring.visible = false
 	_selection_box.visible = false
-	_sync_ui_position()
 
 
 func spawn_enemy() -> EnemyBase:
@@ -54,7 +53,6 @@ func spawn_enemy() -> EnemyBase:
 	_slot.visible = true
 	_slot.process_mode = Node.PROCESS_MODE_INHERIT
 	_ui_root.visible = true
-	_sync_ui_position()
 	enemy = enemy_scene.instantiate() as EnemyBase
 	enemy.data = enemy_data
 	enemy.position = _spawn.position
@@ -71,7 +69,6 @@ func set_selected(selected: bool) -> void:
 func show_damage(amount: int, color: Color) -> void:
 	if amount <= 0:
 		return
-	_sync_ui_position()
 	var floater := Label.new()
 	_damage_floaters.add_child(floater)
 	floater.position = _damage_anchor.position
@@ -90,12 +87,10 @@ func show_damage(amount: int, color: Color) -> void:
 
 
 func sync_view() -> void:
-	_sync_ui_position()
 	sync_realtime_view()
 
 
 func sync_realtime_view() -> void:
-	_sync_ui_position()
 	var alive := enemy != null and enemy.is_alive()
 	var cooldown_total: float = enemy.cooldown_total() if alive else 0.0
 	_bar.visible = alive
@@ -113,7 +108,7 @@ func is_alive() -> bool:
 
 
 func _bind_ui() -> void:
-	_ui_root = _slot.get_tree().current_scene.get_node("UI/EnemyUi/%s" % _slot.name) as Node2D
+	_ui_root = _slot.get_node("EnemyUi") as Node2D
 	_bar = _ui_root.get_node("EnemyHealthBar") as Control
 	_background = _ui_root.get_node("EnemyHealthBar/Background") as ColorRect
 	_fill = _ui_root.get_node("EnemyHealthBar/Fill") as ColorRect
@@ -121,8 +116,3 @@ func _bind_ui() -> void:
 	_cooldown_ring = _ui_root.get_node("CooldownRing") as Node2D
 	_selection_box = _ui_root.get_node("SelectionBox") as Control
 	_damage_floaters = _ui_root.get_node("DamageFloaters") as Node2D
-
-
-func _sync_ui_position() -> void:
-	if _ui_root != null:
-		_ui_root.position = _slot.get_global_transform_with_canvas().origin

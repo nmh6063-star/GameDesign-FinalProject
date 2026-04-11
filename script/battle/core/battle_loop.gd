@@ -58,6 +58,9 @@ func _initialize() -> void:
 func _begin_battle() -> void:
 	randomize()
 	_context.reset_for_battle()
+	if _should_skip_reward_selection():
+		_begin_stage()
+		return
 	_show_reward_selection()
 
 
@@ -377,7 +380,18 @@ func _finish_battle(text: String) -> void:
 	_context.lock_resolution()
 	_clear_current_ball()
 	_target.visible = false
+	set_physics_process(false)
 	_hud.show_result(text)
+	var game_manager := _game_manager()
+	if game_manager == null:
+		return
+	await get_tree().create_timer(1.1).timeout
+	if not is_inside_tree():
+		return
+	if text == "Game Over":
+		game_manager.call("restart_run")
+		return
+	game_manager.call("complete_current_room")
 
 
 func _on_enemy_action_requested(enemy: EnemyBase) -> void:
@@ -419,3 +433,16 @@ func _enemy_id_for_slot(spawn: Marker2D) -> String:
 	if spawn == null or not spawn.name.begins_with("EnemySpawn_"):
 		return ""
 	return spawn.name.trim_prefix("EnemySpawn_")
+
+
+func _game_manager() -> Node:
+	return get_node_or_null("/root/GameManager")
+
+
+func _should_skip_reward_selection() -> bool:
+	var game_manager := _game_manager()
+	if game_manager == null:
+		return false
+	if not game_manager.has_method("should_skip_battle_rewards"):
+		return false
+	return bool(game_manager.call("should_skip_battle_rewards"))

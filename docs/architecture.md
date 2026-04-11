@@ -32,91 +32,91 @@ Generic reusable widgets still live in `script/ui/`, and content definitions sti
 ```text
 res://
   script/
-    battle/
-      core/
-        battle_context.gd
-        battle_loop.gd
-        battle_resolver.gd
+	battle/
+	  core/
+		battle_context.gd
+		battle_loop.gd
+		battle_resolver.gd
 
-      controllers/
-        battle_ball_manager.gd
-        enemy_slot_controller.gd
-        reward_selection_controller.gd
+	  controllers/
+		battle_ball_manager.gd
+		enemy_slot_controller.gd
+		reward_selection_controller.gd
 
-      ui/
-        battle_hud_adapter.gd
+	  ui/
+		battle_hud_adapter.gd
 
-    entities/
-      balls/
-        ball_base.gd
-        ball_catalog.gd
-        ball_data.gd
-        elemental_balls/
-          elemental_ball_base.gd
-          elemental_ball_scene.tscn
-          level_merge_rule.gd
-          merge_rule_base.gd
-        modifier_balls/
-          modifier_ball_base.gd
-          modifier_ball_scene.tscn
-        effects/
-          ball_effect_base.gd
-          duplicate_effect.gd
-          explode_effect.gd
-          heal_touch_effect.gd
-          magnet_effect.gd
-          multiply_effect.gd
-          shot_amplifier_effect.gd
+	entities/
+	  balls/
+		ball_base.gd
+		ball_catalog.gd
+		ball_data.gd
+		elemental_balls/
+		  elemental_ball_base.gd
+		  elemental_ball_scene.tscn
+		  level_merge_rule.gd
+		  merge_rule_base.gd
+		modifier_balls/
+		  modifier_ball_base.gd
+		  modifier_ball_scene.tscn
+		effects/
+		  ball_effect_base.gd
+		  duplicate_effect.gd
+		  explode_effect.gd
+		  heal_touch_effect.gd
+		  magnet_effect.gd
+		  multiply_effect.gd
+		  shot_amplifier_effect.gd
 
-      enemies/
-        enemy_base.gd
-        enemy_catalog.gd
-        enemy_data.gd
-        enemy_scene.tscn
-        actions/
-          bomb_drop_action.gd
-          direct_attack_action.gd
-          enemy_action_base.gd
-        effects/
-          enemy_effect_base.gd
+	  enemies/
+		enemy_base.gd
+		enemy_catalog.gd
+		enemy_data.gd
+		enemy_scene.tscn
+		actions/
+		  bomb_drop_action.gd
+		  direct_attack_action.gd
+		  enemy_action_base.gd
+		effects/
+		  enemy_effect_base.gd
 
-    map/
-      map_controller.gd
-      map_generator.gd
-      map_tile.gd
+	map/
+	  map_controller.gd
+	  map_generator.gd
+	  map_tile.gd
 
-    player/
-      player.gd
+	player/
+	  player.gd
 
-    state/
-      battle_loadout.gd
-      map_state.gd
-      player_state.gd
+	state/
+	  battle_loadout.gd
+	  map_state.gd
+	  player_state.gd
 
-    ui/
-      damage_floater.gd
-      line_indicator.gd
-      shoot_ammo_hud.gd
-      timer_ring.gd
+	ui/
+	  damage_floater.gd
+	  line_indicator.gd
+	  shoot_ammo_hud.gd
+	  timer_ring.gd
 
   data/
-    balls/
-      amplifier_ball.tres
-      bomb_ball.tres
-      duplication_ball.tres
-      heal_ball.tres
-      magnet_ball.tres
-      multiplication_ball.tres
-      normal_ball.tres
-    enemies/
-      enemy1.tres
-      enemy2.tres
+	balls/
+	  amplifier_ball.tres
+	  bomb_ball.tres
+	  duplication_ball.tres
+	  heal_ball.tres
+	  magnet_ball.tres
+	  multiplication_ball.tres
+	  normal_ball.tres
+	enemies/
+	  enemy1.tres
+	  enemy2.tres
 
   scenes/
-    main.tscn
-    map.tscn
-    map_tile.tscn
-    reward_selection.tscn
+	main.tscn
+	map.tscn
+	map_tile.tscn
+	reward_selection.tscn
 ```
 
 ## Main Responsibilities
