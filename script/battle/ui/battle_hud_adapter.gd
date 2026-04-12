@@ -14,6 +14,7 @@ var _queue_keys: Array[String] = []
 var _top_frame: Control
 var _queue_roots: Array[Node2D] = []
 var _shoot_ammo_hud: Control
+var _combo_hud: Control
 var _game_over: Control
 var _stage_clear: Control
 
@@ -29,6 +30,7 @@ func _init(root: CanvasLayer) -> void:
 		_root.get_node("BallQueue/Center/Slots/Slot4/PreviewRoot") as Node2D,
 	]
 	_shoot_ammo_hud = _root.get_node("ShootAmmoHUD") as Control
+	_combo_hud = _root.get_node_or_null("ComboHUD") as Control
 	_game_over = _root.get_node("GameOver") as Control
 	_stage_clear = _root.get_node("StageClear") as Control
 
@@ -58,6 +60,11 @@ func sync_ball_queue(items: Array) -> void:
 
 func sync_shoot_ammo(bullets: int, merge_progress: int) -> void:
 	_shoot_ammo_hud.call("sync_state", bullets, merge_progress, BattleContext.MERGES_PER_BULLET)
+
+
+func sync_combo(combo: int, multiplier: float, timer_ratio: float) -> void:
+	if _combo_hud != null:
+		_combo_hud.call("sync_state", combo, multiplier, timer_ratio)
 
 
 func show_damage(amount: int, anchor: Marker2D, color: Color) -> void:

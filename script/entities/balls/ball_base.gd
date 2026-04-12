@@ -174,6 +174,9 @@ func _physics_process(_delta: float) -> void:
 		return
 	sleeping = false
 	gravity_scale = 0.0
+	if battle_context.slow_mo_active:
+		linear_velocity = Vector2.ZERO
+		return
 	var delta_x := aim_target.position.x - position.x
 	var direction := 0.0 if absf(delta_x) < 15.0 else signf(delta_x)
 	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0, 0.0, 2500.0) * direction, 0.0)

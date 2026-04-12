@@ -5,6 +5,7 @@ enum Phase { PLAY, RESOLVE }
 
 const MAX_BULLETS := 5
 const MERGES_PER_BULLET := 5
+const COMBO_TIMEOUT := 5.0
 
 var controller
 var phase := Phase.PLAY
@@ -15,6 +16,9 @@ var current_ball: BallBase = null
 var merge_progress := 0
 var bullets := 0
 var battle_result_text := ""
+var slow_mo_active := false
+var combo := 0
+var combo_timer := 0.0
 
 
 func _init(p_controller = null) -> void:
@@ -30,6 +34,9 @@ func reset_for_battle() -> void:
 	merge_progress = 0
 	bullets = 0
 	battle_result_text = ""
+	slow_mo_active = false
+	combo = 0
+	combo_timer = 0.0
 
 
 func start_turn() -> void:
@@ -60,14 +67,53 @@ func has_battle_result() -> bool:
 	return battle_result_text != ""
 
 
+func combo_multiplier() -> float:
+	if combo < 3:
+		return 1.0
+	if combo < 5:
+		return 1.1
+	if combo < 7:
+		return 1.3
+	if combo < 10:
+		return 1.6
+	if combo < 13:
+		return 2.0
+	if combo < 16:
+		return 2.4
+	if combo < 20:
+		return 2.7
+	return 3
+
+
+func combo_timer_ratio() -> float:
+	if combo <= 0:
+		return 0.0
+	return clampf(combo_timer / COMBO_TIMEOUT, 0.0, 1.0)
+
+
+func tick_combo(delta: float) -> void:
+	if combo <= 0:
+		return
+	combo_timer -= delta
+	if combo_timer <= 0.0:
+		combo_timer = 0.0
+		combo = 0
+	if controller != null:
+		controller.sync_combo_hud()
+
+
 func register_merge() -> void:
+	combo += 1
+	combo_timer = COMBO_TIMEOUT
 	if bullets < MAX_BULLETS:
-		merge_progress += 1
-		if merge_progress >= MERGES_PER_BULLET:
-			merge_progress = 0
+		var progress_gain := maxi(1, int(combo_multiplier()))
+		merge_progress += progress_gain
+		while merge_progress >= MERGES_PER_BULLET and bullets < MAX_BULLETS:
+			merge_progress -= MERGES_PER_BULLET
 			bullets = mini(bullets + 1, MAX_BULLETS)
 	if controller != null:
 		controller.sync_shoot_ammo_hud()
+		controller.sync_combo_hud()
 
 
 func can_shoot() -> bool:
