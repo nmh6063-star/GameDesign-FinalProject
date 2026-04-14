@@ -57,56 +57,10 @@ anchors_preset = -1
 anchor_top = 0.58
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 56.160004
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.78, 0.73, 0.89, 0.48)
-
-[node name="BackdropColumns" type="Control" parent="." unique_id=847697444]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
-[node name="ColumnLeft" type="ColorRect" parent="BackdropColumns" unique_id=4341930]
-layout_mode = 0
-offset_left = 118.0
-offset_right = 206.0
-offset_bottom = 410.0
-color = Color(0.66, 0.57, 0.78, 0.28)
-
-[node name="ColumnMid" type="ColorRect" parent="BackdropColumns" unique_id=520595135]
-layout_mode = 0
-offset_left = 534.0
-offset_right = 626.0
-offset_bottom = 456.0
-color = Color(0.66, 0.57, 0.78, 0.24)
-
-[node name="ColumnRight" type="ColorRect" parent="BackdropColumns" unique_id=318736244]
-layout_mode = 0
-offset_left = 920.0
-offset_right = 1004.0
-offset_bottom = 398.0
-color = Color(0.66, 0.57, 0.78, 0.28)
-
-[node name="BeamLeft" type="ColorRect" parent="BackdropColumns" unique_id=402970270]
-layout_mode = 0
-offset_left = 344.0
-offset_top = 328.0
-offset_right = 384.0
-offset_bottom = 862.0
-rotation = 0.741765
-color = Color(1, 1, 1, 0.1)
-
-[node name="BeamCenter" type="ColorRect" parent="BackdropColumns" unique_id=537189871]
-layout_mode = 0
-offset_left = 555.0
-offset_top = 336.0
-offset_right = 591.0
-offset_bottom = 756.0
-color = Color(1, 1, 1, 0.16)
 
 [node name="CurrentRoomLabel" type="Label" parent="." unique_id=177682147]
 layout_mode = 0
@@ -142,9 +96,9 @@ horizontal_alignment = 1
 
 [node name="DoorCenter" type="CenterContainer" parent="." unique_id=1018380031]
 layout_mode = 0
-offset_top = 120.0
+offset_top = 104.0
 offset_right = 1152.0
-offset_bottom = 472.0
+offset_bottom = 456.0
 
 [node name="Doors" type="HBoxContainer" parent="DoorCenter" unique_id=742018872]
 layout_mode = 2
@@ -169,6 +123,16 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_selected")
+
+[node name="TypeIcon" type="TextureRect" parent="DoorCenter/Doors/LeftDoor" unique_id=1559558329]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 208.0
+offset_bottom = 166.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="TypeMark" type="Label" parent="DoorCenter/Doors/LeftDoor" unique_id=1152299016]
 layout_mode = 0
@@ -224,6 +188,16 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_selected")
 
+[node name="TypeIcon" type="TextureRect" parent="DoorCenter/Doors/CenterDoor" unique_id=868401095]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 208.0
+offset_bottom = 166.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="TypeMark" type="Label" parent="DoorCenter/Doors/CenterDoor" unique_id=778172555]
 layout_mode = 0
 offset_left = 20.0
@@ -278,6 +252,16 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_selected")
 
+[node name="TypeIcon" type="TextureRect" parent="DoorCenter/Doors/RightDoor" unique_id=1462353726]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 208.0
+offset_bottom = 166.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="TypeMark" type="Label" parent="DoorCenter/Doors/RightDoor" unique_id=25252887]
 layout_mode = 0
 offset_left = 20.0
@@ -322,7 +306,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 10
 text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M TOGGLE MAP"
 
-[node name="MapGraph" parent="." unique_id=814081330 instance=ExtResource("3_graph")]
+[node name="MapGraph" parent="." instance=ExtResource("3_graph")]
 visible = false
 layout_mode = 0
 offset_left = 744.0
@@ -333,9 +317,9 @@ offset_bottom = 606.0
 [node name="MapToggle" type="Panel" parent="." unique_id=1590899332]
 layout_mode = 0
 offset_left = 884.0
-offset_top = 556.0
+offset_top = 580.0
 offset_right = 936.0
-offset_bottom = 612.0
+offset_bottom = 636.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_hint")
 
 [node name="Label" type="Label" parent="MapToggle" unique_id=1388249034]

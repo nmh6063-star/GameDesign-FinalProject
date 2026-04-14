@@ -2,7 +2,6 @@ extends RefCounted
 class_name MapController
 
 const MapGenerator := preload("res://script/map/map_generator.gd")
-const MapTypes := preload("res://script/map/map_types.gd")
 
 signal run_started(run_data)
 signal state_changed
@@ -10,23 +9,26 @@ signal room_entered(room_data)
 signal run_completed(room_data)
 
 var _generator := MapGenerator.new()
-var _run
+var _run: MapGenerator.Run
 var _current_room_id := -1
 var _visited_room_ids: Array = []
+var _completed_room_ids: Array = []
 var _available_choice_ids: Array = []
 var _selected_choice_index := 0
 
 
-func start_new_run(seed: int = -1, config = null) -> void:
-	_run = _generator.generate(seed, config)
-	_current_room_id = _run.start_node_id
-	_visited_room_ids = [_current_room_id]
-	_refresh_choices()
+func start_new_run(seed: int = -1) -> void:
+	_run = _generator.generate(seed)
+	_current_room_id = -1
+	_visited_room_ids = []
+	_completed_room_ids = []
+	_available_choice_ids = _run.start_room_ids.duplicate()
+	_selected_choice_index = 0
 	run_started.emit(_run)
 	state_changed.emit()
 
 
-func run_data():
+func run_data() -> MapGenerator.Run:
 	return _run
 
 
@@ -34,18 +36,22 @@ func seed() -> int:
 	return 0 if _run == null else int(_run.seed)
 
 
-func current_room():
-	return null if _run == null else _run.node(_current_room_id)
+func current_room() -> MapGenerator.Room:
+	return null if _run == null or _current_room_id < 0 else _run.room(_current_room_id)
+
+
+func current_room_id() -> int:
+	return _current_room_id
 
 
 func current_room_type() -> int:
-	var room = current_room()
-	return MapTypes.RoomType.START if room == null else int(room.room_type)
+	var room := current_room()
+	return MapGenerator.Room.Type.START if room == null else int(room.type)
 
 
 func current_layer_index() -> int:
-	var room = current_room()
-	return -1 if room == null else int(room.layer_index)
+	var room := current_room()
+	return -1 if room == null else int(room.row)
 
 
 func visited_room_ids() -> Array:
@@ -56,12 +62,22 @@ func visited_has(room_id: int) -> bool:
 	return room_id in _visited_room_ids
 
 
+func completed_room_ids() -> Array:
+	return _completed_room_ids.duplicate()
+
+
+func completed_has(room_id: int) -> bool:
+	return room_id in _completed_room_ids
+
+
 func available_choices() -> Array:
-	if _run == null:
-		return []
 	var rooms: Array = []
+	if _run == null:
+		return rooms
 	for room_id in _available_choice_ids:
-		rooms.append(_run.node(room_id))
+		var room := _run.room(int(room_id))
+		if room != null:
+			rooms.append(room)
 	return rooms
 
 
@@ -73,14 +89,14 @@ func selected_choice_index() -> int:
 	return _selected_choice_index
 
 
-func selected_choice():
+func selected_choice() -> MapGenerator.Room:
 	if _run == null or _available_choice_ids.is_empty():
 		return null
-	return _run.node(_available_choice_ids[_selected_choice_index])
+	return _run.room(int(_available_choice_ids[_selected_choice_index]))
 
 
 func selected_path_target_id() -> int:
-	var room = selected_choice()
+	var room := selected_choice()
 	return -1 if room == null else int(room.id)
 
 
@@ -101,11 +117,12 @@ func select_choice_index(index: int) -> void:
 	state_changed.emit()
 
 
-func confirm_selection():
-	var room = selected_choice()
+func confirm_selection() -> MapGenerator.Room:
+	var room := selected_choice()
 	if room == null:
 		return null
 	_current_room_id = room.id
+	room.selected = true
 	if room.id not in _visited_room_ids:
 		_visited_room_ids.append(room.id)
 	_refresh_choices()
@@ -116,17 +133,24 @@ func confirm_selection():
 	return room
 
 
+func mark_current_room_complete() -> void:
+	if _current_room_id < 0 or _current_room_id in _completed_room_ids:
+		return
+	_completed_room_ids.append(_current_room_id)
+	state_changed.emit()
+
+
 func is_complete() -> bool:
-	var room = current_room()
-	return room != null and room.room_type == MapTypes.RoomType.FINAL_BOSS and _available_choice_ids.is_empty()
+	var room := current_room()
+	return room != null and room.type == MapGenerator.Room.Type.BOSS and _available_choice_ids.is_empty()
 
 
 func has_choices() -> bool:
 	return not _available_choice_ids.is_empty()
 
 
-func room_by_id(room_id: int):
-	return null if _run == null else _run.node(room_id)
+func room_by_id(room_id: int) -> MapGenerator.Room:
+	return null if _run == null else _run.room(room_id)
 
 
 func edge_is_selected(source_id: int, target_id: int) -> bool:
@@ -136,14 +160,18 @@ func edge_is_selected(source_id: int, target_id: int) -> bool:
 func _refresh_choices() -> void:
 	_available_choice_ids.clear()
 	_selected_choice_index = 0
-	var room = current_room()
-	if room == null:
+	if _run == null:
 		return
-	_available_choice_ids = room.outgoing.duplicate()
-	_available_choice_ids.sort_custom(func(a, b):
-		var left = _run.node(int(a))
-		var right = _run.node(int(b))
-		if left.layer_index == right.layer_index:
-			return left.slot_index < right.slot_index
-		return left.layer_index < right.layer_index
+	var room := current_room()
+	if room == null:
+		_available_choice_ids = _run.start_room_ids.duplicate()
+	else:
+		for next_room_data in room.next_rooms:
+			_available_choice_ids.append((next_room_data as MapGenerator.Room).id)
+	_available_choice_ids.sort_custom(func(left, right):
+		var left_room := _run.room(int(left))
+		var right_room := _run.room(int(right))
+		if left_room.row == right_room.row:
+			return left_room.column < right_room.column
+		return left_room.row < right_room.row
 	)

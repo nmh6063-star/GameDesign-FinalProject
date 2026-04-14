@@ -16,3 +16,7 @@ res://script/battle/core/battle_loop.gd
 res://script/map/map_types.gd
 res://script/game_manager/game_manager.gd
 res://scenes/map/map_selection.tscn
+res://script/map/map_controller.gd
+res://scenes/map/map_graph.tscn
+res://scenes/map/room.tscn
+res://script/map/map_room.gd

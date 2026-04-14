@@ -19,7 +19,6 @@ config/icon="res://assets/CapsuleBall.png"
 [autoload]
 
 BattleLoadout="*res://script/state/battle_loadout.gd"
-MapState="*res://script/state/map_state.gd"
 PlayerState="*res://script/state/player_state.gd"
 GameManager="*res://script/game_manager/game_manager.gd"
 
