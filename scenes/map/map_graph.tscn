@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://bqd7tgo0v2d3o"]
+
+[ext_resource type="Script" path="res://script/map/map_graph.gd" id="1_script"]
+[ext_resource type="FontFile" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.86, 0.70, 0.21, 0.86)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(1, 0.95, 0.8, 0.26)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="MapGraph" type="Panel"]
+custom_minimum_size = Vector2(360, 360)
+script = ExtResource("1_script")
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Title" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 140.0
+offset_bottom = 30.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "MAP"
+
+[node name="Rooms" type="Node2D" parent="."]

@@ -1,8 +1,0 @@
-[gd_scene format=3 uid="uid://dyoj8165ej3ax"]
-
-[ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="1_fhjgc"]
-
-[node name="IndicatorSprite" type="Sprite2D" unique_id=722041512]
-modulate = Color(1, 1, 1, 0.5019608)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("1_fhjgc")

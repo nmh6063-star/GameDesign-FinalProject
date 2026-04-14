@@ -1,0 +1,336 @@
+[gd_scene format=3 uid="uid://mbue24d7it6y"]
+
+[ext_resource type="Script" uid="uid://b02wy63n4qldg" path="res://script/map/map_selection.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]
+[ext_resource type="PackedScene" path="res://scenes/map/map_graph.tscn" id="3_graph"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_door"]
+bg_color = Color(0.29, 0.12, 0.37, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.62, 0.51, 0.72, 0.85)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selected"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(1, 0.84, 0.37, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hint"]
+bg_color = Color(0.15, 0.08, 0.2, 0.95)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="MapSelection" type="Control" unique_id=1231186139]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1152.0
+offset_bottom = 648.0
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=2076150768]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.25, 0.08, 0.34, 1)
+
+[node name="FloorTint" type="ColorRect" parent="." unique_id=1910119952]
+layout_mode = 1
+anchors_preset = -1
+anchor_top = 0.58
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 56.160004
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.78, 0.73, 0.89, 0.48)
+
+[node name="CurrentRoomLabel" type="Label" parent="." unique_id=177682147]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 34.0
+offset_right = 514.0
+offset_bottom = 60.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "CURRENT ROOM: START"
+
+[node name="SeedLabel" type="Label" parent="." unique_id=2056705365]
+layout_mode = 0
+offset_left = 852.0
+offset_top = 34.0
+offset_right = 1108.0
+offset_bottom = 56.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "Seed 0"
+horizontal_alignment = 2
+
+[node name="StatusLabel" type="Label" parent="." unique_id=993607419]
+layout_mode = 0
+offset_left = 318.0
+offset_top = 82.0
+offset_right = 836.0
+offset_bottom = 106.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "CHOOSE YOUR PATH"
+horizontal_alignment = 1
+
+[node name="DoorCenter" type="CenterContainer" parent="." unique_id=1018380031]
+layout_mode = 0
+offset_top = 104.0
+offset_right = 1152.0
+offset_bottom = 456.0
+
+[node name="Doors" type="HBoxContainer" parent="DoorCenter" unique_id=742018872]
+layout_mode = 2
+theme_override_constants/separation = 42
+
+[node name="LeftDoor" type="Panel" parent="DoorCenter/Doors" unique_id=209229058]
+custom_minimum_size = Vector2(284, 300)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_door")
+
+[node name="SelectionFrame" type="Panel" parent="DoorCenter/Doors/LeftDoor" unique_id=483181883]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_selected")
+
+[node name="TypeIcon" type="TextureRect" parent="DoorCenter/Doors/LeftDoor" unique_id=1559558329]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 208.0
+offset_bottom = 166.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TypeMark" type="Label" parent="DoorCenter/Doors/LeftDoor" unique_id=1152299016]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 32.0
+offset_right = 264.0
+offset_bottom = 136.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 72
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TypeName" type="Label" parent="DoorCenter/Doors/LeftDoor" unique_id=564624221]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 264.0
+offset_bottom = 200.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "BATTLE"
+horizontal_alignment = 1
+
+[node name="LayerLabel" type="Label" parent="DoorCenter/Doors/LeftDoor" unique_id=679824054]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 248.0
+offset_right = 264.0
+offset_bottom = 272.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 10
+text = "LAYER 1"
+horizontal_alignment = 1
+
+[node name="CenterDoor" type="Panel" parent="DoorCenter/Doors" unique_id=149705788]
+custom_minimum_size = Vector2(284, 300)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_door")
+
+[node name="SelectionFrame" type="Panel" parent="DoorCenter/Doors/CenterDoor" unique_id=1297461395]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_selected")
+
+[node name="TypeIcon" type="TextureRect" parent="DoorCenter/Doors/CenterDoor" unique_id=868401095]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 208.0
+offset_bottom = 166.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TypeMark" type="Label" parent="DoorCenter/Doors/CenterDoor" unique_id=778172555]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 32.0
+offset_right = 264.0
+offset_bottom = 136.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 72
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TypeName" type="Label" parent="DoorCenter/Doors/CenterDoor" unique_id=1899208912]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 264.0
+offset_bottom = 200.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "BATTLE"
+horizontal_alignment = 1
+
+[node name="LayerLabel" type="Label" parent="DoorCenter/Doors/CenterDoor" unique_id=1896221691]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 248.0
+offset_right = 264.0
+offset_bottom = 272.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 10
+text = "LAYER 1"
+horizontal_alignment = 1
+
+[node name="RightDoor" type="Panel" parent="DoorCenter/Doors" unique_id=4247931]
+custom_minimum_size = Vector2(284, 300)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_door")
+
+[node name="SelectionFrame" type="Panel" parent="DoorCenter/Doors/RightDoor" unique_id=235819257]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_selected")
+
+[node name="TypeIcon" type="TextureRect" parent="DoorCenter/Doors/RightDoor" unique_id=1462353726]
+layout_mode = 0
+offset_left = 76.0
+offset_top = 34.0
+offset_right = 208.0
+offset_bottom = 166.0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TypeMark" type="Label" parent="DoorCenter/Doors/RightDoor" unique_id=25252887]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 32.0
+offset_right = 264.0
+offset_bottom = 136.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 72
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TypeName" type="Label" parent="DoorCenter/Doors/RightDoor" unique_id=512718236]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 170.0
+offset_right = 264.0
+offset_bottom = 200.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "BATTLE"
+horizontal_alignment = 1
+
+[node name="LayerLabel" type="Label" parent="DoorCenter/Doors/RightDoor" unique_id=1817575411]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 248.0
+offset_right = 264.0
+offset_bottom = 272.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 10
+text = "LAYER 1"
+horizontal_alignment = 1
+
+[node name="InstructionsLabel" type="Label" parent="." unique_id=1669777170]
+layout_mode = 0
+offset_left = 48.0
+offset_top = 592.0
+offset_right = 638.0
+offset_bottom = 618.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 10
+text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M TOGGLE MAP"
+
+[node name="MapGraph" parent="." instance=ExtResource("3_graph")]
+visible = false
+layout_mode = 0
+offset_left = 744.0
+offset_top = 246.0
+offset_right = 1104.0
+offset_bottom = 606.0
+
+[node name="MapToggle" type="Panel" parent="." unique_id=1590899332]
+layout_mode = 0
+offset_left = 884.0
+offset_top = 580.0
+offset_right = 936.0
+offset_bottom = 636.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_hint")
+
+[node name="Label" type="Label" parent="MapToggle" unique_id=1388249034]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 18
+text = "M"
+horizontal_alignment = 1
+vertical_alignment = 1

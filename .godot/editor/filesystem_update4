@@ -1,0 +1,15 @@
+res://scenes/main.tscn
+res://data/balls/amplifier_ball.tres
+res://data/balls/bomb_ball.tres
+res://data/balls/duplication_ball.tres
+res://data/balls/heal_ball.tres
+res://data/balls/magnet_ball.tres
+res://data/balls/multiplication_ball.tres
+res://data/balls/normal_ball.tres
+res://data/enemies/enemy1.tres
+res://data/enemies/enemy2.tres
+res://script/battle/core/battle_context.gd
+res://script/battle/core/battle_loop.gd
+res://script/battle/ui/battle_hud_adapter.gd
+res://script/entities/balls/ball_base.gd
+res://script/ui/combo_hud.gd

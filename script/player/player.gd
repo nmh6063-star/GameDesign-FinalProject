@@ -1,12 +1,19 @@
 extends Node2D
 
-@onready var base = $Sprite2D.modulate
+var _base_modulate := Color.WHITE
+@onready var _sprite := get_node_or_null("Sprite2D") as Sprite2D
 
+func _ready() -> void:
+	if _sprite != null:
+		_base_modulate = _sprite.modulate
 
 func flash() -> void:
-	$Sprite2D.modulate = Color(18.892, 0.0, 0.0)
+	if _sprite == null:
+		return
+	_sprite.modulate = Color(18.892, 0.0, 0.0)
 	$Timer.start()
 
 
 func _on_timer_timeout() -> void:
-	$Sprite2D.modulate = base
+	if _sprite != null:
+		_sprite.modulate = _base_modulate

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://dhl2xr20pcxpy"]
+
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/entities/balls/effects/ball_effect_base.gd" id="1_6sksi"]
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" uid="uid://bd865hogik8m6" path="res://script/entities/balls/effects/explode_effect.gd" id="3_ball_effect"]
+
+[sub_resource type="Resource" id="BombTouchingEffect_1"]
+script = ExtResource("3_ball_effect")
+
+[resource]
+script = ExtResource("1_ball_data")
+id = "ball_bomb"
+display_name = "Bomb Ball"
+description = "Starts blinking after drop. After 3 seconds, it destroys all balls in a radius."
+spawn_levels = PackedInt32Array(1)
+symbol = "B"
+tint = Color(0.92, 0.16, 0.14, 1)
+outline_tint = Color(0, 0, 0, 1)
+effects = Array[ExtResource("1_6sksi")]([SubResource("BombTouchingEffect_1")])
