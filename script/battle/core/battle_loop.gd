@@ -19,6 +19,7 @@ const ENEMY_DAMAGE_COLOR := Color(0.92, 0.58, 0.06)
 const HEAL_COLOR := Color(0.35, 0.92, 0.55)
 const MERGE_SETTLE_TIME := 0.5
 const SHOOT_BURST_STRENGTH_MULT := 10.0
+const SLOW_MO_SCALE := 0.2
 
 var _context := BattleContext.new(self)
 var _resolver := BattleResolver.new()
@@ -70,6 +71,7 @@ func _physics_process(_delta: float) -> void:
 	_update_enemy_realtime_views()
 	_update_target_visual()
 	_handle_shoot_input()
+	_context.tick_combo(_delta)
 
 
 func _step_battle_resolution() -> void:
@@ -93,16 +95,21 @@ func _update_enemy_realtime_views() -> void:
 
 func _update_target_visual() -> void:
 	_target.position = _root.get_local_mouse_position()
-	_target.visible = (
-		_context.phase == BattleContext.Phase.PLAY
-		and Input.is_action_pressed("shoot")
-		and _context.can_shoot()
-	)
+	_target.visible = _context.slow_mo_active
 
 
 func _handle_shoot_input() -> void:
-	if Input.is_action_just_pressed("shoot"):
-		try_shoot(_target_area, _target.global_position)
+	if _context.slow_mo_active:
+		if Input.is_action_just_pressed("drop"):
+			try_shoot(_target_area, _target.global_position)
+			_exit_slow_mo()
+		elif not Input.is_action_pressed("shoot"):
+			_exit_slow_mo()
+		return
+	if _context.phase == BattleContext.Phase.PLAY \
+		and Input.is_action_just_pressed("shoot") \
+		and _context.can_shoot():
+		_enter_slow_mo()
 
 
 func ensure_ball_in_play() -> void:
@@ -251,6 +258,10 @@ func sync_shoot_ammo_hud() -> void:
 	_hud.sync_shoot_ammo(_context.bullets, _context.merge_progress)
 
 
+func sync_combo_hud() -> void:
+	_hud.sync_combo(_context.combo, _context.combo_multiplier(), _context.combo_timer_ratio())
+
+
 func track_ball(ball) -> void:
 	_line_indicator.call("track_ball", ball)
 	if _box != null:
@@ -268,6 +279,16 @@ func sync_enemy_views() -> void:
 	for slot in _enemy_slots:
 		slot.set_selected(slot == selected)
 		slot.sync_view()
+
+
+func _enter_slow_mo() -> void:
+	_context.slow_mo_active = true
+	Engine.time_scale = SLOW_MO_SCALE
+
+
+func _exit_slow_mo() -> void:
+	_context.slow_mo_active = false
+	Engine.time_scale = 1.0
 
 
 func _show_reward_selection() -> void:
@@ -375,6 +396,8 @@ func _sync_player_bar() -> void:
 func _finish_battle(text: String) -> void:
 	if _context.has_battle_result():
 		return
+	if _context.slow_mo_active:
+		_exit_slow_mo()
 	_context.finish_battle(text)
 	_context.phase = BattleContext.Phase.RESOLVE
 	_context.lock_resolution()

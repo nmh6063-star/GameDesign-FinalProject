@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
 [ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="21_ring"]
+[ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="22_combo"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
@@ -315,6 +316,80 @@ offset_top = 1.0
 offset_right = 1.0
 offset_bottom = 13.0
 color = Color(0.96, 0.8, 0.12, 1)
+
+[node name="ComboHUD" type="Control" parent="UI" unique_id=1357639289]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 56.0
+offset_top = 32.0
+offset_right = 200.0
+offset_bottom = 192.0
+pivot_offset = Vector2(72, 80)
+script = ExtResource("22_combo")
+
+[node name="VBox" type="Control" parent="UI/ComboHUD" unique_id=2117429973]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ComboTitle" type="Label" parent="UI/ComboHUD/VBox" unique_id=969388412]
+layout_mode = 0
+offset_top = -1.0
+offset_right = 144.0
+offset_bottom = 9.5
+theme_override_colors/font_color = Color(0.96, 0.8, 0.12, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 12
+text = "COMBO"
+horizontal_alignment = 1
+
+[node name="ComboCount" type="Label" parent="UI/ComboHUD/VBox" unique_id=336680734]
+layout_mode = 0
+offset_top = 20.0
+offset_right = 144.0
+offset_bottom = 48.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 32
+text = "0"
+horizontal_alignment = 1
+
+[node name="Multiplier" type="Label" parent="UI/ComboHUD/VBox" unique_id=892328392]
+layout_mode = 0
+offset_top = 55.0
+offset_right = 144.0
+offset_bottom = 67.25
+theme_override_colors/font_color = Color(0.35, 0.92, 0.55, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 14
+text = "x 1.0"
+horizontal_alignment = 1
+paragraph_separator = "\\"
+
+[node name="ComboBar" type="Control" parent="UI/ComboHUD/VBox" unique_id=1975742381]
+anchors_preset = 0
+offset_left = 10.0
+offset_top = 72.0
+offset_right = 134.0
+offset_bottom = 80.0
+
+[node name="Background" type="ColorRect" parent="UI/ComboHUD/VBox/ComboBar" unique_id=1683604259]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.15, 0.1, 0.2, 0.9)
+
+[node name="Fill" type="ColorRect" parent="UI/ComboHUD/VBox/ComboBar" unique_id=974484407]
+layout_mode = 0
+offset_right = 124.0
+offset_bottom = 8.0
+color = Color(1.6845763e-06, 0.7855929, 0.19968045, 1)
 
 [node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000008]
 layout_mode = 3
