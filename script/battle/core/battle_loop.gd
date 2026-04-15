@@ -2,6 +2,7 @@ extends Node2D
 class_name BattleLoop
 
 const BallBase := preload("res://script/entities/balls/ball_base.gd")
+const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const EnemyBase := preload("res://script/entities/enemies/enemy_base.gd")
 const BattleContext := preload("res://script/battle/core/battle_context.gd")
 const BattleResolver := preload("res://script/battle/core/battle_resolver.gd")
@@ -21,6 +22,13 @@ const HEAL_COLOR := Color(0.35, 0.92, 0.55)
 const MERGE_SETTLE_TIME := 0.5
 const SHOOT_BURST_STRENGTH_MULT := 10.0
 const SLOW_MO_SCALE := 0.2
+const HOLD_ACTION := "hold_ball"
+const SPECIAL_SLOT_ACTIONS := [
+	"special_slot_1",
+	"special_slot_2",
+	"special_slot_3",
+	"special_slot_4",
+]
 
 var _context := BattleContext.new(self)
 var _resolver := BattleResolver.new()
@@ -69,6 +77,7 @@ func _begin_battle() -> void:
 func _physics_process(_delta: float) -> void:
 	_step_battle_resolution()
 	_handle_selection_input()
+	_handle_hold_input()
 	_update_enemy_realtime_views()
 	_update_target_visual()
 	_handle_shoot_input()
@@ -99,18 +108,59 @@ func _update_target_visual() -> void:
 	_target.visible = _context.slow_mo_active
 
 
+func _handle_hold_input() -> void:
+	if _context.phase != BattleContext.Phase.PLAY or _context.slow_mo_active:
+		return
+	if not Input.is_action_just_pressed(HOLD_ACTION):
+		return
+	if _box == null or not is_instance_valid(_context.current_ball):
+		return
+	if _box.hold_swap(_context.current_ball):
+		track_ball(_context.current_ball)
+
+
 func _handle_shoot_input() -> void:
 	if _context.slow_mo_active:
+		for i in range(SPECIAL_SLOT_ACTIONS.size()):
+			if Input.is_action_just_pressed(SPECIAL_SLOT_ACTIONS[i]):
+				if _try_use_special_slot(i):
+					_exit_slow_mo()
+				return
 		if Input.is_action_just_pressed("drop"):
-			try_shoot(_target_area, _target.global_position)
+			if _context.can_shoot():
+				try_shoot(_target_area, _target.global_position)
 			_exit_slow_mo()
-		elif not Input.is_action_pressed("shoot"):
+		elif Input.is_action_just_pressed("shoot"):
 			_exit_slow_mo()
 		return
 	if _context.phase == BattleContext.Phase.PLAY \
 		and Input.is_action_just_pressed("shoot") \
-		and _context.can_shoot():
+		and _can_enter_action_mode():
 		_enter_slow_mo()
+
+
+func _try_use_special_slot(index: int) -> bool:
+	var slot_items := _special_slot_entries()
+	if index < 0 or index >= slot_items.size():
+		return false
+	var item: Dictionary = slot_items[index]
+	var cost := BallCatalog.special_cost(item["id"])
+	if not _context.try_spend_mana(cost):
+		return false
+	var mouse_x := _root.get_local_mouse_position().x
+	if _box != null:
+		_box.drop_ball_at_x(item["id"], int(item.get("level", 1)), mouse_x)
+	_sync_special_bar()
+	return true
+
+
+func _can_enter_action_mode() -> bool:
+	if _context.can_shoot():
+		return true
+	for item in _special_slot_entries():
+		if _context.can_spend_mana(BallCatalog.special_cost(item["id"])):
+			return true
+	return false
 
 
 func ensure_ball_in_play() -> void:
@@ -136,7 +186,7 @@ func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	for ball in hit_balls:
 		ball.on_shot(_context)
 	burst_knock_on_balls(burst_origin, SHOOT_BURST_STRENGTH_MULT)
-	sync_shoot_ammo_hud()
+	_sync_special_bar()
 
 
 func _complete_turn_after_drop() -> void:
@@ -241,7 +291,6 @@ func damage_player(amount: int) -> void:
 
 
 func burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -> void:
-	print(strength_scale)
 	var strength := BURST_STRENGTH * strength_scale
 	var radius_squared := BURST_AREA_RADIUS * BURST_AREA_RADIUS
 	for node in get_tree().get_nodes_in_group("ball"):
@@ -257,8 +306,8 @@ func burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -
 		body.apply_central_impulse(offset.normalized() * (strength))
 
 
-func sync_shoot_ammo_hud() -> void:
-	_hud.sync_shoot_ammo(_context.bullets, _context.merge_progress)
+func sync_mana_hud() -> void:
+	_hud.sync_mana(_context.mana_pipes, _context.merge_progress)
 
 
 func sync_combo_hud() -> void:
@@ -267,8 +316,7 @@ func sync_combo_hud() -> void:
 
 func track_ball(ball) -> void:
 	_line_indicator.call("track_ball", ball)
-	if _box != null:
-		_hud.sync_ball_queue(_box.preview())
+	_sync_ball_hud()
 
 
 func has_battle_result() -> bool:
@@ -287,11 +335,13 @@ func sync_enemy_views() -> void:
 func _enter_slow_mo() -> void:
 	_context.slow_mo_active = true
 	Engine.time_scale = SLOW_MO_SCALE
+	_sync_special_bar()
 
 
 func _exit_slow_mo() -> void:
 	_context.slow_mo_active = false
 	Engine.time_scale = 1.0
+	_sync_special_bar()
 
 
 func _show_reward_selection() -> void:
@@ -315,13 +365,15 @@ func _begin_stage() -> void:
 		_context,
 		_target,
 		_on_ball_dropped,
-		BattleLoadout.ball_pool_ids()
+		BattleLoadout.queue_ball_pool_ids()
 	)
 	_spawn_enemies()
 	_target.z_index = 999
 	_hud.clear_result()
 	track_ball(null)
 	_sync_player_bar()
+	sync_mana_hud()
+	_sync_special_bar()
 	set_physics_process(true)
 	_begin_turn()
 
@@ -333,7 +385,8 @@ func _on_ball_dropped() -> void:
 func _begin_turn() -> void:
 	_context.start_turn()
 	sync_enemy_views()
-	sync_shoot_ammo_hud()
+	sync_mana_hud()
+	_sync_special_bar()
 	ensure_ball_in_play()
 
 
@@ -394,6 +447,38 @@ func _spawn_enemies() -> void:
 func _sync_player_bar() -> void:
 	_player_fill.size.x = _player_bar.size.x * float(PlayerState.player_health) / float(PlayerState.player_max_health)
 	_player_hp_label.text = "%d/%d" % [PlayerState.player_health, PlayerState.player_max_health]
+
+
+func _sync_ball_hud() -> void:
+	if _box == null:
+		_hud.sync_ball_queue({}, [], {})
+		return
+	_hud.sync_ball_queue(_box.next_entry(), _box.queue_preview(), _box.held_entry())
+
+
+func _sync_special_bar() -> void:
+	_hud.sync_special_bar(
+		_special_slot_entries(),
+		_context.mana_pipes,
+		_context.slow_mo_active,
+		_context.can_shoot()
+	)
+
+
+func _special_slot_entries() -> Array:
+	var entries: Array = []
+	for ball_id in BattleLoadout.special_ball_ids():
+		var data := BallCatalog.data_for_id(ball_id)
+		var scene := BallCatalog.scene_for_id(ball_id)
+		if data == null or scene == null:
+			continue
+		entries.append({
+			"id": ball_id,
+			"scene": scene,
+			"data": data,
+			"level": 1,
+		})
+	return entries
 
 
 func _finish_battle(text: String) -> void:

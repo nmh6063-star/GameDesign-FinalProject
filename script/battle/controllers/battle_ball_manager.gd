@@ -14,6 +14,7 @@ var _target: Node2D
 var _on_ball_dropped: Callable
 var _spawn_pool: Array = []
 var _queue: Array = []
+var _held_entry: Dictionary = {}
 var _drop_left_x: float
 var _drop_right_x: float
 var _drop_y: float
@@ -60,13 +61,12 @@ func consume(ball: BallBase) -> void:
 	Engine.get_main_loop().root.get_node("Main").add_child(effect)
 	var effect2 = Effects.new()
 	Engine.get_main_loop().root.get_node("Main").add_child(effect2)
-	print(ball.data.id)
 	if str(ball.data.id) == "ball_bomb":
 		effect2.freeze_frame(0.1)
 		effect.shake(10.0)
 	else:
-		effect2.freeze_frame(float(ball.level)/1000.0)
-		effect.shake(ball.level/10.0)
+		effect2.freeze_frame(float(ball.level) / 1000.0)
+		effect.shake(ball.level / 10.0)
 	ball.die()
 
 
@@ -93,13 +93,22 @@ func drop_ball(ball_id: String, level: int = 1) -> BallBase:
 	var data := BallCatalog.data_for_id(ball_id)
 	if data == null:
 		return null
+	var radius: float = data.radius_for_level(level)
+	var x: float = randf_range(_drop_left_x + radius, _drop_right_x - radius)
+	return drop_ball_at_x(ball_id, level, x)
+
+
+func drop_ball_at_x(ball_id: String, level: int = 1, x: float = INF) -> BallBase:
+	var data := BallCatalog.data_for_id(ball_id)
+	if data == null:
+		return null
 	var scene := BallCatalog.scene_for_id(ball_id)
 	var ball := scene.instantiate() as BallBase
 	if ball == null:
 		return null
 	var radius: float = data.radius_for_level(level)
-	var x: float = randf_range(_drop_left_x + radius, _drop_right_x - radius)
-	var spawned := _spawn_instance(ball, data, level, Vector2(x, _drop_y), false)
+	var drop_x := _clamp_drop_x(_ball_placeholder.position.x if is_inf(x) else x, radius)
+	var spawned := _spawn_instance(ball, data, level, Vector2(drop_x, _drop_y), false)
 	spawned.sleeping = false
 	return spawned
 
@@ -110,11 +119,48 @@ func spawn_setup_ball() -> BallBase:
 	return _spawn_instance(base, entry["data"], entry["level"], _ball_placeholder.position, true)
 
 
+func hold_swap(current_ball: BallBase) -> bool:
+	if not is_instance_valid(current_ball) or current_ball.data == null or not current_ball.is_setup_ball():
+		return false
+	var replacement := _take_queue_entry() if _held_entry.is_empty() else _held_entry.duplicate()
+	if replacement.is_empty():
+		return false
+	_held_entry = _entry_from_ball(current_ball)
+	current_ball.configure(replacement["data"], replacement["level"], _context, _target)
+	current_ball.position = _ball_placeholder.position
+	current_ball.linear_velocity = Vector2.ZERO
+	current_ball.angular_velocity = 0.0
+	current_ball.rotation = 0.0
+	current_ball.sleeping = false
+	current_ball.set_playfield_state(true)
+	return true
+
+
+func next_entry() -> Dictionary:
+	_fill_queue()
+	return {} if _queue.is_empty() else (_queue[0] as Dictionary).duplicate()
+
+
+func queue_preview() -> Array:
+	_fill_queue()
+	var items: Array = []
+	for i in range(1, QUEUE_SIZE):
+		if i >= _queue.size():
+			break
+		items.append((_queue[i] as Dictionary).duplicate())
+	return items
+
+
+func held_entry() -> Dictionary:
+	return _held_entry.duplicate()
+
+
 func preview() -> Array:
 	var items: Array = []
-	for entry in _queue:
-		if items.size() == QUEUE_SIZE:
-			break
+	var next := next_entry()
+	if not next.is_empty():
+		items.append(next)
+	for entry in queue_preview():
 		items.append(entry)
 	return items
 
@@ -164,9 +210,19 @@ func _roll_ball_entry() -> Dictionary:
 	for entry in _spawn_pool:
 		roll -= entry["data"].spawn_weight
 		if roll <= 0:
-			return {"id": entry["id"], "scene": entry["scene"], "data": entry["data"], "level": entry["data"].random_spawn_level()}
+			return {
+				"id": entry["id"],
+				"scene": entry["scene"],
+				"data": entry["data"],
+				"level": entry["data"].random_spawn_level(),
+			}
 	var entry: Dictionary = _spawn_pool[0]
-	return {"id": entry["id"], "scene": entry["scene"], "data": entry["data"], "level": entry["data"].random_spawn_level()}
+	return {
+		"id": entry["id"],
+		"scene": entry["scene"],
+		"data": entry["data"],
+		"level": entry["data"].random_spawn_level(),
+	}
 
 
 func _capture_drop_bounds() -> void:
@@ -181,3 +237,16 @@ func _capture_drop_bounds() -> void:
 		_drop_right_x = maxf(_drop_right_x, x)
 	_drop_left_x -= _root.global_position.x
 	_drop_right_x -= _root.global_position.x
+
+
+func _clamp_drop_x(x: float, radius: float) -> float:
+	return clampf(x, _drop_left_x + radius, _drop_right_x - radius)
+
+
+func _entry_from_ball(ball: BallBase) -> Dictionary:
+	return {
+		"id": ball.data.id,
+		"scene": BallCatalog.scene_for_id(ball.data.id),
+		"data": ball.data,
+		"level": ball.level,
+	}

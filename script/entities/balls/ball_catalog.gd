@@ -2,6 +2,7 @@ extends RefCounted
 class_name BallCatalog
 
 const NORMAL_BALL_ID := "ball_normal"
+const MAX_SPECIAL_SLOTS := 4
 const ELEMENTAL_BALL_SCENE := preload("res://script/entities/balls/elemental_balls/elemental_ball_scene.tscn")
 const MODIFIER_BALL_SCENE := preload("res://script/entities/balls/modifier_balls/modifier_ball_scene.tscn")
 const IDS: Array[String] = [
@@ -30,6 +31,14 @@ static func ids(include_normal: bool = true) -> Array[String]:
 		if include_normal or ball_id != NORMAL_BALL_ID:
 			out.append(ball_id)
 	return out
+
+
+static func is_special(ball_id: String) -> bool:
+	return ball_id != NORMAL_BALL_ID
+
+
+static func special_cost(ball_id: String) -> int:
+	return 1
 
 
 static func scene_for_id(ball_id: String) -> PackedScene:
