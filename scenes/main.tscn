@@ -4,9 +4,11 @@
 [ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
+[ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_jkv2x"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
+[ext_resource type="Script" uid="uid://cpctoqyaugfnj" path="res://script/ui/line_limit.gd" id="13_a8y0u"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
 [ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
@@ -16,7 +18,7 @@
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
-bounce = 0.9
+bounce = 0.4
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
@@ -76,6 +78,15 @@ corner_radius_bottom_left = 20
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_surface"]
 friction = 2.5
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trceg"]
+size = Vector2(106, 449)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a8y0u"]
+size = Vector2(429, 58)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jkv2x"]
+size = Vector2(360, 41.99997)
 
 [node name="Main" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
@@ -351,6 +362,7 @@ layout_mode = 0
 offset_top = 20.0
 offset_right = 144.0
 offset_bottom = 48.0
+pivot_offset = Vector2(73, 12)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 32
@@ -424,6 +436,36 @@ theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 12
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="LineLimit" type="Control" parent="UI" unique_id=1133250344]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_jkv2x")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/LineLimit" unique_id=1879806430]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+pivot_offset = Vector2(19.5, 20.5)
+text = "0"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Timer" type="Timer" parent="UI/LineLimit" unique_id=169813689]
+one_shot = true
 
 [node name="GameOver" type="CenterContainer" parent="UI" unique_id=555100001]
 visible = false
@@ -780,6 +822,69 @@ position = Vector2(8, -3)
 scale = Vector2(7.6547318, 8.198811)
 polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
 
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Box" unique_id=183793935]
+position = Vector2(-216, 8)
+shape = SubResource("RectangleShape2D_trceg")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Background/Box" unique_id=1075060659]
+position = Vector2(248, 4)
+shape = SubResource("RectangleShape2D_trceg")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Background/Box" unique_id=2010969369]
+position = Vector2(33.5, 224)
+shape = SubResource("RectangleShape2D_a8y0u")
+
+[node name="Limit" type="Node2D" parent="Background" unique_id=876298834]
+position = Vector2(0, -67)
+rotation = -1.5707964
+script = ExtResource("13_a8y0u")
+
+[node name="Area2D" type="Area2D" parent="Background/Limit" unique_id=1377853102]
+position = Vector2(-280, -3.0517578e-05)
+rotation = 1.5707964
+scale = Vector2(1.8, 1.8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Limit/Area2D" unique_id=543735123]
+position = Vector2(37.777786, -199.44446)
+scale = Vector2(0.5555556, 0.5555556)
+shape = SubResource("RectangleShape2D_jkv2x")
+
+[node name="Indicator0" type="Sprite2D" parent="Background/Limit" unique_id=1477895582]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, -75.20001)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator1" type="Sprite2D" parent="Background/Limit" unique_id=1615771166]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, -19.200012)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator2" type="Sprite2D" parent="Background/Limit" unique_id=1233836906]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 36.799988)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator3" type="Sprite2D" parent="Background/Limit" unique_id=1185555479]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 92.79999)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator4" type="Sprite2D" parent="Background/Limit" unique_id=777286870]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 148.79999)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator5" type="Sprite2D" parent="Background/Limit" unique_id=1821844430]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 204.79999)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
 [node name="gun" type="Sprite2D" parent="Background" unique_id=672488835]
 position = Vector2(512, 188.99998)
 scale = Vector2(0.7, 0.7)
@@ -787,4 +892,7 @@ texture = ExtResource("16_jbj1t")
 region_enabled = true
 region_rect = Rect2(731.8239, 332.31876, 454.1761, 387.68124)
 
+[connection signal="timeout" from="UI/LineLimit/Timer" to="UI/LineLimit" method="_on_timer_timeout"]
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
+[connection signal="body_entered" from="Background/Limit/Area2D" to="Background/Limit" method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Background/Limit/Area2D" to="Background/Limit" method="_on_area_2d_body_exited"]

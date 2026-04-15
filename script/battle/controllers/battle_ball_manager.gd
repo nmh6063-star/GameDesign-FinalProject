@@ -4,6 +4,7 @@ class_name BattleBallManager
 const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const BallBase := preload("res://script/entities/balls/ball_base.gd")
 const QUEUE_SIZE := 5
+const Effects := preload("res://script/battle/core/general_effects.gd")
 
 var _root: Node2D
 var _ball_parent: Node
@@ -53,10 +54,20 @@ func active() -> Array:
 
 
 func consume(ball: BallBase) -> void:
-	ball.visible = false
 	ball.set_playfield_state(false)
 	ball.remove_from_group("ball")
-	ball.queue_free()
+	var effect = Effects.new()
+	Engine.get_main_loop().root.get_node("Main").add_child(effect)
+	var effect2 = Effects.new()
+	Engine.get_main_loop().root.get_node("Main").add_child(effect2)
+	print(ball.data.id)
+	if str(ball.data.id) == "ball_bomb":
+		effect2.freeze_frame(0.1)
+		effect.shake(10.0)
+	else:
+		effect2.freeze_frame(float(ball.level)/1000.0)
+		effect.shake(ball.level/10.0)
+	ball.die()
 
 
 func spawn_copy(source: BallBase, offset: Vector2 = Vector2.ZERO) -> BallBase:
@@ -95,7 +106,8 @@ func drop_ball(ball_id: String, level: int = 1) -> BallBase:
 
 func spawn_setup_ball() -> BallBase:
 	var entry := _take_queue_entry()
-	return _spawn_instance(entry["scene"].instantiate() as BallBase, entry["data"], entry["level"], _ball_placeholder.position, true)
+	var base = entry["scene"].instantiate() as BallBase
+	return _spawn_instance(base, entry["data"], entry["level"], _ball_placeholder.position, true)
 
 
 func preview() -> Array:

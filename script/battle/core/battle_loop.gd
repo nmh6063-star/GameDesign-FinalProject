@@ -10,6 +10,7 @@ const EnemySlotController := preload("res://script/battle/controllers/enemy_slot
 const RewardSelectionController := preload("res://script/battle/controllers/reward_selection_controller.gd")
 const BattleHudAdapter := preload("res://script/battle/ui/battle_hud_adapter.gd")
 const REWARD_SELECTION_SCENE := preload("res://scenes/reward_selection.tscn")
+const Effects := preload("res://script/battle/core/general_effects.gd")
 
 const BURST_AREA_RADIUS := 320.0
 const BURST_STRENGTH := 35.0
@@ -116,6 +117,7 @@ func ensure_ball_in_play() -> void:
 	if _context.phase != BattleContext.Phase.PLAY or is_instance_valid(_context.current_ball):
 		return
 	_context.current_ball = spawn_setup_ball()
+	
 	track_ball(_context.current_ball)
 
 
@@ -239,6 +241,7 @@ func damage_player(amount: int) -> void:
 
 
 func burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -> void:
+	print(strength_scale)
 	var strength := BURST_STRENGTH * strength_scale
 	var radius_squared := BURST_AREA_RADIUS * BURST_AREA_RADIUS
 	for node in get_tree().get_nodes_in_group("ball"):
@@ -251,7 +254,7 @@ func burst_knock_on_balls(origin_global: Vector2, strength_scale: float = 1.0) -
 		var distance_squared := offset.length_squared()
 		if distance_squared == 0.0 or distance_squared > radius_squared:
 			continue
-		body.apply_central_impulse(offset.normalized() * strength)
+		body.apply_central_impulse(offset.normalized() * (strength))
 
 
 func sync_shoot_ammo_hud() -> void:

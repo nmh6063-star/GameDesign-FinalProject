@@ -17,6 +17,9 @@ var aim_target: Node2D
 var set_up := false
 var level := 1
 var ui_preview := false
+var touchingDir = ""
+var last = 0
+var dying = false
 
 
 func _ready() -> void:
@@ -70,6 +73,20 @@ func set_playfield_state(is_set_up: bool) -> void:
 	if set_up:
 		sleeping = false
 
+func die():
+	var timer = Timer.new()
+	add_child(timer)
+	timer.wait_time = 1.0
+	timer.one_shot = true
+	timer.timeout.connect(_on_timer_timeout)
+	self.freeze = true
+	$CollisionShape2D.disabled = true
+	dying = true
+	timer.start()
+
+func _on_timer_timeout():
+	self.queue_free()
+
 
 func participates_in_level_merge() -> bool:
 	return data != null and data.participates_in_level_merge()
@@ -107,7 +124,7 @@ func check_merge(ctx: BattleContext, other: BallBase) -> bool:
 	return false
 
 
-func merge_with(ctx: BattleContext, other: BallBase) -> void:
+func merge_with(ctx: BattleContext, other: BallBase, level: float) -> void:
 	pass
 
 
@@ -159,7 +176,14 @@ func multiply_level(multiplier: int = 2) -> void:
 
 
 func _physics_process(_delta: float) -> void:
-	physics_material_override.absorbent = linear_velocity.y <= 1.0
+	if dying:
+		self_modulate.a -= 5.0 * _delta
+		self_modulate.a = max(self_modulate.a, 0)
+		scale += Vector2(2.5 * _delta, 2.5 * _delta)
+		for child in get_children():
+			if "self_modulate" in child:
+				child.self_modulate.a -= 5.0 * _delta
+				child.self_modulate.a = max(child.self_modulate.a, 0)
 	if not visible:
 		gravity_scale = 0.0
 		return
@@ -180,12 +204,24 @@ func _physics_process(_delta: float) -> void:
 	var delta_x := aim_target.position.x - position.x
 	var direction := 0.0 if absf(delta_x) < 15.0 else signf(delta_x)
 	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0, 0.0, 2500.0) * direction, 0.0)
+	if (touchingDir == 'right' and linear_velocity.x > 0) or (touchingDir == 'left' and linear_velocity.x < 0):
+		linear_velocity.x = 0
+	if (touchingDir == 'right' and linear_velocity.x < 0) or (touchingDir == 'left' and linear_velocity.x > 0):
+		touchingDir = ''
 	if Input.is_action_just_pressed("drop"):
 		sleeping = false
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()
-
+		
+				
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if(state.get_contact_count() > 0):
+		if(set_up):
+			if global_position.x > 400:
+				touchingDir = 'right'
+			else:
+				touchingDir = 'left'
 
 func _draw() -> void:
 	if data == null:

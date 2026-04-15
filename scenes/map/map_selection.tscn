@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b02wy63n4qldg" path="res://script/map/map_selection.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]
-[ext_resource type="PackedScene" path="res://scenes/map/map_graph.tscn" id="3_graph"]
+[ext_resource type="PackedScene" uid="uid://bqd7tgo0v2d3o" path="res://scenes/map/map_graph.tscn" id="3_graph"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_door"]
 bg_color = Color(0.29, 0.12, 0.37, 0.92)
@@ -306,7 +306,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 10
 text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M TOGGLE MAP"
 
-[node name="MapGraph" parent="." instance=ExtResource("3_graph")]
+[node name="MapGraph" parent="." unique_id=1176279663 instance=ExtResource("3_graph")]
 visible = false
 layout_mode = 0
 offset_left = 744.0

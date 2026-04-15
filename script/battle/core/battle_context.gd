@@ -5,7 +5,7 @@ enum Phase { PLAY, RESOLVE }
 
 const MAX_BULLETS := 5
 const MERGES_PER_BULLET := 5
-const COMBO_TIMEOUT := 5.0
+var COMBO_TIMEOUT := 5.0
 
 var controller
 var phase := Phase.PLAY
@@ -98,12 +98,14 @@ func tick_combo(delta: float) -> void:
 	if combo_timer <= 0.0:
 		combo_timer = 0.0
 		combo = 0
+		COMBO_TIMEOUT = 5.0
 	if controller != null:
 		controller.sync_combo_hud()
 
 
 func register_merge() -> void:
 	combo += 1
+	COMBO_TIMEOUT -= clampf(0.1 / (combo/2.0), 0.25, 5.0)
 	combo_timer = COMBO_TIMEOUT
 	if bullets < MAX_BULLETS:
 		var progress_gain := maxi(1, int(combo_multiplier()))

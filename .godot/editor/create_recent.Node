@@ -1,4 +1,8 @@
+Timer
+RichTextLabel
 Control
+Area2D
+CollisionShape2D
 Sprite2D
 AnimatedSprite2D
 Node2D
@@ -7,9 +11,4 @@ Button
 CanvasLayer
 Camera2D
 Polygon2D
-Timer
-CollisionShape2D
-Area2D
 HSlider
-RichTextLabel
-Label

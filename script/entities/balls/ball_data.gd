@@ -50,7 +50,7 @@ func radius_for_level(level: int) -> float:
 	if not participates_in_level_merge():
 		return radius
 	for i in range(1, level):
-		radius += merge_growth / float(i)
+		radius += merge_growth / float(i/2.0)
 	return radius
 
 
