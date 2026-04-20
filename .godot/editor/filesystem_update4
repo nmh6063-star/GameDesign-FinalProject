@@ -1,3 +1,4 @@
+res://scenes/menu_screen.tscn
 res://data/balls/amplifier_ball.tres
 res://data/balls/bomb_ball.tres
 res://data/balls/duplication_ball.tres
@@ -7,10 +8,9 @@ res://data/balls/multiplication_ball.tres
 res://data/balls/normal_ball.tres
 res://data/enemies/enemy1.tres
 res://data/enemies/enemy2.tres
-res://scenes/camp_fire.tscn
-res://script/battle/controllers/reward_selection_controller.gd
-res://script/battle/core/battle_loop.gd
-res://script/map/camp_fire.gd
-res://script/state/player_state.gd
-res://scenes/shop.tscn
+res://script/map/menu_screen.gd
+res://scenes/tutorial_complete.tscn
+res://script/map/tutorial_complete.gd
+res://script/battle/controllers/battle_ball_manager.gd
+res://script/game_manager/game_manager.gd
 res://script/map/shop.gd

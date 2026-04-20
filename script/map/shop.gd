@@ -3,8 +3,6 @@ class_name ShopController
 
 signal selection_completed
 
-var _selected_count := 0
-
 
 func _ready() -> void:
 	_connect_signals()
@@ -25,13 +23,13 @@ func _populate_slots() -> void:
 	pass
 
 
-func _on_slot_hovered(index: int) -> void:
+func _on_slot_hovered(_index: int) -> void:
 	# TODO: show item description
-	_description_popup().visible = false
+	pass
 
 
 func _on_slot_unhovered() -> void:
-	_description_popup().visible = false
+	pass
 
 
 func _on_slot_pressed(index: int) -> void:
@@ -47,40 +45,32 @@ func _on_continue_pressed() -> void:
 
 func _slot_buttons() -> Array[Button]:
 	return [
-		$Overlay/Card/Slots/Slot0 as Button,
-		$Overlay/Card/Slots/Slot1 as Button,
-		$Overlay/Card/Slots/Slot2 as Button,
+		$Overlay/Card/Slots/item1 as Button,
+		$Overlay/Card/Slots/item2 as Button,
+		$Overlay/Card/Slots/item3 as Button,
 		$Overlay/Card/Slots/Slot3 as Button,
-		$Overlay/Card/Slots/Slot4 as Button,
+		$Overlay/Card/Slots/item4 as Button,
 	]
 
 
 func _preview_roots() -> Array[Node2D]:
 	return [
-		$Overlay/Card/Slots/Slot0/PreviewRoot as Node2D,
-		$Overlay/Card/Slots/Slot1/PreviewRoot as Node2D,
-		$Overlay/Card/Slots/Slot2/PreviewRoot as Node2D,
+		$Overlay/Card/Slots/item1/PreviewRoot as Node2D,
+		$Overlay/Card/Slots/item2/PreviewRoot as Node2D,
+		$Overlay/Card/Slots/item3/PreviewRoot as Node2D,
 		$Overlay/Card/Slots/Slot3/PreviewRoot as Node2D,
-		$Overlay/Card/Slots/Slot4/PreviewRoot as Node2D,
+		$Overlay/Card/Slots/item4/PreviewRoot as Node2D,
 	]
 
 
 func _name_labels() -> Array[Label]:
 	return [
-		$Overlay/Card/Slots/Slot0/Name as Label,
-		$Overlay/Card/Slots/Slot1/Name as Label,
-		$Overlay/Card/Slots/Slot2/Name as Label,
+		$Overlay/Card/Slots/item1/Name as Label,
+		$Overlay/Card/Slots/item2/Name as Label,
+		$Overlay/Card/Slots/item3/Name as Label,
 		$Overlay/Card/Slots/Slot3/Name as Label,
-		$Overlay/Card/Slots/Slot4/Name as Label,
+		$Overlay/Card/Slots/item4/Name as Label,
 	]
-
-
-func _description_popup() -> Control:
-	return $Overlay/Card/DescriptionPopup as Control
-
-
-func _description_label() -> Label:
-	return $Overlay/Card/DescriptionPopup/Description as Label
 
 
 func _continue_button() -> Button:

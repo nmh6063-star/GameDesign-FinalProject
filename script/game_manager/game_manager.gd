@@ -5,6 +5,14 @@ const MapGenerator := preload("res://script/map/map_generator.gd")
 
 const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
+const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
+const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
+
+const _NON_GAME_SCENES := [
+	"res://scenes/menu_screen.tscn",
+	"res://scenes/tutorial.tscn",
+	"res://scenes/tutorial_complete.tscn",
+]
 
 signal run_started(run_data)
 signal room_started(room_data)
@@ -158,8 +166,16 @@ func toggle_map_view() -> bool:
 	return map_view_visible
 
 
-func _scene_for_room(_room) -> String:
-	return BATTLE_SCENE_PATH
+func _scene_for_room(room) -> String:
+	if room == null:
+		return BATTLE_SCENE_PATH
+	match room.type:
+		MapGenerator.Room.Type.CAMPFIRE:
+			return CAMPFIRE_SCENE_PATH
+		MapGenerator.Room.Type.SHOP:
+			return SHOP_SCENE_PATH
+		_:
+			return BATTLE_SCENE_PATH
 
 
 func _change_scene(scene_path: String) -> void:
@@ -206,3 +222,17 @@ func _sync_map_snapshot() -> void:
 
 func _room_payload(room) -> Dictionary:
 	return room.to_dictionary() if room != null and room.has_method("to_dictionary") else {}
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	if scene.scene_file_path in _NON_GAME_SCENES:
+		return
+	if event.keycode == KEY_6:
+		get_tree().change_scene_to_file(CAMPFIRE_SCENE_PATH)
+	elif event.keycode == KEY_7:
+		get_tree().change_scene_to_file(SHOP_SCENE_PATH)

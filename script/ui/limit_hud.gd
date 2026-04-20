@@ -1,7 +1,7 @@
 extends Control
 
 @onready var text = $RichTextLabel
-@onready var limit = get_node("/root/Main/Background/Limit")
+@onready var limit = get_tree().current_scene.get_node("Background/Limit")
 
 var lastStatus = false
 var timer = 10

@@ -58,9 +58,9 @@ func consume(ball: BallBase) -> void:
 	ball.set_playfield_state(false)
 	ball.remove_from_group("ball")
 	var effect = Effects.new()
-	Engine.get_main_loop().root.get_node("Main").add_child(effect)
+	_root.add_child(effect)
 	var effect2 = Effects.new()
-	Engine.get_main_loop().root.get_node("Main").add_child(effect2)
+	_root.add_child(effect2)
 	if str(ball.data.id) == "ball_bomb":
 		effect2.freeze_frame(0.1)
 		effect.shake(10.0)

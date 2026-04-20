@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://dma10uiettp5j"]
+
+[ext_resource type="Texture2D" uid="uid://bdwvvox5ouhf6" path="res://assets/TutorailCompleted.png" id="1_5g8ue"]
+[ext_resource type="Script" uid="uid://c2qx2ewn3davn" path="res://script/map/tutorial_complete.gd" id="1_vpi1v"]
+
+[node name="TutorialComplete" type="Node2D" unique_id=1261693720]
+script = ExtResource("1_vpi1v")
+
+[node name="TutorailCompleted" type="Sprite2D" parent="." unique_id=1717996533]
+position = Vector2(572, 359.03125)
+scale = Vector2(0.7414879, 0.809347)
+texture = ExtResource("1_5g8ue")
+
+[node name="GoBackToMenu" type="Button" parent="TutorailCompleted" unique_id=1975865459]
+show_behind_parent = true
+offset_left = -317.38034
+offset_top = 137.17773
+offset_right = 314.61966
+offset_bottom = 281.17773
+metadata/_edit_use_anchors_ = true
