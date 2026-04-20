@@ -8,9 +8,8 @@ res://data/balls/multiplication_ball.tres
 res://data/balls/normal_ball.tres
 res://data/enemies/enemy1.tres
 res://data/enemies/enemy2.tres
-res://script/map/menu_screen.gd
-res://scenes/tutorial_complete.tscn
-res://script/map/tutorial_complete.gd
-res://script/battle/controllers/battle_ball_manager.gd
+res://script/battle/core/battle_loop.gd
 res://script/game_manager/game_manager.gd
-res://script/map/shop.gd
+res://scenes/pause_menu.tscn
+res://script/ui/pause_menu.gd
+res://script/map/map_selection.gd

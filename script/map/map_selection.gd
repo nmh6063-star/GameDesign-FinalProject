@@ -50,6 +50,8 @@ signal minimap_toggled(is_visible)
 
 func _ready() -> void:
 	set_process_unhandled_input(true)
+	for i in range(_doors.size()):
+		_doors[i].gui_input.connect(_on_door_gui_input.bind(i))
 	if _game_manager != null:
 		var callback := Callable(self, "_on_map_state_changed")
 		if not _game_manager.map_state_changed.is_connected(callback):
@@ -146,6 +148,17 @@ func _refresh_view() -> void:
 		frame.visible = is_selected
 		door.modulate = Color(1.0, 1.0, 1.0, 1.0) if is_selected else Color(0.9, 0.88, 0.97, 0.94)
 		door.scale = Vector2.ONE * (1.06 if is_selected else 1.0)
+
+
+func _on_door_gui_input(event: InputEvent, door_index: int) -> void:
+	if _game_manager == null:
+		return
+	if not event is InputEventMouseButton:
+		return
+	var mouse_event := event as InputEventMouseButton
+	if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT:
+		_game_manager.set_map_choice_index(door_index)
+		_confirm_selection()
 
 
 func _confirm_selection() -> void:

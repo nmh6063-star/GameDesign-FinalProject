@@ -7,11 +7,19 @@ const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
+const MENU_SCENE_PATH := "res://scenes/menu_screen.tscn"
+const PAUSE_MENU_SCENE := preload("res://scenes/pause_menu.tscn")
 
 const _NON_GAME_SCENES := [
 	"res://scenes/menu_screen.tscn",
 	"res://scenes/tutorial.tscn",
 	"res://scenes/tutorial_complete.tscn",
+]
+
+const _ROOM_SCENES := [
+	BATTLE_SCENE_PATH,
+	CAMPFIRE_SCENE_PATH,
+	SHOP_SCENE_PATH,
 ]
 
 signal run_started(run_data)
@@ -24,6 +32,10 @@ var current_map_data := {}
 var map_view_visible := false
 
 var _controller := MapController.new()
+var _pause_menu: CanvasLayer
+var _room_entry_health: int = -1
+var _room_rng_seed: int = 0
+var _current_room_scene: String = ""
 
 
 func _ready() -> void:
@@ -129,7 +141,9 @@ func choose_map_node(choice_index: int = -1):
 	var room = _controller.confirm_selection()
 	if room == null:
 		return null
-	_change_scene(_scene_for_room(room))
+	var scene_path := _scene_for_room(room)
+	_save_room_entry_state(scene_path)
+	_change_scene(scene_path)
 	return room
 
 
@@ -160,10 +174,60 @@ func should_skip_battle_rewards() -> bool:
 	return true
 
 
+func get_room_rng_seed() -> int:
+	return _room_rng_seed
+
+
+func restart_current_room() -> void:
+	if _current_room_scene.is_empty():
+		return
+	if _room_entry_health >= 0:
+		PlayerState.player_health = _room_entry_health
+	get_tree().change_scene_to_file(_current_room_scene)
+
+
+func exit_to_menu() -> void:
+	_current_room_scene = ""
+	get_tree().change_scene_to_file(MENU_SCENE_PATH)
+
+
 func toggle_map_view() -> bool:
 	map_view_visible = not map_view_visible
 	map_state_changed.emit()
 	return map_view_visible
+
+
+func _save_room_entry_state(scene_path: String) -> void:
+	_room_entry_health = PlayerState.player_health
+	_room_rng_seed = randi()
+	_current_room_scene = scene_path
+
+
+func _ensure_pause_menu() -> void:
+	if _pause_menu != null and is_instance_valid(_pause_menu):
+		return
+	_pause_menu = PAUSE_MENU_SCENE.instantiate()
+	_pause_menu.restart_requested.connect(_on_pause_restart)
+	_pause_menu.title_requested.connect(_on_pause_title)
+	_pause_menu.exit_requested.connect(_on_pause_exit)
+	add_child(_pause_menu)
+
+
+func _show_pause_menu(in_room: bool, in_game: bool = true) -> void:
+	_ensure_pause_menu()
+	_pause_menu.show_menu(in_room, in_game)
+
+
+func _on_pause_restart() -> void:
+	restart_current_room()
+
+
+func _on_pause_title() -> void:
+	exit_to_menu()
+
+
+func _on_pause_exit() -> void:
+	get_tree().quit()
 
 
 func _scene_for_room(room) -> String:
@@ -229,6 +293,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	var scene := get_tree().current_scene
 	if scene == null:
+		return
+	if event.keycode == KEY_ESCAPE:
+		var in_room := scene.scene_file_path in _ROOM_SCENES
+		var in_game := scene.scene_file_path not in _NON_GAME_SCENES
+		_show_pause_menu(in_room, in_game)
 		return
 	if scene.scene_file_path in _NON_GAME_SCENES:
 		return

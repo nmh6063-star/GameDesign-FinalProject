@@ -68,7 +68,11 @@ func _initialize() -> void:
 
 
 func _begin_battle() -> void:
-	randomize()
+	var gm := _game_manager()
+	if gm != null and gm.has_method("get_room_rng_seed"):
+		seed(gm.get_room_rng_seed())
+	else:
+		randomize()
 	_context.reset_for_battle()
 	if _should_skip_reward_selection():
 		_begin_stage()
