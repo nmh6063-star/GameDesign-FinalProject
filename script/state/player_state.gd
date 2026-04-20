@@ -2,6 +2,7 @@ extends Node
 
 var player_max_health := 100
 var player_health := 100
+var aim_size_level: int = 0
 
 
 func heal(amount: int) -> void:
@@ -14,3 +15,4 @@ func damage(amount: int) -> void:
 
 func reset_for_run() -> void:
 	player_health = player_max_health
+	aim_size_level = 0

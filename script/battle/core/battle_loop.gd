@@ -58,6 +58,8 @@ func _ready() -> void:
 	_hud = BattleHudAdapter.new(_ui_root)
 	_enemy_slots = _build_enemy_slots()
 	set_physics_process(false)
+	if PlayerState.aim_size_level > 0:
+		_target.scale = Vector2.ONE * (1.0 + PlayerState.aim_size_level * 0.25)
 	call_deferred("_initialize")
 
 
