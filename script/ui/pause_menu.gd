@@ -8,8 +8,8 @@ signal exit_requested
 @onready var _title_btn := $Center/VBox/TitleButton as TextureButton
 
 
-func show_menu(in_room: bool, in_game: bool = true) -> void:
-	_restart_btn.visible = in_room
+func show_menu(in_room: bool, in_game: bool = true, can_restart: bool = true) -> void:
+	_restart_btn.visible = in_room and can_restart
 	_title_btn.visible = in_game
 	visible = true
 	get_tree().paused = true

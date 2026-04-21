@@ -13,3 +13,8 @@ res://script/game_manager/game_manager.gd
 res://scenes/pause_menu.tscn
 res://script/ui/pause_menu.gd
 res://script/map/map_selection.gd
+res://script/map/map_generator.gd
+res://script/map/map_room.gd
+res://script/state/player_state.gd
+res://script/map/event_room.gd
+res://scenes/event_room.tscn

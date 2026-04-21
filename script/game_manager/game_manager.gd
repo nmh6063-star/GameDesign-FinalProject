@@ -7,6 +7,7 @@ const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
+const EVENT_SCENE_PATH := "res://scenes/event_room.tscn"
 const MENU_SCENE_PATH := "res://scenes/menu_screen.tscn"
 const PAUSE_MENU_SCENE := preload("res://scenes/pause_menu.tscn")
 
@@ -20,6 +21,7 @@ const _ROOM_SCENES := [
 	BATTLE_SCENE_PATH,
 	CAMPFIRE_SCENE_PATH,
 	SHOP_SCENE_PATH,
+	EVENT_SCENE_PATH,
 ]
 
 signal run_started(run_data)
@@ -213,9 +215,9 @@ func _ensure_pause_menu() -> void:
 	add_child(_pause_menu)
 
 
-func _show_pause_menu(in_room: bool, in_game: bool = true) -> void:
+func _show_pause_menu(in_room: bool, in_game: bool = true, can_restart: bool = true) -> void:
 	_ensure_pause_menu()
-	_pause_menu.show_menu(in_room, in_game)
+	_pause_menu.show_menu(in_room, in_game, can_restart)
 
 
 func _on_pause_restart() -> void:
@@ -238,6 +240,8 @@ func _scene_for_room(room) -> String:
 			return CAMPFIRE_SCENE_PATH
 		MapGenerator.Room.Type.SHOP:
 			return SHOP_SCENE_PATH
+		MapGenerator.Room.Type.EVENT:
+			return EVENT_SCENE_PATH
 		_:
 			return BATTLE_SCENE_PATH
 
@@ -297,9 +301,13 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.keycode == KEY_ESCAPE:
 		var in_room := scene.scene_file_path in _ROOM_SCENES
 		var in_game := scene.scene_file_path not in _NON_GAME_SCENES
-		_show_pause_menu(in_room, in_game)
+		var can_restart := in_room and scene.scene_file_path != EVENT_SCENE_PATH
+		_show_pause_menu(in_room, in_game, can_restart)
 		return
 	if scene.scene_file_path in _NON_GAME_SCENES:
+		return
+	if event.keycode == KEY_P and scene.scene_file_path in _ROOM_SCENES:
+		complete_current_room()
 		return
 	if event.keycode == KEY_6:
 		get_tree().change_scene_to_file(CAMPFIRE_SCENE_PATH)

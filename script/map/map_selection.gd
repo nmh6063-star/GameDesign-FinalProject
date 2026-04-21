@@ -133,16 +133,24 @@ func _refresh_view() -> void:
 			door.scale = Vector2.ONE
 			continue
 		var room = choices[index]
-		var room_type := int(room.type)
-		var texture := MapRoom.texture_for_type(room_type)
+		var hidden: bool = room.mystery and not _game_manager.visited_has(int(room.id))
 		door.visible = true
-		icon.texture = texture
-		icon.visible = texture != null
-		icon.modulate = MapRoom.tint_for_type(room_type) if texture != null else Color.WHITE
-		mark.visible = texture == null
-		mark.text = MapRoom.short_label_for_type(room_type)
-		mark.modulate = MapRoom.tint_for_type(room_type)
-		name.text = MapRoom.label_for_type(room_type).to_upper()
+		if hidden:
+			icon.visible = false
+			mark.visible = true
+			mark.text = "?"
+			mark.modulate = Color("d4a017")
+			name.text = "???"
+		else:
+			var room_type := int(room.type)
+			var texture := MapRoom.texture_for_type(room_type)
+			icon.texture = texture
+			icon.visible = texture != null
+			icon.modulate = MapRoom.tint_for_type(room_type) if texture != null else Color.WHITE
+			mark.visible = texture == null
+			mark.text = MapRoom.short_label_for_type(room_type)
+			mark.modulate = MapRoom.tint_for_type(room_type)
+			name.text = MapRoom.label_for_type(room_type).to_upper()
 		layer.text = "FLOOR %d" % (int(room.row) + 1)
 		var is_selected := index == selected_index
 		frame.visible = is_selected

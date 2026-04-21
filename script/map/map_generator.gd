@@ -13,6 +13,9 @@ const MAX_OUTGOING := 3
 const MONSTER_ROOM_WEIGHT := 10.0
 const SHOP_ROOM_WEIGHT := 2.5
 const CAMPFIRE_ROOM_WEIGHT := 4.0
+const EVENT_ROOM_WEIGHT := 1.5
+const MYSTERY_CHANCE := 0.25
+const MYSTERY_EVENT_WEIGHT := 8.0
 
 
 class Room extends RefCounted:
@@ -24,6 +27,7 @@ class Room extends RefCounted:
 		SHOP,
 		CAMPFIRE,
 		BOSS,
+		EVENT,
 	}
 
 	var id := -1
@@ -34,6 +38,7 @@ class Room extends RefCounted:
 	var prev_rooms: Array = []
 	var type := Type.NOT_ASSIGNED
 	var selected := false
+	var mystery := false
 
 	func is_active() -> bool:
 		return not next_rooms.is_empty() or not prev_rooms.is_empty() or type == Type.BOSS
@@ -52,6 +57,7 @@ class Room extends RefCounted:
 			"position": position,
 			"room_type": type,
 			"selected": selected,
+			"mystery": mystery,
 			"next_room_ids": next_ids,
 			"prev_room_ids": prev_ids,
 		}
@@ -103,7 +109,7 @@ class Run extends RefCounted:
 
 var _rng := RandomNumberGenerator.new()
 var _next_room_id := 0
-var _weight_total := MONSTER_ROOM_WEIGHT + SHOP_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT
+var _weight_total := MONSTER_ROOM_WEIGHT + SHOP_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + EVENT_ROOM_WEIGHT
 
 
 func generate(seed: int = -1) -> Run:
@@ -269,14 +275,42 @@ func _assign_room_types(floors: Array, boss_room: Room) -> void:
 		for room_data in floors[row]:
 			var room := room_data as Room
 			if room.is_active() and room.type == Room.Type.NOT_ASSIGNED:
-				room.type = _random_room_type(room)
+				if row >= 3 and _rng.randf() < MYSTERY_CHANCE:
+					room.mystery = true
+					room.type = _mystery_room_type(room)
+				else:
+					room.type = _random_room_type(room)
+	_deduplicate_sibling_types(floors)
 
 
 func _random_room_type(room: Room) -> int:
 	while true:
 		var roll := _rng.randf() * _weight_total
 		var room_type := Room.Type.MONSTER
-		if roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT:
+		if roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + SHOP_ROOM_WEIGHT:
+			room_type = Room.Type.EVENT
+		elif roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT:
+			room_type = Room.Type.SHOP
+		elif roll >= MONSTER_ROOM_WEIGHT:
+			room_type = Room.Type.CAMPFIRE
+		if room_type == Room.Type.CAMPFIRE and (room.row < 3 or room.row == 12 or _has_parent_of_type(room, Room.Type.CAMPFIRE)):
+			continue
+		if room_type == Room.Type.SHOP and _has_parent_of_type(room, Room.Type.SHOP):
+			continue
+		if room_type == Room.Type.EVENT and (room.row < 3 or _has_parent_of_type(room, Room.Type.EVENT)):
+			continue
+		return room_type
+	return Room.Type.MONSTER
+
+
+func _mystery_room_type(room: Room) -> int:
+	var total := MONSTER_ROOM_WEIGHT + SHOP_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + MYSTERY_EVENT_WEIGHT
+	while true:
+		var roll := _rng.randf() * total
+		var room_type := Room.Type.MONSTER
+		if roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + SHOP_ROOM_WEIGHT:
+			room_type = Room.Type.EVENT
+		elif roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT:
 			room_type = Room.Type.SHOP
 		elif roll >= MONSTER_ROOM_WEIGHT:
 			room_type = Room.Type.CAMPFIRE
@@ -285,6 +319,38 @@ func _random_room_type(room: Room) -> int:
 		if room_type == Room.Type.SHOP and _has_parent_of_type(room, Room.Type.SHOP):
 			continue
 		return room_type
+	return Room.Type.MONSTER
+
+
+func _deduplicate_sibling_types(floors: Array) -> void:
+	for floor_data in floors:
+		for room_data in floor_data:
+			var room := room_data as Room
+			if room.next_rooms.size() <= 1:
+				continue
+			var seen_types := {}
+			for next_data in room.next_rooms:
+				var next_room := next_data as Room
+				if next_room.type in [Room.Type.BOSS, Room.Type.START, Room.Type.TREASURE]:
+					continue
+				if seen_types.has(int(next_room.type)):
+					next_room.type = _alternative_type(next_room, seen_types)
+				seen_types[int(next_room.type)] = true
+
+
+func _alternative_type(room: Room, taken: Dictionary) -> int:
+	var candidates := [
+		Room.Type.MONSTER, Room.Type.CAMPFIRE, Room.Type.SHOP, Room.Type.EVENT,
+	]
+	candidates.shuffle()
+	for candidate in candidates:
+		if taken.has(candidate):
+			continue
+		if candidate == Room.Type.CAMPFIRE and room.row < 3:
+			continue
+		if candidate == Room.Type.EVENT and room.row < 3:
+			continue
+		return candidate
 	return Room.Type.MONSTER
 
 
