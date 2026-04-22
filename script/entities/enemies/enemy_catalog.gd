@@ -5,10 +5,12 @@ const ENEMY_SCENE := preload("res://script/entities/enemies/enemy_scene.tscn")
 const IDS: Array[String] = [
 	"enemy1",
 	"enemy2",
+	"enemy_tutorial",  # TUTORIAL ONLY: used exclusively in tutorial.tscn
 ]
 const DATA_BY_ID := {
 	IDS[0]: preload("res://data/enemies/enemy1.tres"),
 	IDS[1]: preload("res://data/enemies/enemy2.tres"),
+	IDS[2]: preload("res://data/enemies/enemy_tutorial.tres"),  # TUTORIAL ONLY
 }
 
 

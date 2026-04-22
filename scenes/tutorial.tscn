@@ -5,7 +5,7 @@
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_e13mp"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="4_vrdqu"]
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="5_cmspm"]
-[ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="6_ikfo1"]
+[ext_resource type="Script" uid="uid://c5wk2b3gkx1uh" path="res://script/tutorialScript/tutorial_battle_loop.gd" id="6_ikfo1"]
 [ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/mana_hud.gd" id="7_dwom6"]
 [ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="8_bl2xa"]
 [ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_15kfc"]
@@ -15,6 +15,8 @@
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="13_5qvs7"]
 [ext_resource type="Script" uid="uid://cpctoqyaugfnj" path="res://script/ui/line_limit.gd" id="14_qbchm"]
 [ext_resource type="Script" uid="uid://dhxev4cw26q7" path="res://script/map/tutorial.gd" id="15_tutor"]
+[ext_resource type="Texture2D" uid="uid://j2xtbg1oeluq" path="res://assets/tempAssets/click1.png" id="16_vrdqu"]
+[ext_resource type="Texture2D" uid="uid://csgb2mm6can3p" path="res://assets/tempAssets/click2.png" id="17_cmspm"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
@@ -122,6 +124,31 @@ size = Vector2(429, 58)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jkv2x"]
 size = Vector2(360, 41.99997)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ikfo1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16_vrdqu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_cmspm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_vrdqu")
+}],
+"loop": false,
+"name": &"click",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16_vrdqu")
+}],
+"loop": false,
+"name": &"idle",
+"speed": 5.0
+}]
 
 [node name="Tutorial" type="Node2D" unique_id=1625147204]
 position = Vector2(422, 377)
@@ -1036,7 +1063,7 @@ vertical_alignment = 1
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=181201766]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn_enemy1" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
+[node name="EnemySpawn_enemy_tutorial" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
 position = Vector2(12, -8)
 
 [node name="EnemyHolder2" type="Node2D" parent="EnemySlot" unique_id=1419468957]
@@ -1106,7 +1133,7 @@ vertical_alignment = 1
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1307839188]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn_enemy2" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
+[node name="EnemySpawn_enemy_tutorial" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
 position = Vector2(12, -8)
 
 [node name="EnemyHolder3" type="Node2D" parent="EnemySlot" unique_id=1419468959]
@@ -1291,6 +1318,20 @@ theme_override_fonts/font = ExtResource("3_e13mp")
 theme_override_font_sizes/font_size = 24
 text = "Tutorial"
 horizontal_alignment = 1
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=552914286]
+position = Vector2(202, -33)
+scale = Vector2(0.22916669, 0.22916669)
+sprite_frames = SubResource("SpriteFrames_ikfo1")
+animation = &"idle"
+
+[node name="Holdhint" type="TextEdit" parent="." unique_id=1089359746]
+offset_left = -30.0
+offset_top = -41.0
+offset_right = 156.0
+offset_bottom = 62.0
+text = "Press H to hold balls 
+you dont need"
 
 [connection signal="timeout" from="UI/LineLimit/Timer" to="UI/LineLimit" method="_on_timer_timeout"]
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
