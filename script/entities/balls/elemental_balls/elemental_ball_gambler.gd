@@ -39,8 +39,11 @@ static func buy_in():
 static func roll_for_initiative():
 	pass
 
-static func gambling_fallacy():
-	pass
+static func gambling_fallacy(_ctx: BattleContext, _source: BallBase):
+	if randi_range(1, 2) == 1:
+		_ctx.damage_player(_source.level)
+	else:
+		_ctx.damage_enemy(_source.level * 2, _ctx.active_enemy())
 
 
 	
