@@ -83,7 +83,7 @@ static func get_passive(type):
 				"name": "Darkness Consumes",
 				"type": "Dark",
 				"function": "darkness_consume",
-				"description": "Passive",
+				"description": "Passive: Every shot deals 1.5x more damage at the cost of dealing half the damage to you",
 				"rank": 0
 			}
 		"Gambler":
@@ -91,7 +91,7 @@ static func get_passive(type):
 				"name": "Gambling Fallacy",
 				"type": "Gambler",
 				"function": "gambling_fallacy",
-				"description": "Passive",
+				"description": "Passive: Every merge heals you a random amount or hurts you a random amount",
 				"rank": 0
 			}
 		_:

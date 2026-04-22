@@ -19,3 +19,4 @@ res://script/entities/balls/elemental_balls/elemental_ball_dark.gd
 res://scenes/map/map_selection.tscn
 res://script/map/map_selection.gd
 res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd
+res://script/entities/balls/elemental_balls/elemental_ball_scene.tscn

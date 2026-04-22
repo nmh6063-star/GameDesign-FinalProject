@@ -66,7 +66,7 @@ static func enbiggen(_ctx: BattleContext, _source: BallBase):
 	pass
 	
 static func eye_for_an_arm(_ctx: BattleContext, _source: BallBase):
-	_ctx.damage_enemy(_source.level*2, _ctx.active_enemy())
+	_ctx.damage_enemy(_source.level*1.5, _ctx.active_enemy())
 	_ctx.damage_player(_source.level/2)
 
 static func create_copy(_ctx: BattleContext, _source: BallBase):

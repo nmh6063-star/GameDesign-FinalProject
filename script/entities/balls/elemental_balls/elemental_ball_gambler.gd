@@ -11,7 +11,7 @@ static var functions: Array[String] = [
 static var functions_by_id := {
 	functions[0]: [buy_in, on_merge, 1],
 	functions[1]: [roll_for_initiative, can_trigger, 7],
-	functions[2]: [gambling_fallacy, on_shot, -1]
+	functions[2]: [gambling_fallacy, on_merge, -1]
 }
 
 static func get_target_function(_source: BallBase, function: String, function_match: String):
