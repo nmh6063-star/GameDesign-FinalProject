@@ -7,6 +7,7 @@ class_name TutorialBallManager
 
 var _tutorial_sequence: Array = []
 var _tutorial_index: int = 0
+const _MAX_TUTORIAL_QUEUE_LEVEL := 3
 
 
 # Replaces the random queue with a fixed repeating sequence.
@@ -26,6 +27,17 @@ func _fill_queue() -> void:
 			var data := BallCatalog.data_for_id(raw["id"])
 			var scene := BallCatalog.scene_for_id(raw["id"])
 			if data != null and scene != null:
-				_queue.append({"id": raw["id"], "scene": scene, "data": data, "level": raw.get("level", 1)})
+				_queue.append({
+					"id": raw["id"],
+					"scene": scene,
+					"data": data,
+					"level": _tutorial_level(raw.get("level", 1)),
+				})
 				continue
-		_queue.append(_roll_ball_entry())
+		var rolled: Dictionary = _roll_ball_entry()
+		rolled["level"] = _tutorial_level(rolled.get("level", 1))
+		_queue.append(rolled)
+
+
+func _tutorial_level(level: int) -> int:
+	return clampi(level, 1, _MAX_TUTORIAL_QUEUE_LEVEL)

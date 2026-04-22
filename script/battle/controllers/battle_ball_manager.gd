@@ -5,6 +5,7 @@ const ElementCatalog := preload("res://script/entities/balls/elemental_balls/ele
 const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const BallBase := preload("res://script/entities/balls/ball_base.gd")
 const QUEUE_SIZE := 5
+const MAX_QUEUE_LEVEL := 3
 const Effects := preload("res://script/battle/core/general_effects.gd")
 
 var _root: Node2D
@@ -236,14 +237,14 @@ func _roll_ball_entry() -> Dictionary:
 				"id": entry["id"],
 				"scene": entry["scene"],
 				"data": entry["data"],
-				"level": entry["data"].random_spawn_level(),
+				"level": min(entry["data"].random_spawn_level(), MAX_QUEUE_LEVEL),
 			}
 	var entry: Dictionary = _spawn_pool[0]
 	return {
 		"id": entry["id"],
 		"scene": entry["scene"],
 		"data": entry["data"],
-		"level": entry["data"].random_spawn_level(),
+		"level": min(entry["data"].random_spawn_level(), MAX_QUEUE_LEVEL),
 	}
 
 

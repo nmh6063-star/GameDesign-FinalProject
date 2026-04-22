@@ -195,7 +195,7 @@ func on_destroy(ctx: BattleContext) -> void:
 
 
 func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
-	level *= 2
+	level += 1
 	for elements in element_list:
 		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
 			elements["element"].on_merge(ctx, self, elements["effect"])
