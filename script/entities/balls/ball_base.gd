@@ -3,6 +3,7 @@ class_name BallBase
 
 const BattleContext := preload("res://script/battle/core/battle_context.gd")
 const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
+const ElementCatalog := preload("res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd")
 const BallData := preload("res://script/entities/balls/ball_data.gd")
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
@@ -16,7 +17,13 @@ var battle_context: BattleContext
 var aim_target: Node2D
 var set_up := false
 var level := 1
+var rank := 1
 var ui_preview := false
+var touchingDir = ""
+var last = 0
+var dying = false
+var type = []
+var element_list = []
 
 
 func _ready() -> void:
@@ -41,6 +48,12 @@ func set_runtime(ctx: BattleContext, target: Node2D) -> void:
 func configure(ball_data: BallData, ball_level: int, ctx: BattleContext, target: Node2D) -> void:
 	data = ball_data
 	level = ball_level
+	var temp = level
+	if rank != 8:
+		rank = 1
+		while temp > 1:
+			temp /= 2
+			rank += 1
 	set_runtime(ctx, target)
 	refresh()
 
@@ -56,6 +69,12 @@ func set_preview(ball_data: BallData, ball_level: int) -> void:
 func refresh() -> void:
 	if data == null:
 		return
+	var temp = level
+	if rank != 8:
+		rank = 1
+		while temp > 1:
+			temp /= 2
+			rank += 1
 	_update_collision()
 	queue_redraw()
 
@@ -69,6 +88,20 @@ func set_playfield_state(is_set_up: bool) -> void:
 	gravity_scale = 0.0 if set_up else GRAVITY_SCALE
 	if set_up:
 		sleeping = false
+
+func die():
+	var timer = Timer.new()
+	add_child(timer)
+	timer.wait_time = 1.0
+	timer.one_shot = true
+	timer.timeout.connect(_on_timer_timeout)
+	self.freeze = true
+	$CollisionShape2D.disabled = true
+	dying = true
+	timer.start()
+
+func _on_timer_timeout():
+	self.queue_free()
 
 
 func participates_in_level_merge() -> bool:
@@ -107,7 +140,7 @@ func check_merge(ctx: BattleContext, other: BallBase) -> bool:
 	return false
 
 
-func merge_with(ctx: BattleContext, other: BallBase) -> void:
+func merge_with(ctx: BattleContext, other: BallBase, level: float) -> void:
 	pass
 
 
@@ -116,6 +149,13 @@ func try_apply_board_behavior(ctx: BattleContext) -> bool:
 		if effect.can_trigger(ctx, self):
 			effect.apply(ctx, self)
 			return true
+	for elements in element_list:
+		if elements["element"].get_target_function(self, elements["effect"], "can_trigger"):
+			elements["element"].apply(ctx, self, elements["effect"])
+		#print(elements.can_trigger(ctx, self))
+		#if elements["element"].can_trigger(ctx, self, elements[1]):
+		#	#elements.apply(ctx, self)
+		#	print("pass")
 	return false
 
 
@@ -124,8 +164,10 @@ func tick_board_behavior(ctx: BattleContext) -> void:
 		effect.tick(ctx, self)
 
 
-func shot_base_damage() -> int:
-	return level if data != null and data.id == BallCatalog.NORMAL_BALL_ID else 0
+func shot_base_damage():
+	#if data..size() > 0:
+	#	print("detected element")
+	return level if data != null and (data.id == BallCatalog.NORMAL_BALL_ID || data.id == "ball_heavy") else null
 
 
 func shot_damage_multiplier() -> float:
@@ -138,6 +180,10 @@ func shot_damage_multiplier() -> float:
 func on_shot(ctx: BattleContext) -> void:
 	for effect in _effects():
 		effect.on_shot(ctx, self)
+	print(element_list)
+	for elements in element_list:
+		if elements["element"].get_target_function(self, elements["effect"], "on_shot"):
+			elements["element"].on_shot(ctx, self, elements["effect"])
 	if is_queued_for_deletion():
 		return
 	ctx.consume_ball(self)
@@ -148,8 +194,11 @@ func on_destroy(ctx: BattleContext) -> void:
 		effect.on_destroy(ctx, self)
 
 
-func merge_into_me() -> void:
+func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
 	level *= 2
+	for elements in element_list:
+		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
+			elements["element"].on_merge(ctx, self, elements["effect"])
 	refresh()
 
 
@@ -157,9 +206,27 @@ func multiply_level(multiplier: int = 2) -> void:
 	level *= multiplier
 	refresh()
 
+func rank_state():
+	print("test")
+	
+
 
 func _physics_process(_delta: float) -> void:
-	physics_material_override.absorbent = linear_velocity.y <= 1.0
+	if type.size() > 0:
+		var base_color = Vector3.ZERO
+		for i in type:
+			base_color.x += ElementCatalog.get_color(i).r
+			base_color.y += ElementCatalog.get_color(i).g
+			base_color.z += ElementCatalog.get_color(i).b
+		self_modulate = Color(base_color.x, base_color.y, base_color.z)
+	if dying:
+		self_modulate.a -= 5.0 * _delta
+		self_modulate.a = max(self_modulate.a, 0)
+		scale += Vector2(2.5 * _delta, 2.5 * _delta)
+		for child in get_children():
+			if "self_modulate" in child:
+				child.self_modulate.a -= 5.0 * _delta
+				child.self_modulate.a = max(child.self_modulate.a, 0)
 	if not visible:
 		gravity_scale = 0.0
 		return
@@ -180,12 +247,24 @@ func _physics_process(_delta: float) -> void:
 	var delta_x := aim_target.position.x - position.x
 	var direction := 0.0 if absf(delta_x) < 15.0 else signf(delta_x)
 	linear_velocity = Vector2(clampf(absf(delta_x) * 25.0, 0.0, 2500.0) * direction, 0.0)
+	if (touchingDir == 'right' and linear_velocity.x > 0) or (touchingDir == 'left' and linear_velocity.x < 0):
+		linear_velocity.x = 0
+	if (touchingDir == 'right' and linear_velocity.x < 0) or (touchingDir == 'left' and linear_velocity.x > 0):
+		touchingDir = ''
 	if Input.is_action_just_pressed("drop"):
 		sleeping = false
 		gravity_scale = GRAVITY_SCALE
 		set_up = false
 		dropped.emit()
-
+		
+				
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	if(state.get_contact_count() > 0):
+		if(set_up):
+			if global_position.x > 400:
+				touchingDir = 'right'
+			else:
+				touchingDir = 'left'
 
 func _draw() -> void:
 	if data == null:

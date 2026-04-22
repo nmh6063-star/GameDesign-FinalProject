@@ -3,18 +3,16 @@ class_name BattleContext
 
 enum Phase { PLAY, RESOLVE }
 
-const MAX_BULLETS := 5
-const MERGES_PER_BULLET := 5
-const COMBO_TIMEOUT := 5.0
+const MAX_MANA_PIPES := 5
+const MERGES_PER_MANA_PIPE := 5
+var COMBO_TIMEOUT := 5.0
 
 var controller
 var phase := Phase.PLAY
 var resolving_board := true
-var player_energy_max := 1000
-var player_energy := 1000
+var mana_pipes := 0
 var current_ball: BallBase = null
 var merge_progress := 0
-var bullets := 0
 var battle_result_text := ""
 var slow_mo_active := false
 var combo := 0
@@ -29,10 +27,9 @@ func _init(p_controller = null) -> void:
 func reset_for_battle() -> void:
 	phase = Phase.PLAY
 	resolving_board = true
-	player_energy = player_energy_max
+	mana_pipes = 0
 	current_ball = null
 	merge_progress = 0
-	bullets = 0
 	battle_result_text = ""
 	slow_mo_active = false
 	combo = 0
@@ -43,9 +40,6 @@ func start_turn() -> void:
 	phase = Phase.PLAY
 	resolving_board = true
 	current_ball = null
-	player_energy = min(player_energy + 5, player_energy_max)
-
-
 func begin_resolution() -> void:
 	phase = Phase.RESOLVE
 	resolving_board = true
@@ -98,32 +92,49 @@ func tick_combo(delta: float) -> void:
 	if combo_timer <= 0.0:
 		combo_timer = 0.0
 		combo = 0
+		COMBO_TIMEOUT = 5.0
 	if controller != null:
 		controller.sync_combo_hud()
 
 
 func register_merge() -> void:
 	combo += 1
+	COMBO_TIMEOUT -= clampf(0.1 / (combo/2.0), 0.25, 5.0)
 	combo_timer = COMBO_TIMEOUT
-	if bullets < MAX_BULLETS:
+	if mana_pipes < MAX_MANA_PIPES:
 		var progress_gain := maxi(1, int(combo_multiplier()))
 		merge_progress += progress_gain
-		while merge_progress >= MERGES_PER_BULLET and bullets < MAX_BULLETS:
-			merge_progress -= MERGES_PER_BULLET
-			bullets = mini(bullets + 1, MAX_BULLETS)
+		while merge_progress >= MERGES_PER_MANA_PIPE and mana_pipes < MAX_MANA_PIPES:
+			merge_progress -= MERGES_PER_MANA_PIPE
+			mana_pipes = mini(mana_pipes + 1, MAX_MANA_PIPES)
 	if controller != null:
-		controller.sync_shoot_ammo_hud()
+		controller.sync_mana_hud()
 		controller.sync_combo_hud()
 
 
 func can_shoot() -> bool:
-	return bullets > 0
+	return mana_pipes > 0
+
+
+func can_spend_mana(amount: int) -> bool:
+	return amount <= mana_pipes
+
+
+func try_spend_mana(amount: int) -> bool:
+	if not can_spend_mana(amount):
+		return false
+	mana_pipes -= amount
+	if controller != null:
+		controller.sync_mana_hud()
+	return true
 
 
 func try_consume_shot() -> bool:
-	if bullets <= 0:
+	if mana_pipes <= 0:
 		return false
-	bullets -= 1
+	mana_pipes -= 1
+	if controller != null:
+		controller.sync_mana_hud()
 	return true
 
 

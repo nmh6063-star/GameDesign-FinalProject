@@ -15,7 +15,7 @@ func _resolve_one_merge(ctx: BattleContext) -> BallBase:
 		for j in range(i + 1, balls.size()):
 			var other := balls[j] as BallBase
 			if ball.check_merge(ctx, other):
-				ball.merge_with(ctx, other)
+				ball.merge_with(ctx, other, ball.level)
 				return ball
 	return null
 

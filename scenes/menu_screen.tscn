@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://doufdp16uyaku"]
+
+[ext_resource type="Script" uid="uid://clbb8867asvwx" path="res://script/map/menu_screen.gd" id="1_e6vgv"]
+[ext_resource type="Texture2D" uid="uid://qvby6aw6lwbs" path="res://assets/MenuScreen.png" id="1_yft84"]
+
+[node name="MenuScreen" type="Node2D" unique_id=455783042]
+position = Vector2(0, 640)
+script = ExtResource("1_e6vgv")
+
+[node name="MenuScreen" type="Sprite2D" parent="." unique_id=1779615548]
+position = Vector2(576, -280)
+scale = Vector2(0.72865576, 0.7258065)
+texture = ExtResource("1_yft84")
+
+[node name="Setting" type="Button" parent="MenuScreen" unique_id=507625135]
+show_behind_parent = true
+anchors_preset = -1
+anchor_left = -0.006922526
+anchor_top = -0.05694445
+anchor_right = 0.08494866
+anchor_bottom = 0.079435475
+offset_left = -735.60114
+offset_top = 376.13333
+offset_right = -727.60114
+offset_bottom = 384.13333
+metadata/_edit_use_anchors_ = true
+
+[node name="StartGame" type="Button" parent="MenuScreen" unique_id=1470628158]
+show_behind_parent = true
+anchors_preset = -1
+anchor_left = -0.19036937
+anchor_right = 0.1922478
+anchor_bottom = 0.14610216
+offset_left = -5.489563
+offset_top = -9.64444
+offset_right = 2.510437
+offset_bottom = -1.6444397
+metadata/_edit_use_anchors_ = true
+
+[node name="Tutorial" type="Button" parent="MenuScreen" unique_id=1145179821]
+show_behind_parent = true
+anchors_preset = -1
+anchor_left = -0.0069225067
+anchor_right = 0.34800452
+anchor_bottom = 0.11415768
+offset_left = -274.47803
+offset_top = 165.33333
+offset_right = -266.47803
+offset_bottom = 173.33334
+metadata/_edit_use_anchors_ = true

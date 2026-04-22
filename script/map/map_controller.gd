@@ -118,6 +118,7 @@ func select_choice_index(index: int) -> void:
 
 
 func confirm_selection() -> MapGenerator.Room:
+	print("WHAT THE HELL")
 	var room := selected_choice()
 	if room == null:
 		return null

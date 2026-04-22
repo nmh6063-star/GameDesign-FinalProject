@@ -18,6 +18,7 @@ const LABELS := {
 	MapGenerator.Room.Type.SHOP: "Shop",
 	MapGenerator.Room.Type.CAMPFIRE: "Campfire",
 	MapGenerator.Room.Type.BOSS: "Boss",
+	MapGenerator.Room.Type.EVENT: "Event",
 }
 
 const SHORT_LABELS := {
@@ -27,6 +28,7 @@ const SHORT_LABELS := {
 	MapGenerator.Room.Type.SHOP: "SH",
 	MapGenerator.Room.Type.CAMPFIRE: "CF",
 	MapGenerator.Room.Type.BOSS: "BS",
+	MapGenerator.Room.Type.EVENT: "?",
 }
 
 const TINTS := {
@@ -36,6 +38,7 @@ const TINTS := {
 	MapGenerator.Room.Type.SHOP: Color("120c11"),
 	MapGenerator.Room.Type.CAMPFIRE: Color("120c11"),
 	MapGenerator.Room.Type.BOSS: Color("6b091d"),
+	MapGenerator.Room.Type.EVENT: Color("d4a017"),
 }
 
 const BASE_ICON_SCALE := Vector2(0.015, 0.015)
@@ -96,12 +99,23 @@ func set_state(is_available: bool, is_current: bool, is_visited: bool, is_select
 	if room == null:
 		return
 	selectable = is_available
-	var modulate_color := tint_for_type(int(room.type))
+	var hidden := room.mystery and not is_visited and not is_current
+	if hidden:
+		sprite_2d.visible = false
+		sprite_2d.modulate = Color("d4a017")
+	else:
+		var texture := texture_for_type(int(room.type))
+		sprite_2d.texture = texture
+		sprite_2d.visible = texture != null
+		sprite_2d.scale = BASE_ICON_SCALE
+		sprite_2d.modulate = tint_for_type(int(room.type))
+	var modulate_color := Color("d4a017") if hidden else tint_for_type(int(room.type))
 	if not is_visited and not is_available and not is_current:
 		modulate_color = modulate_color.darkened(0.45)
 	if is_current:
 		modulate_color = Color.WHITE
-	sprite_2d.modulate = modulate_color
+	if not hidden:
+		sprite_2d.modulate = modulate_color
 	border.modulate = HIGHLIGHT_COLOR if is_current or is_selected else BORDER_COLOR
 	if is_current or is_selected:
 		animation_player.play("highlight")

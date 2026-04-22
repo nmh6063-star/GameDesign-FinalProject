@@ -1,0 +1,130 @@
+[gd_scene format=3 uid="uid://conqdedat55ct"]
+
+[ext_resource type="Script" uid="uid://d1mj4hdnmtb7p" path="res://script/ui/pause_menu.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cv37c1rsrb6jg" path="res://assets/buttonTemplate.png" id="2_btn"]
+[ext_resource type="FontFile" uid="uid://bxb64wxaym54g" path="res://assets/dogica/TTF/dogicapixelbold.ttf" id="3_font"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=707072584]
+process_mode = 3
+layer = 128
+script = ExtResource("1_script")
+
+[node name="Background" type="ColorRect" parent="." unique_id=854291480]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.4)
+
+[node name="Center" type="CenterContainer" parent="." unique_id=618401127]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -60.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center" unique_id=1374801440]
+custom_minimum_size = Vector2(320, 384)
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Title" type="Label" parent="Center/VBox" unique_id=1575029222]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 32
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="ContinueButton" type="TextureButton" parent="Center/VBox" unique_id=1641831699]
+layout_mode = 2
+size_flags_vertical = 3
+texture_normal = ExtResource("2_btn")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Center/VBox/ContinueButton" unique_id=1220960091]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.0706, 0.0471, 0.0667, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "Continue"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RestartButton" type="TextureButton" parent="Center/VBox" unique_id=1655406813]
+layout_mode = 2
+size_flags_vertical = 3
+texture_normal = ExtResource("2_btn")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Center/VBox/RestartButton" unique_id=318537529]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.0706, 0.0471, 0.0667, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "Restart Room"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TitleButton" type="TextureButton" parent="Center/VBox" unique_id=1143746899]
+layout_mode = 2
+size_flags_vertical = 3
+texture_normal = ExtResource("2_btn")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Center/VBox/TitleButton" unique_id=1182134850]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.0706, 0.0471, 0.0667, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "Return to Title"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ExitButton" type="TextureButton" parent="Center/VBox" unique_id=409911553]
+layout_mode = 2
+size_flags_vertical = 3
+texture_normal = ExtResource("2_btn")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="Center/VBox/ExitButton" unique_id=1345875826]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.0706, 0.0471, 0.0667, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "Exit Game"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="Center/VBox/ContinueButton" to="." method="_on_continue_pressed"]
+[connection signal="pressed" from="Center/VBox/RestartButton" to="." method="_on_restart_pressed"]
+[connection signal="pressed" from="Center/VBox/TitleButton" to="." method="_on_title_pressed"]
+[connection signal="pressed" from="Center/VBox/ExitButton" to="." method="_on_exit_pressed"]

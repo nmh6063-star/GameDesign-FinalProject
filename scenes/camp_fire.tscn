@@ -1,0 +1,133 @@
+[gd_scene format=3 uid="uid://o3jck8tnkoh6"]
+
+[ext_resource type="Script" uid="uid://kk6jf5cjb31" path="res://script/map/camp_fire.gd" id="1_laf35"]
+[ext_resource type="Texture2D" uid="uid://cdftqemd26thc" path="res://assets/camp_fire.png" id="2_5a6tu"]
+[ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_ttny0"]
+[ext_resource type="Texture2D" uid="uid://b3fn2gtehwri4" path="res://assets/tempAssets/healSymbol.png" id="4_54jok"]
+[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="5_xkesr"]
+[ext_resource type="Texture2D" uid="uid://d4hamqba42h3j" path="res://assets/tempAssets/upgrade2.png" id="6_xkesr"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
+bg_color = Color(0.28, 0.2, 0.35, 0.94)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.93, 0.93, 0.93, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[node name="CampFire" type="CanvasLayer" unique_id=1144266803]
+script = ExtResource("1_laf35")
+
+[node name="Overlay" type="Control" parent="." unique_id=134457163]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="Overlay" unique_id=960938994]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.03, 0.07, 0.84)
+
+[node name="CampFire" type="Sprite2D" parent="Overlay" unique_id=209103429]
+position = Vector2(576.00006, 334)
+scale = Vector2(0.5859375, 0.5859375)
+texture = ExtResource("2_5a6tu")
+
+[node name="Title" type="Label" parent="Overlay" unique_id=1866172958]
+layout_mode = 0
+offset_left = 72.0
+offset_top = 56.0
+offset_right = 1056.0
+offset_bottom = 96.0
+theme_override_fonts/font = ExtResource("2_ttny0")
+theme_override_font_sizes/font_size = 24
+text = "Camp Fire"
+horizontal_alignment = 1
+
+[node name="UpgradeAimSize" type="Button" parent="." unique_id=979542643]
+custom_minimum_size = Vector2(168, 220)
+offset_left = 714.0
+offset_top = 168.0
+offset_right = 882.0
+offset_bottom = 388.0
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_ttny0")
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
+theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UpgradeAimSize" unique_id=1786326391]
+position = Vector2(84, 92)
+
+[node name="Name" type="Label" parent="UpgradeAimSize" unique_id=464398715]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 166.0
+offset_right = 158.0
+offset_bottom = 212.0
+theme_override_fonts/font = ExtResource("2_ttny0")
+theme_override_font_sizes/font_size = 11
+text = "Increase 
+
+Aim Size"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Target" type="Sprite2D" parent="UpgradeAimSize" unique_id=1947704975]
+position = Vector2(67.5, 86.5)
+scale = Vector2(0.11666667, 0.11666667)
+texture = ExtResource("5_xkesr")
+
+[node name="Heal2" type="Button" parent="." unique_id=75297451]
+custom_minimum_size = Vector2(168, 220)
+offset_left = 280.0
+offset_top = 168.0
+offset_right = 448.0
+offset_bottom = 388.0
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_ttny0")
+theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
+theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
+theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
+
+[node name="HealSymbol" type="Sprite2D" parent="Heal2" unique_id=269336523]
+position = Vector2(84.000015, 104.000015)
+scale = Vector2(0.23632814, 0.23632814)
+texture = ExtResource("4_54jok")
+
+[node name="PreviewRoot" type="Node2D" parent="Heal2" unique_id=726977421]
+position = Vector2(84, 92)
+
+[node name="Name" type="Label" parent="Heal2" unique_id=405830804]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 166.0
+offset_right = 158.0
+offset_bottom = 212.0
+theme_override_fonts/font = ExtResource("2_ttny0")
+theme_override_font_sizes/font_size = 11
+text = "Heal 100 HP"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Upgrade2" type="Sprite2D" parent="Heal2" unique_id=714600254]
+position = Vector2(543, 80)
+scale = Vector2(0.12559818, 0.12559818)
+texture = ExtResource("6_xkesr")

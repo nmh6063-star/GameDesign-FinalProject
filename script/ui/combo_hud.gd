@@ -27,5 +27,6 @@ func sync_state(combo: int, multiplier: float, timer_ratio: float) -> void:
 
 func _pop_animation() -> void:
 	var tween := create_tween()
-	tween.tween_property(self, "scale", Vector2(1.15, 1.15), 0.06).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	tween.tween_property(self, "scale", Vector2.ONE, 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	var value = float($VBox/ComboCount.text)
+	tween.tween_property($VBox/ComboCount, "scale", Vector2(1.15 + value/5.0, 1.15 + value/5.0), 0.06).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property($VBox/ComboCount, "scale", (Vector2.ONE + Vector2(value/10.0, value/10.0)), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)

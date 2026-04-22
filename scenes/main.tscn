@@ -4,19 +4,20 @@
 [ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
+[ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_jkv2x"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
+[ext_resource type="Script" uid="uid://cpctoqyaugfnj" path="res://script/ui/line_limit.gd" id="13_a8y0u"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
-[ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/shoot_ammo_hud.gd" id="15_shoothud"]
-[ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="16_jbj1t"]
+[ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/mana_hud.gd" id="15_manahud"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
 [ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="21_ring"]
 [ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="22_combo"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
-bounce = 0.9
+bounce = 0.4
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_o5qli"]
 radius = 20.0
@@ -25,6 +26,23 @@ radius = 20.0
 base_font = ExtResource("6_choun")
 spacing_glyph = -2
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_card"]
+bg_color = Color(0.65, 0.65, 0.65, 0.95)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_header"]
+bg_color = Color(0.06, 0.03, 0.08, 0.88)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_slot"]
+bg_color = Color(1, 1, 1, 0)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_bg"]
 bg_color = Color(0.54901963, 0.4509804, 0.6313726, 1)
 corner_radius_top_left = 24
@@ -32,20 +50,38 @@ corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_slot"]
-bg_color = Color(1, 1, 1, 0)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_focus"]
-bg_color = Color(1, 1, 1, 0)
-border_width_left = 4
-border_width_top = 4
-border_width_right = 4
-border_width_bottom = 4
-border_color = Color(1, 0.17254902, 0.14901961, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_special_bar"]
+bg_color = Color(0.24, 0.24, 0.24, 0.95)
 corner_radius_top_left = 28
 corner_radius_top_right = 28
 corner_radius_bottom_right = 28
 corner_radius_bottom_left = 28
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_special_slot"]
+bg_color = Color(0.13, 0.13, 0.13, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cost_badge"]
+bg_color = Color(0.06, 0.06, 0.1, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92, 0.92, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attack_slot"]
+bg_color = Color(0.98, 0.58, 0.13, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_result"]
 bg_color = Color(0.15, 0.08, 0.2, 0.94)
@@ -76,6 +112,15 @@ corner_radius_bottom_left = 20
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_surface"]
 friction = 2.5
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trceg"]
+size = Vector2(106, 449)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a8y0u"]
+size = Vector2(429, 58)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jkv2x"]
+size = Vector2(360, 41.99997)
 
 [node name="Main" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
@@ -165,90 +210,175 @@ script = ExtResource("2_gm")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
 
-[node name="BallQueue" type="Panel" parent="UI" unique_id=1041509987]
-offset_left = 56.0
-offset_top = 220.0
-offset_right = 136.0
-offset_bottom = 624.0
+[node name="BallQueue" type="Control" parent="UI" unique_id=1041509987]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 42.0
+offset_top = 240.0
+offset_right = 530.0
+offset_bottom = 644.0
+mouse_filter = 2
+
+[node name="NextBox" type="Panel" parent="UI/BallQueue" unique_id=1041509988]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 114.0
+offset_bottom = 94.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_card")
+
+[node name="Header" type="Panel" parent="UI/BallQueue/NextBox" unique_id=1041509989]
+layout_mode = 0
+offset_right = 92.0
+offset_bottom = 20.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_header")
+
+[node name="Title" type="Label" parent="UI/BallQueue/NextBox/Header" unique_id=1041509990]
+layout_mode = 0
+offset_right = 92.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "Next"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot0" type="Panel" parent="UI/BallQueue/NextBox" unique_id=2104974235]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 26.0
+offset_right = 82.0
+offset_bottom = 88.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/NextBox/Slot0" unique_id=484554664]
+position = Vector2(36, 31)
+
+[node name="QueueBox" type="Panel" parent="UI/BallQueue" unique_id=1041509991]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 102.0
+offset_right = 114.0
+offset_bottom = 404.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_queue_bg")
 
-[node name="Center" type="CenterContainer" parent="UI/BallQueue" unique_id=1000005001]
+[node name="Center" type="CenterContainer" parent="UI/BallQueue/QueueBox" unique_id=1000005001]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
-[node name="Slots" type="VBoxContainer" parent="UI/BallQueue/Center" unique_id=1000005002]
-custom_minimum_size = Vector2(68, 380)
+[node name="Slots" type="VBoxContainer" parent="UI/BallQueue/QueueBox/Center" unique_id=1000005002]
+custom_minimum_size = Vector2(70, 254)
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 10
 
-[node name="Slot0" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=2104974235]
+[node name="Slot1" type="Panel" parent="UI/BallQueue/QueueBox/Center/Slots" unique_id=1248755655]
 custom_minimum_size = Vector2(68, 68)
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
 
-[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot0" unique_id=484554664]
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/QueueBox/Center/Slots/Slot1" unique_id=1252669065]
 position = Vector2(34, 34)
 
-[node name="TopFrame" type="Panel" parent="UI/BallQueue/Center/Slots/Slot0" unique_id=1885310689]
-modulate = Color(1, 1, 1, 0.627451)
+[node name="Slot2" type="Panel" parent="UI/BallQueue/QueueBox/Center/Slots" unique_id=1863335542]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/QueueBox/Center/Slots/Slot2" unique_id=1771129353]
+position = Vector2(34, 34)
+
+[node name="Slot3" type="Panel" parent="UI/BallQueue/QueueBox/Center/Slots" unique_id=1329058807]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/QueueBox/Center/Slots/Slot3" unique_id=347683052]
+position = Vector2(34, 34)
+
+[node name="Slot4" type="Panel" parent="UI/BallQueue/QueueBox/Center/Slots" unique_id=2088297033]
+custom_minimum_size = Vector2(68, 68)
+layout_mode = 2
+size_flags_horizontal = 4
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/QueueBox/Center/Slots/Slot4" unique_id=194895819]
+position = Vector2(34, 34)
+
+[node name="HoldBox" type="Panel" parent="UI/BallQueue" unique_id=1041509992]
 layout_mode = 0
-offset_left = -4.0
-offset_top = -4.0
-offset_right = 72.0
-offset_bottom = 72.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_queue_focus")
+offset_left = 582.0
+offset_right = 674.0
+offset_bottom = 94.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_card")
 
-[node name="Slot1" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=1248755655]
-custom_minimum_size = Vector2(68, 68)
-layout_mode = 2
-size_flags_horizontal = 4
+[node name="Header" type="Panel" parent="UI/BallQueue/HoldBox" unique_id=1041509993]
+layout_mode = 0
+offset_right = 92.0
+offset_bottom = 20.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_queue_header")
+
+[node name="Title" type="Label" parent="UI/BallQueue/HoldBox/Header" unique_id=1041509994]
+layout_mode = 0
+offset_right = 92.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "Hold"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HoldSlot" type="Panel" parent="UI/BallQueue/HoldBox" unique_id=1041509995]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 26.0
+offset_right = 82.0
+offset_bottom = 88.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
 
-[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot1" unique_id=1252669065]
-position = Vector2(34, 34)
+[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/HoldBox/HoldSlot" unique_id=1041509996]
+position = Vector2(36, 31)
 
-[node name="Slot2" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=1863335542]
-custom_minimum_size = Vector2(68, 68)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
+[node name="Hint" type="Label" parent="UI/BallQueue/HoldBox" unique_id=1041509997]
+layout_mode = 0
+offset_top = 76.0
+offset_right = 92.0
+offset_bottom = 92.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "H"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot2" unique_id=1771129353]
-position = Vector2(34, 34)
-
-[node name="Slot3" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=1329058807]
-custom_minimum_size = Vector2(68, 68)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot3" unique_id=347683052]
-position = Vector2(34, 34)
-
-[node name="Slot4" type="Panel" parent="UI/BallQueue/Center/Slots" unique_id=2088297033]
-custom_minimum_size = Vector2(68, 68)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="UI/BallQueue/Center/Slots/Slot4" unique_id=194895819]
-position = Vector2(34, 34)
-
-[node name="ShootAmmoHUD" type="Control" parent="UI" unique_id=901000000]
+[node name="ManaHUD" type="Control" parent="UI" unique_id=901000000]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 736.0
-offset_top = 392.0
-offset_right = 1076.0
-offset_bottom = 436.0
-script = ExtResource("15_shoothud")
+offset_left = 775.0
+offset_top = 398.0
+offset_right = 985.0
+offset_bottom = 430.0
+mouse_filter = 2
+script = ExtResource("15_manahud")
 
-[node name="Row" type="VBoxContainer" parent="UI/ShootAmmoHUD" unique_id=901000001]
+[node name="Row" type="VBoxContainer" parent="UI/ManaHUD" unique_id=901000001]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -257,50 +387,50 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="BulletPips" type="HBoxContainer" parent="UI/ShootAmmoHUD/Row" unique_id=901000006]
+[node name="ManaPipes" type="HBoxContainer" parent="UI/ManaHUD/Row" unique_id=901000006]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_constants/separation = 12
 
-[node name="Pip0" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000007]
+[node name="Pip0" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000007]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip1" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000008]
+[node name="Pip1" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000008]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip2" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000009]
+[node name="Pip2" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000009]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip3" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000010]
+[node name="Pip3" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000010]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip4" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000011]
+[node name="Pip4" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000011]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip5" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000012]
+[node name="Pip5" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000012]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip6" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000013]
+[node name="Pip6" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000013]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Pip7" type="Panel" parent="UI/ShootAmmoHUD/Row/BulletPips" unique_id=901000014]
+[node name="Pip7" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000014]
 custom_minimum_size = Vector2(22, 22)
 layout_mode = 2
 
-[node name="Meter" type="Control" parent="UI/ShootAmmoHUD/Row" unique_id=901000002]
+[node name="Meter" type="Control" parent="UI/ManaHUD/Row" unique_id=901000002]
 custom_minimum_size = Vector2(122, 14)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 
-[node name="Background" type="ColorRect" parent="UI/ShootAmmoHUD/Row/Meter" unique_id=901000003]
+[node name="Background" type="ColorRect" parent="UI/ManaHUD/Row/Meter" unique_id=901000003]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -309,21 +439,22 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.12, 0.08, 0.02, 1)
 
-[node name="Fill" type="ColorRect" parent="UI/ShootAmmoHUD/Row/Meter" unique_id=901000004]
+[node name="Fill" type="ColorRect" parent="UI/ManaHUD/Row/Meter" unique_id=901000004]
 layout_mode = 0
 offset_left = 1.0
 offset_top = 1.0
 offset_right = 1.0
 offset_bottom = 13.0
-color = Color(0.96, 0.8, 0.12, 1)
+color = Color(0.33, 0.66, 1, 1)
 
 [node name="ComboHUD" type="Control" parent="UI" unique_id=1357639289]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 56.0
-offset_top = 32.0
-offset_right = 200.0
-offset_bottom = 192.0
+offset_left = 44.0
+offset_top = 34.0
+offset_right = 188.0
+offset_bottom = 194.0
+scale = Vector2(0.9, 0.9)
 pivot_offset = Vector2(72, 80)
 script = ExtResource("22_combo")
 
@@ -351,6 +482,7 @@ layout_mode = 0
 offset_top = 20.0
 offset_right = 144.0
 offset_bottom = 48.0
+pivot_offset = Vector2(73, 12)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 32
@@ -394,36 +526,338 @@ color = Color(1.6845763e-06, 0.7855929, 0.19968045, 1)
 [node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000008]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 736.0
-offset_top = 344.0
-offset_right = 1084.0
-offset_bottom = 374.0
+offset_left = 752.0
+offset_top = 338.0
+offset_right = 1076.0
+offset_bottom = 376.0
 
 [node name="Background" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000009]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 2.0
+offset_bottom = 2.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(1.1, 0.90000004)
 color = Color(0, 0, 0, 1)
 
 [node name="Fill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000014]
-layout_mode = 0
+layout_mode = 1
+offset_top = 2.0
 offset_right = 240.0
-offset_bottom = 30.0
+offset_bottom = 32.0
+scale = Vector2(1, 1.1)
 color = Color(0, 0.7607843, 0, 1)
 
 [node name="Label" type="Label" parent="UI/PlayerHealthBar" unique_id=832688741]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 1
+
+[node name="SpecialBar" type="Panel" parent="UI" unique_id=1800000019]
+offset_left = 624.0
+offset_top = 484.0
+offset_right = 1144.0
+offset_bottom = 578.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_special_bar")
+
+[node name="Slots" type="HBoxContainer" parent="UI/SpecialBar" unique_id=1800000020]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 10.0
+offset_right = 502.0
+offset_bottom = 84.0
+mouse_filter = 2
+theme_override_constants/separation = 12
+
+[node name="Slot0" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000021]
+custom_minimum_size = Vector2(84, 74)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000022]
+position = Vector2(42, 32)
+
+[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000023]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 74.0
+offset_bottom = 48.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 8
+vertical_alignment = 1
+
+[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000050]
+layout_mode = 0
+offset_left = 62.0
+offset_top = -8.0
+offset_right = 82.0
+offset_bottom = 12.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
+
+[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot0/CostBadge" unique_id=1800000024]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("6_choun")
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000025]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 84.0
+offset_bottom = 72.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot1" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000026]
+custom_minimum_size = Vector2(84, 74)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000027]
+position = Vector2(42, 32)
+
+[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000028]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 74.0
+offset_bottom = 48.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 8
+vertical_alignment = 1
+
+[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000051]
+layout_mode = 0
+offset_left = 62.0
+offset_top = -8.0
+offset_right = 82.0
+offset_bottom = 12.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
+
+[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot1/CostBadge" unique_id=1800000029]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000030]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 84.0
+offset_bottom = 72.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "2"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot2" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000031]
+custom_minimum_size = Vector2(84, 74)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000032]
+position = Vector2(42, 32)
+
+[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000033]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 74.0
+offset_bottom = 48.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 8
+vertical_alignment = 1
+
+[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000052]
+layout_mode = 0
+offset_left = 62.0
+offset_top = -8.0
+offset_right = 82.0
+offset_bottom = 12.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
+
+[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot2/CostBadge" unique_id=1800000034]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000035]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 84.0
+offset_bottom = 72.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Slot3" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000036]
+custom_minimum_size = Vector2(84, 74)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
+
+[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000037]
+position = Vector2(42, 32)
+
+[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000038]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 24.0
+offset_right = 74.0
+offset_bottom = 48.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 8
+vertical_alignment = 1
+
+[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000053]
+layout_mode = 0
+offset_left = 62.0
+offset_top = -8.0
+offset_right = 82.0
+offset_bottom = 12.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
+
+[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot3/CostBadge" unique_id=1800000039]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000044]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 84.0
+offset_bottom = 72.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="AttackSlot" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000040]
+custom_minimum_size = Vector2(92, 74)
+layout_mode = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_attack_slot")
+
+[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/AttackSlot" unique_id=1800000054]
+layout_mode = 0
+offset_left = 70.0
+offset_top = -8.0
+offset_right = 90.0
+offset_bottom = 12.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
+
+[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/AttackSlot/CostBadge" unique_id=1800000055]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Title" type="Label" parent="UI/SpecialBar/Slots/AttackSlot" unique_id=1800000041]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 18.0
+offset_right = 86.0
+offset_bottom = 42.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Key" type="Label" parent="UI/SpecialBar/Slots/AttackSlot" unique_id=1800000042]
+layout_mode = 0
+offset_top = 56.0
+offset_right = 92.0
+offset_bottom = 72.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "X"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LineLimit" type="Control" parent="UI" unique_id=1133250344]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("9_jkv2x")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="UI/LineLimit" unique_id=1879806430]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+pivot_offset = Vector2(19.5, 20.5)
+text = "0"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Timer" type="Timer" parent="UI/LineLimit" unique_id=169813689]
+one_shot = true
 
 [node name="GameOver" type="CenterContainer" parent="UI" unique_id=555100001]
 visible = false
@@ -527,7 +961,7 @@ script = ExtResource("9_trceg")
 wait_time = 0.1
 one_shot = true
 
-[node name="DamageAnchorPlayer" type="Marker2D" parent="PlayerHolder" unique_id=1800000040]
+[node name="DamageAnchorPlayer" type="Marker2D" parent="PlayerHolder" unique_id=15245076]
 position = Vector2(584, 424)
 
 [node name="EnemySlot" type="Node2D" parent="." unique_id=1614701798]
@@ -597,7 +1031,7 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=1800000041]
+[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=181201766]
 position = Vector2(40, -32)
 
 [node name="EnemySpawn_enemy1" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
@@ -667,7 +1101,7 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1800000042]
+[node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1307839188]
 position = Vector2(40, -32)
 
 [node name="EnemySpawn_enemy2" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
@@ -749,7 +1183,7 @@ position = Vector2(12, -8)
 z_index = -1
 texture_filter = 1
 position = Vector2(248, 0)
-scale = Vector2(0.6, 0.6)
+scale = Vector2(0.7, 0.7)
 texture = ExtResource("17_dp3eg")
 
 [node name="Box" type="StaticBody2D" parent="Background" unique_id=953407219]
@@ -780,11 +1214,73 @@ position = Vector2(8, -3)
 scale = Vector2(7.6547318, 8.198811)
 polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
 
-[node name="gun" type="Sprite2D" parent="Background" unique_id=672488835]
-position = Vector2(512, 188.99998)
-scale = Vector2(0.7, 0.7)
-texture = ExtResource("16_jbj1t")
-region_enabled = true
-region_rect = Rect2(731.8239, 332.31876, 454.1761, 387.68124)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Box" unique_id=183793935]
+visible = false
+position = Vector2(-216, 8)
+shape = SubResource("RectangleShape2D_trceg")
 
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Background/Box" unique_id=1075060659]
+visible = false
+position = Vector2(248, 4)
+shape = SubResource("RectangleShape2D_trceg")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Background/Box" unique_id=2010969369]
+visible = false
+position = Vector2(33.5, 224)
+shape = SubResource("RectangleShape2D_a8y0u")
+
+[node name="Limit" type="Node2D" parent="Background" unique_id=876298834]
+position = Vector2(0, -67)
+rotation = -1.5707964
+script = ExtResource("13_a8y0u")
+
+[node name="Area2D" type="Area2D" parent="Background/Limit" unique_id=1377853102]
+position = Vector2(-280, -3.0517578e-05)
+rotation = 1.5707964
+scale = Vector2(1.8, 1.8)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Limit/Area2D" unique_id=543735123]
+position = Vector2(37.777786, -199.44446)
+scale = Vector2(0.5555556, 0.5555556)
+shape = SubResource("RectangleShape2D_jkv2x")
+
+[node name="Indicator0" type="Sprite2D" parent="Background/Limit" unique_id=1477895582]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, -75.20001)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator1" type="Sprite2D" parent="Background/Limit" unique_id=1615771166]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, -19.200012)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator2" type="Sprite2D" parent="Background/Limit" unique_id=1233836906]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 36.799988)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator3" type="Sprite2D" parent="Background/Limit" unique_id=1185555479]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 92.79999)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator4" type="Sprite2D" parent="Background/Limit" unique_id=777286870]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 148.79999)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[node name="Indicator5" type="Sprite2D" parent="Background/Limit" unique_id=1821844430]
+modulate = Color(1, 1, 1, 0.5019608)
+position = Vector2(51.200016, 204.79999)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("12_indicator")
+
+[connection signal="timeout" from="UI/LineLimit/Timer" to="UI/LineLimit" method="_on_timer_timeout"]
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
+[connection signal="body_entered" from="Background/Limit/Area2D" to="Background/Limit" method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Background/Limit/Area2D" to="Background/Limit" method="_on_area_2d_body_exited"]
