@@ -4,9 +4,20 @@ class_name MapSelection
 const MapController := preload("res://script/map/map_controller.gd")
 const MapGenerator := preload("res://script/map/map_generator.gd")
 const MapRoom := preload("res://script/map/map_room.gd")
+const ElementCatalog := preload("res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd")
+var rank_sizing = {
+	1: null,
+	2: null,
+	3: null,
+	4: null,
+	5: null,
+	6: null,
+	7: null
+}
 
-signal room_confirmed(room_type, room_id)
+signal room_confirmed(room_type, room_id, element_data)
 signal minimap_toggled(is_visible)
+signal augment_toggled(is_visible)
 
 @export var run_seed := -1
 
@@ -16,6 +27,7 @@ signal minimap_toggled(is_visible)
 @onready var _seed_label := $SeedLabel as Label
 @onready var _instructions_label := $InstructionsLabel as Label
 @onready var _map_graph := get_node_or_null("MapGraph")
+@onready var _augment_view := get_node_or_null("AugmentView")
 @onready var _doors := [
 	$DoorCenter/Doors/LeftDoor,
 	$DoorCenter/Doors/CenterDoor,
@@ -47,6 +59,8 @@ signal minimap_toggled(is_visible)
 	$DoorCenter/Doors/RightDoor/SelectionFrame,
 ]
 
+var stored_data = []
+
 
 func _ready() -> void:
 	set_process_unhandled_input(true)
@@ -59,6 +73,11 @@ func _ready() -> void:
 		if not _game_manager.has_run():
 			_game_manager.generate_new_run(run_seed)
 	_refresh_view()
+	var element_balls = _augment_view.get_node("Panel").get_children()
+	var rank = 7
+	for child in element_balls:
+		rank_sizing[rank] = child
+		rank -= 1
 
 
 func _exit_tree() -> void:
@@ -89,6 +108,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if key_event.keycode == KEY_M:
 		_toggle_minimap()
+		accept_event()
+	if key_event.keycode == KEY_Q:
+		_toggle_augment()
 		accept_event()
 
 
@@ -172,6 +194,8 @@ func _on_door_gui_input(event: InputEvent, door_index: int) -> void:
 func _confirm_selection() -> void:
 	if _game_manager == null:
 		return
+	#for child in _augment_view.get_children():
+	#	elementData.append(child.get_item_text(child.selected))
 	var room = _game_manager.enter_selected_room()
 	if room == null:
 		return
@@ -185,6 +209,55 @@ func _toggle_minimap() -> void:
 	if _map_graph != null:
 		_map_graph.visible = is_visible
 	minimap_toggled.emit(is_visible)
+
+func _toggle_augment() -> void:
+	if _game_manager == null:
+		return
+	var ref = _augment_view.get_node("Reference/TextureButton")
+	var scroll_box = _augment_view.get_node("Panel2/ScrollContainer/HBoxContainer")
+	for child in scroll_box.get_children():
+		child.queue_free()
+	for element in ElementCatalog.elemental_database:
+		if element.rank == 0:
+			continue
+		var clone = ref.duplicate()
+		clone.mouse_entered.connect(_set_element_text.bind(element["name"], element["description"]))
+		clone.pressed.connect(_set_element_data.bind(element))
+		scroll_box.add_child(clone)
+		clone.ignore_texture_size = true
+		clone.modulate = ElementCatalog.get_color(element["type"])
+		clone.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+		clone.custom_minimum_size = rank_sizing[element["rank"]].size
+	var is_visible: bool = bool(_game_manager.toggle_augment_view())
+	if _augment_view != null:
+		_augment_view.visible = is_visible
+	augment_toggled.emit(is_visible)
+
+func _set_element_text(text1, text2):
+	var textBox1 = _augment_view.get_node("Panel3/Title")
+	var textBox2 = _augment_view.get_node("Panel3/Desc")
+	textBox1.text = "[u]" + text1 + "[/u]"
+	textBox2.text = text2
+
+func _set_element_data(element):
+	PlayerState.elements[element["rank"]] = element
+	_refresh_augment()
+
+func _refresh_augment():
+	PlayerState.elements[0] = []
+	var types = []
+	var base = []
+	for child in rank_sizing:
+		if PlayerState.elements[child]:
+			if !types.has(PlayerState.elements[child]["type"]):
+				types.append(PlayerState.elements[child]["type"])
+				base.append(ElementCatalog.get_passive(PlayerState.elements[child]["type"]))
+			rank_sizing[child].modulate = ElementCatalog.get_color(PlayerState.elements[child]["type"])
+			rank_sizing[child].mouse_entered.connect(_set_element_text.bind(PlayerState.elements[child]["name"], PlayerState.elements[child]["description"]))
+	PlayerState.elements[0] = base
+	print(base)
+	
+		
 
 
 func _controller() -> MapController:

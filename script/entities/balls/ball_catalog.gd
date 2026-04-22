@@ -13,6 +13,9 @@ const IDS: Array[String] = [
 	"ball_magnet",
 	"ball_multiplication",
 	NORMAL_BALL_ID,
+	"ball_crumble",
+	"ball_heavy",
+	"ball_virus"
 ]
 const DATA_BY_ID := {
 	IDS[0]: preload("res://data/balls/amplifier_ball.tres"),
@@ -22,6 +25,20 @@ const DATA_BY_ID := {
 	IDS[4]: preload("res://data/balls/magnet_ball.tres"),
 	IDS[5]: preload("res://data/balls/multiplication_ball.tres"),
 	IDS[6]: preload("res://data/balls/normal_ball.tres"),
+	IDS[7]: preload("res://data/balls/crumble_ball.tres"),
+	IDS[8]: preload("res://data/balls/heavy_ball.tres"),
+	IDS[9]: preload("res://data/balls/virus_ball.tres")
+}
+
+const ELEMENT_IDS: Array[String] = [
+	"normal",
+	"dark",
+	"gambler"
+]
+const ELEMENT_BY_IDS := {
+	#ELEMENT_IDS[0]: preload("res://script/entities/balls/elemental_balls/elemental_ball_base.gd"),
+	ELEMENT_IDS[1]: preload("res://script/entities/balls/elemental_balls/elemental_ball_dark.gd"),
+	ELEMENT_IDS[2]: preload("res://script/entities/balls/elemental_balls/elemental_ball_gambler.gd")
 }
 
 
@@ -50,3 +67,6 @@ static func scene_for_id(ball_id: String) -> PackedScene:
 
 static func data_for_id(ball_id: String) -> BallData:
 	return DATA_BY_ID.get(ball_id) as BallData
+
+static func data_for_element(element_id: String):
+	return ELEMENT_BY_IDS.get(element_id)

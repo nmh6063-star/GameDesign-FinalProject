@@ -1,6 +1,7 @@
 extends RefCounted
 class_name BattleBallManager
 
+const ElementCatalog := preload("res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd")
 const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const BallBase := preload("res://script/entities/balls/ball_base.gd")
 const QUEUE_SIZE := 5
@@ -76,6 +77,7 @@ func spawn_copy(source: BallBase, offset: Vector2 = Vector2.ZERO) -> BallBase:
 
 func spawn_ball(ball_id: String, level: int, global_position: Vector2, impulse: Vector2 = Vector2.ZERO) -> BallBase:
 	var data := BallCatalog.data_for_id(ball_id)
+	#var data.element_list.append(BallCatalog.data_for_el)
 	if data == null:
 		return null
 	var scene := BallCatalog.scene_for_id(ball_id)
@@ -116,6 +118,26 @@ func drop_ball_at_x(ball_id: String, level: int = 1, x: float = INF) -> BallBase
 func spawn_setup_ball() -> BallBase:
 	var entry := _take_queue_entry()
 	var base = entry["scene"].instantiate() as BallBase
+	if PlayerState.elements[entry["level"]]:
+		base.type = PlayerState.elements[entry["level"]]["type"]
+	var new_data = []
+	for element in PlayerState.elements:
+		if element == 0:
+			for i in PlayerState.elements[0]:
+				var obj = {
+					"element": BallCatalog.data_for_element(i["type"].to_lower()),
+					"effect": i["function"],
+					"rank": i["rank"]
+				}
+				new_data.append(obj)
+		elif PlayerState.elements[element]:
+			var obj = {
+				"element": BallCatalog.data_for_element(PlayerState.elements[element]["type"].to_lower()),
+				"effect": PlayerState.elements[element]["function"],
+				"rank": PlayerState.elements[element]["rank"]
+			}
+			new_data.append(obj)
+	base.element_list = new_data
 	return _spawn_instance(base, entry["data"], entry["level"], _ball_placeholder.position, true)
 
 

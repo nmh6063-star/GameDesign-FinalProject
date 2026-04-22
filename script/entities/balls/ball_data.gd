@@ -17,6 +17,7 @@ const NO_COLOR_STEP := Color(0, 0, 0, 0)
 @export var merge_growth := 5.0
 @export var merge_rule: MergeRuleBase
 @export var effects: Array[BallEffectBase] = []
+var element_list = []
 
 
 func has_tag(tag: String) -> bool:
@@ -55,4 +56,7 @@ func radius_for_level(level: int) -> float:
 
 
 func random_spawn_level() -> int:
-	return int(spawn_levels[randi() % spawn_levels.size()])
+	#temp replacement to remove level 3
+	const levels = [1, 2, 4]
+	return int(levels[randi() % levels.size()])
+	#return int(spawn_levels[randi() % spawn_levels.size()])

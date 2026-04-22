@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c08cng4qd8fv5"]
 
-[ext_resource type="Script" path="res://script/ball/game_ball.gd" id="1_f7cbr"]
+[ext_resource type="Script" uid="uid://tn2ytyqrj2qv" path="res://script/ball/game_ball.gd" id="1_f7cbr"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="2_4dx81"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_eew57"]
 

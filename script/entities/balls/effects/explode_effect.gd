@@ -8,6 +8,9 @@ const ARMED_AT_META := "bomb_armed_at"
 @export var blink_speed: float = 10.0
 @export var min_alpha: float = 0.35
 
+var inRadius = []
+var inst
+
 
 func can_trigger(_ctx: BattleContext, _source: BallBase) -> bool:
 	return false
@@ -16,8 +19,17 @@ func can_trigger(_ctx: BattleContext, _source: BallBase) -> bool:
 func apply(_ctx: BattleContext, _source: BallBase) -> void:
 	pass
 
-
 func tick(ctx: BattleContext, source: BallBase) -> void:
+	if source.get_children().size() < 5:
+		inst = Area2D.new()
+		inst.position = source.get_node("Sprite2D").position
+		source.add_child(inst)
+		var collision = CollisionShape2D.new()
+		inst.add_child(collision)
+		var circle_shape = CircleShape2D.new()
+		circle_shape.radius = 50.0
+		collision.shape = circle_shape
+		inst.body_entered.connect(_on_body_entered)
 	if source.is_queued_for_deletion() or not source.visible:
 		return
 	if source.is_setup_ball():
@@ -45,10 +57,22 @@ func _blink_alpha(elapsed: float) -> float:
 func _explode(ctx: BattleContext, source: BallBase) -> void:
 	var victims: Array = [source]
 	var radius_squared: float = blast_radius * blast_radius
+	var damage = 0
 	for ball in ctx.active_balls():
 		if ball == source or ball.is_queued_for_deletion():
 			continue
-		if source.global_position.distance_squared_to(ball.global_position) <= radius_squared:
+		#if source.global_position.distance_squared_to(ball.global_position) <= radius_squared:
+		#	victims.append(ball)
+		if ball in inRadius:
 			victims.append(ball)
+			damage += ball.level
 	for ball in victims:
 		ctx.consume_ball(ball)
+	source.remove_child(inst)
+
+func _on_body_entered(body):
+	inRadius.append(body)
+
+func _on_body_exited(body):
+	inRadius.erase(body)
+	
