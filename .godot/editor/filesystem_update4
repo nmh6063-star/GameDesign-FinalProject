@@ -14,3 +14,9 @@ res://script/map/tutorial_complete.gd
 res://script/battle/controllers/battle_ball_manager.gd
 res://script/game_manager/game_manager.gd
 res://script/map/shop.gd
+res://script/battle/core/battle_loop.gd
+res://script/entities/enemies/enemy_catalog.gd
+res://script/map/tutorial.gd
+res://data/enemies/enemy_tutorial.tres
+res://script/tutorialScript/tutorial_battle_loop.gd
+res://scenes/tutorial.tscn
