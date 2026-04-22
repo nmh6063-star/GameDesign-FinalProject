@@ -6,56 +6,56 @@ static var elemental_database = [
 		"name": "Poison Apple",
 		"type": "Dark",
 		"function": "health_for_damage",
-		"description": "Test Description",
+		"description": "Deal a bit extra damage but also take a bit of damage. Shoot this rank ball to trigger",
 		"rank": 1
 	},
 	{
 		"name": "Dark Brew",
 		"type": "Dark",
 		"function": "deploy_enchantment",
-		"description": "Test Description",
+		"description": "NOT FINISHED",
 		"rank": 2
 	},
 	{
 		"name": "Slow Down",
 		"type": "Dark",
 		"function": "slow_time",
-		"description": "Test Description",
+		"description": "NOT FINISHED",
 		"rank": 3
 	},
 	{
 		"name": "Care Drop",
 		"type": "Dark",
 		"function": "care_drop",
-		"description": "Test",
+		"description": "Drop in a cluster of balls from the top of the board. Triggers on merge.",
 		"rank": 4
 	},
 	{
 		"name": "Biggering",
 		"type": "Dark",
 		"function": "enbiggen",
-		"description": "test",
+		"description": "Increase damage of balls at the cost of higher size scaling (NOT FINISHED)",
 		"rank": 5
 	},
 	{
 		"name": "An Eye For An Arm",
 		"type": "Dark",
 		"function": "eye_for_an_arm",
-		"description": "test",
+		"description": "Deal moderate damage to yourself and high damage to an enemy. Triggers on merge.",
 		"rank": 6
 	},
 	{
 		"name": "Clone",
 		"type": "Dark",
 		"function": "create_copy",
-		"description": "test",
+		"description": "Create a clone of the rank 7 ball, taking up a lot of space but giving you lots of damage to work with.",
 		"rank": 7
 	},
 	{
 		"name": "Buy In",
 		"type": "Gambler",
 		"function": "buy_in",
-		"description": "Buy into the game! Gain health on merge or lose health on merge.",
+		"description": "Buy into the game! Gain health on merge or lose health on merge. Triggers on shot",
 		"rank": 1
 	},
 	{

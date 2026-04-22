@@ -6,9 +6,9 @@ class_name ElementalBallDark
 static var functions: Array[String] = [
 	"health_for_damage",
 	"deploy_enchantment", #this one seems like hell to even touch. Will not be touching for now
-	"slow_time",
+	"slow_time", #holding off bc is a HEAVY interference
 	"care_drop",
-	"enbiggen",
+	"enbiggen", #damage multiplier not in yet
 	"eye_for_an_arm",
 	"create_copy",
 	"darkness_consume"
@@ -19,7 +19,7 @@ static var functions_by_id := {
 	functions[2]: [slow_time, can_trigger, 3],
 	functions[3]: [care_drop, on_merge, 4],
 	functions[4]: [enbiggen, can_trigger, 5],
-	functions[5]: [eye_for_an_arm, can_trigger, 6],
+	functions[5]: [eye_for_an_arm, on_merge, 6],
 	functions[6]: [create_copy, can_trigger, 7],
 	functions[7]: [darkness_consume, on_shot, -1]
 }
@@ -62,17 +62,18 @@ static func care_drop(_ctx: BattleContext, _source: BallBase):
 		_ctx.spawn_ball("ball_normal", Vector2(_source.global_position.x, -83), Vector2.ZERO, randi_range(1, 2))
 
 static func enbiggen(_ctx: BattleContext, _source: BallBase):
+	_source.data.merge_growth = 8
 	pass
 	
 static func eye_for_an_arm(_ctx: BattleContext, _source: BallBase):
-	pass
+	_ctx.damage_enemy(_source.level*2, _ctx.active_enemy())
+	_ctx.damage_player(_source.level/2)
 
 static func create_copy(_ctx: BattleContext, _source: BallBase):
 	_source.rank = 8
 	var ball = _ctx.spawn_ball("ball_normal", _source.global_position, Vector2.ZERO, _source.level) as BallBase
 	ball.rank = 8
 	#_ctx.consume_ball(_source)
-	print("WE DID IT")
 	pass
 
 static func darkness_consume(_ctx: BattleContext, _source: BallBase):

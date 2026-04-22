@@ -16,7 +16,6 @@ spawn_weight = 4
 spawn_levels = PackedInt32Array(1, 2, 3, 4)
 symbol = null
 tint = Color(0.35, 0.74, 0.3, 1)
-outline_tint = null
 level_tint_step = Color(0.05, -0.06, 0, 0)
 base_radius = null
 merge_growth = null

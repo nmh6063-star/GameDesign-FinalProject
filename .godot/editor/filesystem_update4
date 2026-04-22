@@ -11,4 +11,11 @@ res://data/balls/heavy_ball.tres
 res://data/balls/virus_ball.tres
 res://data/enemies/enemy1.tres
 res://data/enemies/enemy2.tres
+res://script/entities/balls/ball_base.gd
 res://script/entities/balls/elemental_balls/elemental_ball_gambler.gd
+res://script/battle/controllers/battle_ball_manager.gd
+res://script/entities/balls/elemental_balls/level_merge_rule.gd
+res://script/entities/balls/elemental_balls/elemental_ball_dark.gd
+res://scenes/map/map_selection.tscn
+res://script/map/map_selection.gd
+res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd

@@ -221,7 +221,7 @@ func _toggle_augment() -> void:
 		if element.rank == 0:
 			continue
 		var clone = ref.duplicate()
-		clone.mouse_entered.connect(_set_element_text.bind(element["name"], element["description"]))
+		clone.mouse_entered.connect(_set_element_text.bind(element["name"], element["description"], element["type"]))
 		clone.pressed.connect(_set_element_data.bind(element))
 		scroll_box.add_child(clone)
 		clone.ignore_texture_size = true
@@ -233,10 +233,10 @@ func _toggle_augment() -> void:
 		_augment_view.visible = is_visible
 	augment_toggled.emit(is_visible)
 
-func _set_element_text(text1, text2):
+func _set_element_text(text1, text2, text3):
 	var textBox1 = _augment_view.get_node("Panel3/Title")
 	var textBox2 = _augment_view.get_node("Panel3/Desc")
-	textBox1.text = "[u]" + text1 + "[/u]"
+	textBox1.text = "[u]" + text1 + " : " + text3 + "[/u]"
 	textBox2.text = text2
 
 func _set_element_data(element):
@@ -253,7 +253,7 @@ func _refresh_augment():
 				types.append(PlayerState.elements[child]["type"])
 				base.append(ElementCatalog.get_passive(PlayerState.elements[child]["type"]))
 			rank_sizing[child].modulate = ElementCatalog.get_color(PlayerState.elements[child]["type"])
-			rank_sizing[child].mouse_entered.connect(_set_element_text.bind(PlayerState.elements[child]["name"], PlayerState.elements[child]["description"]))
+			rank_sizing[child].mouse_entered.connect(_set_element_text.bind(PlayerState.elements[child]["name"], PlayerState.elements[child]["description"], PlayerState.elements[child]["type"]))
 	PlayerState.elements[0] = base
 	print(base)
 	

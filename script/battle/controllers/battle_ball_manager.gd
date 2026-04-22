@@ -119,7 +119,7 @@ func spawn_setup_ball() -> BallBase:
 	var entry := _take_queue_entry()
 	var base = entry["scene"].instantiate() as BallBase
 	if PlayerState.elements[entry["level"]]:
-		base.type = PlayerState.elements[entry["level"]]["type"]
+		base.type.append(PlayerState.elements[entry["level"]]["type"])
 	var new_data = []
 	for element in PlayerState.elements:
 		if element == 0:

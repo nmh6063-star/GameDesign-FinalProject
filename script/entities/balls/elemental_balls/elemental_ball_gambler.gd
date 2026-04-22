@@ -32,11 +32,21 @@ static func on_shot(_ctx: BattleContext, _source: BallBase, function: String) ->
 static func on_merge(_ctx: BattleContext, _source: BallBase, function: String) -> void:
 	functions_by_id[function][0].call(_ctx, _source)
 
-static func buy_in():
-	print("AT LEASt thIS WORKS")
+static func buy_in(_ctx, _source):
+	if randi_range(1, 2) == 1:
+		_ctx.heal_player(randi_range(5, 15))
+	else:
+		_ctx.damage_player(randi_range(1, 10))
 	pass
 
-static func roll_for_initiative():
+static func roll_for_initiative(_ctx, _source):
+	if randi_range(1, 2) == 1:
+		for x in range(3):
+			for i in _ctx.active_enemy().data.actions:
+				i.execute(_ctx, _ctx.active_enemy())
+	else:
+		_ctx.damage_enemy(100, _ctx.active_enemy())
+	_source.rank = 8
 	pass
 
 static func gambling_fallacy(_ctx: BattleContext, _source: BallBase):

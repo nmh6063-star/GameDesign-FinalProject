@@ -22,7 +22,7 @@ var ui_preview := false
 var touchingDir = ""
 var last = 0
 var dying = false
-var type = null
+var type = []
 var element_list = []
 
 
@@ -196,12 +196,6 @@ func on_destroy(ctx: BattleContext) -> void:
 
 func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
 	level *= 2
-	var temp = level
-	if rank != 8:
-		rank = 1
-		while temp > 1:
-			temp /= 2
-			rank += 1
 	for elements in element_list:
 		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
 			elements["element"].on_merge(ctx, self, elements["effect"])
@@ -218,8 +212,13 @@ func rank_state():
 
 
 func _physics_process(_delta: float) -> void:
-	if type:
-		self_modulate = ElementCatalog.get_color(type)
+	if type.size() > 0:
+		var base_color = Vector3.ZERO
+		for i in type:
+			base_color.x += ElementCatalog.get_color(i).r
+			base_color.y += ElementCatalog.get_color(i).g
+			base_color.z += ElementCatalog.get_color(i).b
+		self_modulate = Color(base_color.x, base_color.y, base_color.z)
 	if dying:
 		self_modulate.a -= 5.0 * _delta
 		self_modulate.a = max(self_modulate.a, 0)
