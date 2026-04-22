@@ -181,8 +181,9 @@ func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	var damage_total := 0
 	var damage_multiplier := 1.0
 	for ball in hit_balls:
-		damage_total += ball.shot_base_damage()
-		damage_multiplier *= ball.shot_damage_multiplier()
+		if ball.shot_base_damage():
+			damage_total += ball.shot_base_damage()
+			damage_multiplier *= ball.shot_damage_multiplier()
 	if damage_total > 0:
 		damage_enemy(int(round(float(damage_total) * damage_multiplier)), target_enemy, _context)
 	for ball in hit_balls:

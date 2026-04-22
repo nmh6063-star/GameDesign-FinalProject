@@ -3,6 +3,7 @@ class_name BallBase
 
 const BattleContext := preload("res://script/battle/core/battle_context.gd")
 const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
+const ElementCatalog := preload("res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd")
 const BallData := preload("res://script/entities/balls/ball_data.gd")
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
@@ -16,10 +17,13 @@ var battle_context: BattleContext
 var aim_target: Node2D
 var set_up := false
 var level := 1
+var rank := 1
 var ui_preview := false
 var touchingDir = ""
 var last = 0
 var dying = false
+var type = null
+var element_list = []
 
 
 func _ready() -> void:
@@ -44,6 +48,12 @@ func set_runtime(ctx: BattleContext, target: Node2D) -> void:
 func configure(ball_data: BallData, ball_level: int, ctx: BattleContext, target: Node2D) -> void:
 	data = ball_data
 	level = ball_level
+	var temp = level
+	if rank != 8:
+		rank = 1
+		while temp > 1:
+			temp /= 2
+			rank += 1
 	set_runtime(ctx, target)
 	refresh()
 
@@ -59,6 +69,12 @@ func set_preview(ball_data: BallData, ball_level: int) -> void:
 func refresh() -> void:
 	if data == null:
 		return
+	var temp = level
+	if rank != 8:
+		rank = 1
+		while temp > 1:
+			temp /= 2
+			rank += 1
 	_update_collision()
 	queue_redraw()
 
@@ -133,6 +149,13 @@ func try_apply_board_behavior(ctx: BattleContext) -> bool:
 		if effect.can_trigger(ctx, self):
 			effect.apply(ctx, self)
 			return true
+	for elements in element_list:
+		if elements["element"].get_target_function(self, elements["effect"], "can_trigger"):
+			elements["element"].apply(ctx, self, elements["effect"])
+		#print(elements.can_trigger(ctx, self))
+		#if elements["element"].can_trigger(ctx, self, elements[1]):
+		#	#elements.apply(ctx, self)
+		#	print("pass")
 	return false
 
 
@@ -141,8 +164,10 @@ func tick_board_behavior(ctx: BattleContext) -> void:
 		effect.tick(ctx, self)
 
 
-func shot_base_damage() -> int:
-	return level if data != null and data.id == BallCatalog.NORMAL_BALL_ID else 0
+func shot_base_damage():
+	#if data..size() > 0:
+	#	print("detected element")
+	return level if data != null and (data.id == BallCatalog.NORMAL_BALL_ID || data.id == "ball_heavy") else null
 
 
 func shot_damage_multiplier() -> float:
@@ -155,6 +180,10 @@ func shot_damage_multiplier() -> float:
 func on_shot(ctx: BattleContext) -> void:
 	for effect in _effects():
 		effect.on_shot(ctx, self)
+	print(element_list)
+	for elements in element_list:
+		if elements["element"].get_target_function(self, elements["effect"], "on_shot"):
+			elements["element"].on_shot(ctx, self, elements["effect"])
 	if is_queued_for_deletion():
 		return
 	ctx.consume_ball(self)
@@ -165,8 +194,17 @@ func on_destroy(ctx: BattleContext) -> void:
 		effect.on_destroy(ctx, self)
 
 
-func merge_into_me() -> void:
+func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
 	level *= 2
+	var temp = level
+	if rank != 8:
+		rank = 1
+		while temp > 1:
+			temp /= 2
+			rank += 1
+	for elements in element_list:
+		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
+			elements["element"].on_merge(ctx, self, elements["effect"])
 	refresh()
 
 
@@ -174,8 +212,14 @@ func multiply_level(multiplier: int = 2) -> void:
 	level *= multiplier
 	refresh()
 
+func rank_state():
+	print("test")
+	
+
 
 func _physics_process(_delta: float) -> void:
+	if type:
+		self_modulate = ElementCatalog.get_color(type)
 	if dying:
 		self_modulate.a -= 5.0 * _delta
 		self_modulate.a = max(self_modulate.a, 0)

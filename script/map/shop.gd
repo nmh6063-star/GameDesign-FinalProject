@@ -46,13 +46,19 @@ func _on_continue_pressed() -> void:
 
 
 func _slot_buttons() -> Array[Button]:
+	var buttons: Array[Button]
+	for button in $Overlay/Card.get_children():
+		buttons.append(button)
+	return buttons
+	"""
 	return [
-		$Overlay/Card/Slots/Slot0 as Button,
-		$Overlay/Card/Slots/Slot1 as Button,
-		$Overlay/Card/Slots/Slot2 as Button,
-		$Overlay/Card/Slots/Slot3 as Button,
-		$Overlay/Card/Slots/Slot4 as Button,
+		$Overlay/Card/Slots/Item1 as Button,
+		$Overlay/Card/Slots/Item2 as Button,
+		$Overlay/Card/Slots/Item3 as Button,
+		$Overlay/Card/Slots/Item1 as Button,
+		$Overlay/Card/Slots/Item1 as Button,
 	]
+	"""
 
 
 func _preview_roots() -> Array[Node2D]:

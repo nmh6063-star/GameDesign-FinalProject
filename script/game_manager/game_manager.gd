@@ -11,9 +11,11 @@ signal room_started(room_data)
 signal room_completed(room_data)
 signal run_reset
 signal map_state_changed
+signal augment_state_changed
 
 var current_map_data := {}
 var map_view_visible := false
+var augment_view_visible := false
 
 var _controller := MapController.new()
 
@@ -156,6 +158,11 @@ func toggle_map_view() -> bool:
 	map_view_visible = not map_view_visible
 	map_state_changed.emit()
 	return map_view_visible
+
+func toggle_augment_view() -> bool:
+	augment_view_visible = not augment_view_visible
+	augment_state_changed.emit()
+	return augment_view_visible
 
 
 func _scene_for_room(_room) -> String:

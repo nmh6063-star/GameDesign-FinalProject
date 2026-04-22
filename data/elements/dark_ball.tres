@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://cjl3pryypxukx"]
+
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/entities/balls/effects/ball_effect_base.gd" id="1_0ij3j"]
+[ext_resource type="Script" uid="uid://d0d0la62ow8u6" path="res://script/entities/balls/elemental_balls/elemental_rule_base.gd" id="2_o5uft"]
+[ext_resource type="Script" uid="uid://cyf41l3vbcd00" path="res://script/entities/balls/elemental_balls/elemental_ball_dark.gd" id="3_8nfwq"]
+[ext_resource type="Script" uid="uid://4o28lvfw1dp7" path="res://script/entities/balls/elemental_balls/level_merge_rule.gd" id="3_ns14p"]
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/entities/balls/ball_data.gd" id="4_t4b6y"]
+
+[sub_resource type="Resource" id="Resource_yqd31"]
+script = ExtResource("3_8nfwq")
+metadata/_custom_type_script = "uid://cyf41l3vbcd00"
+
+[sub_resource type="Resource" id="LevelMergeRule_1"]
+script = ExtResource("3_ns14p")
+
+[resource]
+script = ExtResource("4_t4b6y")
+id = "ball_dark"
+display_name = "Dark Ball"
+description = "Ball augmentation with destructive effects that alter mechanics at a cost to both you and enemies."
+spawn_weight = 4
+spawn_levels = PackedInt32Array(1, 2, 3, 4)
+tint = Color(0.110131696, 0.23, 0.09430001, 1)
+level_tint_step = Color(0.05, -0.06, 0, 0)
+merge_rule = SubResource("LevelMergeRule_1")
+element = Array[ExtResource("2_o5uft")]([SubResource("Resource_yqd31")])
