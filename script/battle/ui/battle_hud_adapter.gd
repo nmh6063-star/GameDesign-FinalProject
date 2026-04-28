@@ -8,6 +8,9 @@ const DOGICA_FONT := preload("res://assets/dogica/TTF/dogicabold.ttf")
 const DAMAGE_RISE_PX := 60.0
 const DAMAGE_DURATION := 0.8
 const DAMAGE_FONT_PX := 46
+const DAMAGE_JITTER_X := 0.0
+const DAMAGE_JITTER_Y := 0.0
+const DAMAGE_RISE_JITTER_X := 0.0
 const SPECIAL_SLOT_COUNT := 4
 const ATTACK_READY_COLOR := Color(0.98, 0.58, 0.13, 1.0)
 const ATTACK_LOCKED_COLOR := Color(0.34, 0.3, 0.3, 1.0)
@@ -109,16 +112,21 @@ func show_damage(amount: int, anchor: Marker2D, color: Color) -> void:
 		return
 	var floater := Label.new()
 	_root.add_child(floater)
-	floater.global_position = anchor.global_position
+	var jitter := Vector2(
+		randf_range(-DAMAGE_JITTER_X, DAMAGE_JITTER_X),
+		randf_range(-DAMAGE_JITTER_Y, DAMAGE_JITTER_Y)
+	)
+	floater.global_position = anchor.global_position + jitter
 	floater.text = str(amount)
 	floater.modulate = color
 	floater.modulate.a = 1.0
 	floater.scale = Vector2.ONE
 	floater.add_theme_font_override("font", DOGICA_FONT)
 	floater.add_theme_font_size_override("font_size", DAMAGE_FONT_PX)
+	var rise_target := floater.position + Vector2(randf_range(-DAMAGE_RISE_JITTER_X, DAMAGE_RISE_JITTER_X), -DAMAGE_RISE_PX)
 	var tween := _root.create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(floater, "position", floater.position + Vector2(0, -DAMAGE_RISE_PX), DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "position", rise_target, DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(floater, "scale", Vector2(1.48, 1.48), DAMAGE_DURATION * 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(floater, "modulate:a", 0.0, DAMAGE_DURATION).set_delay(DAMAGE_DURATION * 0.15)
 	tween.set_parallel(false)
@@ -185,7 +193,7 @@ func _render_preview(root: Node2D, item: Dictionary, scale: float) -> void:
 		return
 	var ball: BallBase = (item["scene"] as PackedScene).instantiate() as BallBase
 	ball.ui_preview = true
-	ball.set_preview(item["data"], int(item.get("level", 1)))
+	ball.set_preview(item["data"], int(item.get("rank", 1)))
 	root.add_child(ball)
 	ball.position = Vector2.ZERO
 	ball.scale = Vector2.ONE * scale

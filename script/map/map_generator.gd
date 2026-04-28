@@ -5,17 +5,17 @@ const X_DIST := 30.0
 const Y_DIST := 25.0
 const PLACEMENT_RANDOMNESS := 5.0
 
-const FLOORS := 10
+const FLOORS := 9        ## rows 0-8; boss appended as the 10th layer
 const MAP_WIDTH := 7
 const PATHS := 6
 const MAX_OUTGOING := 3
 
-const MONSTER_ROOM_WEIGHT := 10.0
-const SHOP_ROOM_WEIGHT := 2.5
-const CAMPFIRE_ROOM_WEIGHT := 4.0
-const EVENT_ROOM_WEIGHT := 1.5
-const MYSTERY_CHANCE := 0.25
-const MYSTERY_EVENT_WEIGHT := 8.0
+## Row indices that are always MONSTER.
+const MONSTER_ROWS := [1, 4, 7]
+## Row indices that are always non-battle (SHOP / CAMPFIRE / EVENT).
+const NON_BATTLE_ROWS := [2, 3, 5, 6]
+## Last row before boss — always CAMPFIRE.
+const CAMPFIRE_ROW := 8   ## == FLOORS - 1
 
 
 class Room extends RefCounted:
@@ -109,7 +109,6 @@ class Run extends RefCounted:
 
 var _rng := RandomNumberGenerator.new()
 var _next_room_id := 0
-var _weight_total := MONSTER_ROOM_WEIGHT + SHOP_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + EVENT_ROOM_WEIGHT
 
 
 func generate(seed: int = -1) -> Run:
@@ -117,10 +116,14 @@ func generate(seed: int = -1) -> Run:
 	_rng.seed = run_seed
 	_next_room_id = 0
 	var floors := _generate_grid()
+	# Build freeform branching from layer 2 onward (no fixed node count per battle row).
 	for start_column in _starting_columns():
 		var current_column := int(start_column)
-		for row in range(FLOORS - 1):
+		for row in range(1, FLOORS - 1):
 			current_column = _connect_room(floors, row, current_column)
+	# Single START node at center of row 0, wired to all active row-1 rooms.
+	_attach_start_node(floors)
+	# BOSS wired to all active row-8 rooms.
 	var boss_room := _append_boss_room(floors)
 	_assign_room_types(floors, boss_room)
 	return _pack_run(floors, boss_room, run_seed)
@@ -164,6 +167,10 @@ func validate(run: Run) -> Array:
 	return errors
 
 
+# ---------------------------------------------------------------------------
+# Grid + path generation  (restored from the original branching algorithm)
+# ---------------------------------------------------------------------------
+
 func _generate_grid() -> Array:
 	var floors: Array = []
 	for row in range(FLOORS):
@@ -174,13 +181,17 @@ func _generate_grid() -> Array:
 			room.row = row
 			room.column = column
 			room.position = Vector2(column * X_DIST, row * -Y_DIST)
-			room.position += Vector2(_rng.randf_range(-PLACEMENT_RANDOMNESS, PLACEMENT_RANDOMNESS), _rng.randf_range(-PLACEMENT_RANDOMNESS, PLACEMENT_RANDOMNESS))
+			room.position += Vector2(
+				_rng.randf_range(-PLACEMENT_RANDOMNESS, PLACEMENT_RANDOMNESS),
+				_rng.randf_range(-PLACEMENT_RANDOMNESS, PLACEMENT_RANDOMNESS)
+			)
 			room.type = Room.Type.NOT_ASSIGNED
 			floor.append(room)
 		floors.append(floor)
 	return floors
 
 
+## Returns two columns — one in the left half, one in the right half.
 func _starting_columns() -> Array:
 	var columns: Array = []
 	var anchors := [1, MAP_WIDTH / 2, MAP_WIDTH - 2]
@@ -191,6 +202,53 @@ func _starting_columns() -> Array:
 	while columns.size() < PATHS:
 		columns.append(columns[_rng.randi_range(0, columns.size() - 1)])
 	return columns
+
+
+## Trace PATHS paths from from_cols through intermediate rows, then force-link
+## the final hop into to_cols without crossing (sorted monotone assignment).
+func _trace_through(floors: Array, from_row: int, to_row: int,
+		from_cols: Array, to_cols: Array) -> void:
+	var starts := _build_start_list(from_cols)
+	var final_cols: Array = []
+	for start_col in starts:
+		var col := int(start_col)
+		for row in range(from_row, to_row - 1):   # trace up to row before to_row
+			col = _connect_room(floors, row, col)
+		final_cols.append(col)
+	# Sort finals and assign to sorted checkpoints without crossing.
+	final_cols.sort()
+	var sorted_to := to_cols.duplicate()
+	sorted_to.sort()
+	for i in range(final_cols.size()):
+		var j := (i * sorted_to.size()) / final_cols.size()
+		_force_link(floors, to_row - 1, final_cols[i], int(sorted_to[j]))
+
+
+## Trace PATHS paths from from_cols, letting them end wherever in to_row.
+func _trace_open(floors: Array, from_row: int, to_row: int, from_cols: Array) -> void:
+	var starts := _build_start_list(from_cols)
+	for start_col in starts:
+		var col := int(start_col)
+		for row in range(from_row, to_row):
+			col = _connect_room(floors, row, col)
+
+
+## Pad from_cols up to PATHS entries by randomly duplicating.
+func _build_start_list(from_cols: Array) -> Array:
+	var starts := from_cols.duplicate()
+	while starts.size() < PATHS:
+		starts.append(from_cols[_rng.randi_range(0, from_cols.size() - 1)])
+	return starts
+
+
+## Unconditionally link floors[from_row][from_col] → floors[from_row+1][to_col].
+func _force_link(floors: Array, from_row: int, from_col: int, to_col: int) -> void:
+	var a := floors[from_row][from_col] as Room
+	var b := floors[from_row + 1][to_col] as Room
+	if b not in a.next_rooms:
+		a.next_rooms.append(b)
+	if a not in b.prev_rooms:
+		b.prev_rooms.append(a)
 
 
 func _connect_room(floors: Array, row: int, column: int) -> int:
@@ -239,6 +297,15 @@ func _would_cross_existing_path(floors: Array, row: int, column: int, next_room:
 	return false
 
 
+func _attach_start_node(floors: Array) -> void:
+	var start_room := floors[0][MAP_WIDTH / 2] as Room
+	for room_data in floors[1]:
+		var room := room_data as Room
+		if room.is_active():
+			start_room.next_rooms.append(room)
+			room.prev_rooms.append(start_room)
+
+
 func _append_boss_room(floors: Array) -> Room:
 	var boss_room := Room.new()
 	boss_room.id = _take_room_id()
@@ -254,72 +321,33 @@ func _append_boss_room(floors: Array) -> Room:
 	return boss_room
 
 
+# ---------------------------------------------------------------------------
+# Type assignment — enforces the fixed per-layer structure
+# ---------------------------------------------------------------------------
+
 func _assign_room_types(floors: Array, boss_room: Room) -> void:
-	for room_data in floors[0]:
-		var room := room_data as Room
-		if room.is_active():
-			room.type = Room.Type.MONSTER
-	if FLOORS > 8:
-		for room_data in floors[8]:
-			var room := room_data as Room
-			if room.is_active():
-				room.type = Room.Type.TREASURE
-	for room_data in floors[FLOORS - 1]:
-		var room := room_data as Room
-		if room.is_active():
-			room.type = Room.Type.CAMPFIRE
 	boss_room.type = Room.Type.BOSS
-	for row in range(1, FLOORS - 1):
-		if row == 8:
-			continue
+
+	for row in range(FLOORS):
 		for room_data in floors[row]:
 			var room := room_data as Room
-			if room.is_active() and room.type == Room.Type.NOT_ASSIGNED:
-				if row >= 3 and _rng.randf() < MYSTERY_CHANCE:
-					room.mystery = true
-					room.type = _mystery_room_type(room)
-				else:
-					room.type = _random_room_type(room)
+			if not room.is_active():
+				continue
+			if row == 0:
+				room.type = Room.Type.START
+			elif row in MONSTER_ROWS:
+				room.type = Room.Type.MONSTER
+			elif row == CAMPFIRE_ROW:
+				room.type = Room.Type.CAMPFIRE
+			elif row in NON_BATTLE_ROWS:
+				room.type = _random_non_battle()
+
 	_deduplicate_sibling_types(floors)
 
 
-func _random_room_type(room: Room) -> int:
-	while true:
-		var roll := _rng.randf() * _weight_total
-		var room_type := Room.Type.MONSTER
-		if roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + SHOP_ROOM_WEIGHT:
-			room_type = Room.Type.EVENT
-		elif roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT:
-			room_type = Room.Type.SHOP
-		elif roll >= MONSTER_ROOM_WEIGHT:
-			room_type = Room.Type.CAMPFIRE
-		if room_type == Room.Type.CAMPFIRE and (room.row < 3 or room.row == 12 or _has_parent_of_type(room, Room.Type.CAMPFIRE)):
-			continue
-		if room_type == Room.Type.SHOP and _has_parent_of_type(room, Room.Type.SHOP):
-			continue
-		if room_type == Room.Type.EVENT and (room.row < 3 or _has_parent_of_type(room, Room.Type.EVENT)):
-			continue
-		return room_type
-	return Room.Type.MONSTER
-
-
-func _mystery_room_type(room: Room) -> int:
-	var total := MONSTER_ROOM_WEIGHT + SHOP_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + MYSTERY_EVENT_WEIGHT
-	while true:
-		var roll := _rng.randf() * total
-		var room_type := Room.Type.MONSTER
-		if roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT + SHOP_ROOM_WEIGHT:
-			room_type = Room.Type.EVENT
-		elif roll >= MONSTER_ROOM_WEIGHT + CAMPFIRE_ROOM_WEIGHT:
-			room_type = Room.Type.SHOP
-		elif roll >= MONSTER_ROOM_WEIGHT:
-			room_type = Room.Type.CAMPFIRE
-		if room_type == Room.Type.CAMPFIRE and (room.row < 3 or room.row == 12 or _has_parent_of_type(room, Room.Type.CAMPFIRE)):
-			continue
-		if room_type == Room.Type.SHOP and _has_parent_of_type(room, Room.Type.SHOP):
-			continue
-		return room_type
-	return Room.Type.MONSTER
+func _random_non_battle() -> int:
+	var pool := [Room.Type.SHOP, Room.Type.CAMPFIRE, Room.Type.EVENT]
+	return pool[_rng.randi_range(0, pool.size() - 1)]
 
 
 func _deduplicate_sibling_types(floors: Array) -> void:
@@ -331,39 +359,30 @@ func _deduplicate_sibling_types(floors: Array) -> void:
 			var seen_types := {}
 			for next_data in room.next_rooms:
 				var next_room := next_data as Room
-				if next_room.type in [Room.Type.BOSS, Room.Type.START, Room.Type.TREASURE]:
+				if next_room.type in [Room.Type.BOSS, Room.Type.START,
+						Room.Type.MONSTER, Room.Type.CAMPFIRE]:
 					continue
 				if seen_types.has(int(next_room.type)):
-					next_room.type = _alternative_type(next_room, seen_types)
+					next_room.type = _alternative_non_battle(next_room, seen_types)
 				seen_types[int(next_room.type)] = true
 
 
-func _alternative_type(room: Room, taken: Dictionary) -> int:
-	var candidates := [
-		Room.Type.MONSTER, Room.Type.CAMPFIRE, Room.Type.SHOP, Room.Type.EVENT,
-	]
+func _alternative_non_battle(room: Room, taken: Dictionary) -> int:
+	var candidates := [Room.Type.SHOP, Room.Type.CAMPFIRE, Room.Type.EVENT]
 	candidates.shuffle()
 	for candidate in candidates:
-		if taken.has(candidate):
-			continue
-		if candidate == Room.Type.CAMPFIRE and room.row < 3:
-			continue
-		if candidate == Room.Type.EVENT and room.row < 3:
-			continue
-		return candidate
-	return Room.Type.MONSTER
+		if not taken.has(int(candidate)):
+			return candidate
+	return Room.Type.SHOP
 
 
-func _has_parent_of_type(room: Room, room_type: int) -> bool:
-	for parent_data in room.prev_rooms:
-		if (parent_data as Room).type == room_type:
-			return true
-	return false
+# ---------------------------------------------------------------------------
+# Packing / utilities
+# ---------------------------------------------------------------------------
 
-
-func _pack_run(floors: Array, boss_room: Room, seed: int) -> Run:
+func _pack_run(floors: Array, boss_room: Room, run_seed: int) -> Run:
 	var run := Run.new()
-	run.seed = seed
+	run.seed = run_seed
 	var keep := _kept_room_ids(floors, boss_room)
 	for floor_data in floors:
 		var active_floor: Array = []

@@ -7,6 +7,9 @@ const DOGICA_FONT := preload("res://assets/dogica/TTF/dogicabold.ttf")
 const DAMAGE_RISE_PX := 60.0
 const DAMAGE_DURATION := 0.8
 const DAMAGE_FONT_PX := 46
+const DAMAGE_JITTER_X := 42.0
+const DAMAGE_JITTER_Y := 28.0
+const DAMAGE_RISE_JITTER_X := 26.0
 
 var _slot: Node2D
 var _spawn: Marker2D
@@ -78,16 +81,21 @@ func show_damage(amount: int, color: Color) -> void:
 		return
 	var floater := Label.new()
 	_damage_floaters.add_child(floater)
-	floater.position = _damage_anchor.position
+	var jitter := Vector2(
+		randf_range(-DAMAGE_JITTER_X, DAMAGE_JITTER_X),
+		randf_range(-DAMAGE_JITTER_Y, DAMAGE_JITTER_Y)
+	)
+	floater.position = _damage_anchor.position + jitter
 	floater.text = str(amount)
 	floater.modulate = color
 	floater.modulate.a = 1.0
 	floater.scale = Vector2.ONE
 	floater.add_theme_font_override("font", DOGICA_FONT)
 	floater.add_theme_font_size_override("font_size", DAMAGE_FONT_PX)
+	var rise_target := floater.position + Vector2(randf_range(-DAMAGE_RISE_JITTER_X, DAMAGE_RISE_JITTER_X), -DAMAGE_RISE_PX)
 	var tween := _slot.create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(floater, "position", floater.position + Vector2(0, -DAMAGE_RISE_PX), DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "position", rise_target, DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(floater, "scale", Vector2(1.48, 1.48), DAMAGE_DURATION * 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(floater, "modulate:a", 0.0, DAMAGE_DURATION).set_delay(DAMAGE_DURATION * 0.15)
 	tween.set_parallel(false)

@@ -16,7 +16,6 @@ signal dropped
 var battle_context: BattleContext
 var aim_target: Node2D
 var set_up := false
-var level := 1
 var rank := 1
 var ui_preview := false
 var touchingDir = ""
@@ -45,23 +44,17 @@ func set_runtime(ctx: BattleContext, target: Node2D) -> void:
 	aim_target = target
 
 
-func configure(ball_data: BallData, ball_level: int, ctx: BattleContext, target: Node2D) -> void:
+func configure(ball_data: BallData, ball_rank: int, ctx: BattleContext, target: Node2D) -> void:
 	data = ball_data
-	level = ball_level
-	var temp = level
-	if rank != 8:
-		rank = 1
-		while temp > 1:
-			temp /= 2
-			rank += 1
+	rank = clampi(ball_rank, 1, 7)
 	set_runtime(ctx, target)
 	refresh()
 
 
-func set_preview(ball_data: BallData, ball_level: int) -> void:
+func set_preview(ball_data: BallData, ball_rank: int) -> void:
 	ui_preview = true
 	data = ball_data
-	level = ball_level
+	rank = clampi(ball_rank, 1, 7)
 	set_collision_enabled(false)
 	refresh()
 
@@ -69,14 +62,13 @@ func set_preview(ball_data: BallData, ball_level: int) -> void:
 func refresh() -> void:
 	if data == null:
 		return
-	var temp = level
-	if rank != 8:
-		rank = 1
-		while temp > 1:
-			temp /= 2
-			rank += 1
+	_sync_rank()
 	_update_collision()
 	queue_redraw()
+
+
+func _sync_rank() -> void:
+	rank = clampi(rank, 1, 7)
 
 
 func set_collision_enabled(enabled: bool) -> void:
@@ -104,8 +96,8 @@ func _on_timer_timeout():
 	self.queue_free()
 
 
-func participates_in_level_merge() -> bool:
-	return data != null and data.participates_in_level_merge()
+func participates_in_rank_merge() -> bool:
+	return data != null and data.participates_in_rank_merge()
 
 
 func is_elemental() -> bool:
@@ -117,7 +109,7 @@ func has_tag(tag: String) -> bool:
 
 
 func get_radius() -> float:
-	return 20.0 if data == null else data.radius_for_level(level)
+	return 20.0 if data == null else data.radius_for_rank(rank)
 
 
 func is_setup_ball() -> bool:
@@ -140,7 +132,7 @@ func check_merge(ctx: BattleContext, other: BallBase) -> bool:
 	return false
 
 
-func merge_with(ctx: BattleContext, other: BallBase, level: float) -> void:
+func merge_with(ctx: BattleContext, other: BallBase, rank_strength: float) -> void:
 	pass
 
 
@@ -165,9 +157,7 @@ func tick_board_behavior(ctx: BattleContext) -> void:
 
 
 func shot_base_damage():
-	#if data..size() > 0:
-	#	print("detected element")
-	return level if data != null and (data.id == BallCatalog.NORMAL_BALL_ID || data.id == "ball_heavy") else null
+	return null
 
 
 func shot_damage_multiplier() -> float:
@@ -195,15 +185,17 @@ func on_destroy(ctx: BattleContext) -> void:
 
 
 func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
-	level += 1
+	rank = clampi(rank + 1, 1, 7)
 	for elements in element_list:
 		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
 			elements["element"].on_merge(ctx, self, elements["effect"])
 	refresh()
 
 
-func multiply_level(multiplier: int = 2) -> void:
-	level *= multiplier
+func multiply_rank(multiplier: int = 2) -> void:
+	if multiplier <= 1:
+		return
+	rank = clampi(rank + (multiplier - 1), 1, 7)
 	refresh()
 
 func rank_state():
@@ -270,13 +262,13 @@ func _draw() -> void:
 	if data == null:
 		return
 	var radius := get_radius()
-	var color := data.display_color(level)
-	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(level), OUTLINE_WIDTH, true)
+	var color := data.display_color(rank)
+	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(rank), OUTLINE_WIDTH, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale
 	sprite.modulate = color
-	($RichTextLabel as RichTextLabel).text = "[b]%s[/b]" % data.display_label(level)
+	($RichTextLabel as RichTextLabel).text = "[b]%s[/b]" % data.display_label(rank)
 
 
 func _update_collision() -> void:

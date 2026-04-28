@@ -46,14 +46,14 @@ static func roll_for_initiative(_ctx, _source):
 				i.execute(_ctx, _ctx.active_enemy())
 	else:
 		_ctx.damage_enemy(100, _ctx.active_enemy())
-	_source.rank = 8
+	_source.rank = 7
 	pass
 
 static func gambling_fallacy(_ctx: BattleContext, _source: BallBase):
 	if randi_range(1, 2) == 1:
-		_ctx.damage_player(_source.level)
+		_ctx.damage_player(_source.rank)
 	else:
-		_ctx.damage_enemy(_source.level * 2, _ctx.active_enemy())
+		_ctx.damage_enemy(_source.rank * 2, _ctx.active_enemy())
 
 
 	

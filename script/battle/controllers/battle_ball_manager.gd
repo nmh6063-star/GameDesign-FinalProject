@@ -5,7 +5,7 @@ const ElementCatalog := preload("res://script/entities/balls/elemental_balls/ele
 const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const BallBase := preload("res://script/entities/balls/ball_base.gd")
 const QUEUE_SIZE := 5
-const MAX_QUEUE_LEVEL := 3
+const MAX_QUEUE_RANK := 3
 const Effects := preload("res://script/battle/core/general_effects.gd")
 
 var _root: Node2D
@@ -67,16 +67,16 @@ func consume(ball: BallBase) -> void:
 		effect2.freeze_frame(0.1)
 		effect.shake(10.0)
 	else:
-		effect2.freeze_frame(float(ball.level) / 1000.0)
-		effect.shake(ball.level / 10.0)
+		effect2.freeze_frame(float(ball.rank) / 1000.0)
+		effect.shake(ball.rank / 10.0)
 	ball.die()
 
 
 func spawn_copy(source: BallBase, offset: Vector2 = Vector2.ZERO) -> BallBase:
-	return _spawn_instance(source.duplicate() as BallBase, source.data, source.level, source.position + offset, false)
+	return _spawn_instance(source.duplicate() as BallBase, source.data, source.rank, source.position + offset, false)
 
 
-func spawn_ball(ball_id: String, level: int, global_position: Vector2, impulse: Vector2 = Vector2.ZERO) -> BallBase:
+func spawn_ball(ball_id: String, rank: int, global_position: Vector2, impulse: Vector2 = Vector2.ZERO) -> BallBase:
 	var data := BallCatalog.data_for_id(ball_id)
 	#var data.element_list.append(BallCatalog.data_for_el)
 	if data == null:
@@ -85,23 +85,23 @@ func spawn_ball(ball_id: String, level: int, global_position: Vector2, impulse: 
 	var ball := scene.instantiate() as BallBase
 	if ball == null:
 		return null
-	var spawned := _spawn_instance(ball, data, level, _ball_placeholder.position, false)
+	var spawned := _spawn_instance(ball, data, rank, _ball_placeholder.position, false)
 	spawned.global_position = global_position
 	spawned.apply_central_impulse(impulse)
 	spawned.sleeping = false
 	return spawned
 
 
-func drop_ball(ball_id: String, level: int = 1) -> BallBase:
+func drop_ball(ball_id: String, rank: int = 1) -> BallBase:
 	var data := BallCatalog.data_for_id(ball_id)
 	if data == null:
 		return null
-	var radius: float = data.radius_for_level(level)
+	var radius: float = data.radius_for_rank(rank)
 	var x: float = randf_range(_drop_left_x + radius, _drop_right_x - radius)
-	return drop_ball_at_x(ball_id, level, x)
+	return drop_ball_at_x(ball_id, rank, x)
 
 
-func drop_ball_at_x(ball_id: String, level: int = 1, x: float = INF) -> BallBase:
+func drop_ball_at_x(ball_id: String, rank: int = 1, x: float = INF) -> BallBase:
 	var data := BallCatalog.data_for_id(ball_id)
 	if data == null:
 		return null
@@ -109,9 +109,9 @@ func drop_ball_at_x(ball_id: String, level: int = 1, x: float = INF) -> BallBase
 	var ball := scene.instantiate() as BallBase
 	if ball == null:
 		return null
-	var radius: float = data.radius_for_level(level)
+	var radius: float = data.radius_for_rank(rank)
 	var drop_x := _clamp_drop_x(_ball_placeholder.position.x if is_inf(x) else x, radius)
-	var spawned := _spawn_instance(ball, data, level, Vector2(drop_x, _drop_y), false)
+	var spawned := _spawn_instance(ball, data, rank, Vector2(drop_x, _drop_y), false)
 	spawned.sleeping = false
 	return spawned
 
@@ -119,8 +119,8 @@ func drop_ball_at_x(ball_id: String, level: int = 1, x: float = INF) -> BallBase
 func spawn_setup_ball() -> BallBase:
 	var entry := _take_queue_entry()
 	var base = entry["scene"].instantiate() as BallBase
-	if PlayerState.elements[entry["level"]]:
-		base.type.append(PlayerState.elements[entry["level"]]["type"])
+	if PlayerState.elements[entry["rank"]]:
+		base.type.append(PlayerState.elements[entry["rank"]]["type"])
 	var new_data = []
 	for element in PlayerState.elements:
 		if element == 0:
@@ -139,7 +139,7 @@ func spawn_setup_ball() -> BallBase:
 			}
 			new_data.append(obj)
 	base.element_list = new_data
-	return _spawn_instance(base, entry["data"], entry["level"], _ball_placeholder.position, true)
+	return _spawn_instance(base, entry["data"], entry["rank"], _ball_placeholder.position, true)
 
 
 func hold_swap(current_ball: BallBase) -> bool:
@@ -149,7 +149,7 @@ func hold_swap(current_ball: BallBase) -> bool:
 	if replacement.is_empty():
 		return false
 	_held_entry = _entry_from_ball(current_ball)
-	current_ball.configure(replacement["data"], replacement["level"], _context, _target)
+	current_ball.configure(replacement["data"], replacement["rank"], _context, _target)
 	current_ball.position = _ball_placeholder.position
 	current_ball.linear_velocity = Vector2.ZERO
 	current_ball.angular_velocity = 0.0
@@ -188,8 +188,8 @@ func preview() -> Array:
 	return items
 
 
-func _spawn_instance(ball: BallBase, data, level: int, position: Vector2, is_set_up: bool) -> BallBase:
-	ball.configure(data, level, _context, _target)
+func _spawn_instance(ball: BallBase, data, rank: int, position: Vector2, is_set_up: bool) -> BallBase:
+	ball.configure(data, rank, _context, _target)
 	_ball_parent.add_child(ball)
 	ball.position = position
 	ball.visible = true
@@ -237,15 +237,32 @@ func _roll_ball_entry() -> Dictionary:
 				"id": entry["id"],
 				"scene": entry["scene"],
 				"data": entry["data"],
-				"level": min(entry["data"].random_spawn_level(), MAX_QUEUE_LEVEL),
+				"rank": _roll_queue_rank(),
 			}
 	var entry: Dictionary = _spawn_pool[0]
 	return {
 		"id": entry["id"],
 		"scene": entry["scene"],
 		"data": entry["data"],
-		"level": min(entry["data"].random_spawn_level(), MAX_QUEUE_LEVEL),
+		"rank": _roll_queue_rank(),
 	}
+
+
+## Queue rank distribution:
+## rank 1: 50%
+## rank 2: 35%
+## rank 3: 15%
+func _roll_queue_rank() -> int:
+	var roll := _rng_percent()
+	if roll <= 50:
+		return 1
+	if roll <= 85:
+		return 2
+	return 3
+
+
+func _rng_percent() -> int:
+	return randi_range(1, 100)
 
 
 func _capture_drop_bounds() -> void:
@@ -271,5 +288,5 @@ func _entry_from_ball(ball: BallBase) -> Dictionary:
 		"id": ball.data.id,
 		"scene": BallCatalog.scene_for_id(ball.data.id),
 		"data": ball.data,
-		"level": ball.level,
+		"rank": ball.rank,
 	}

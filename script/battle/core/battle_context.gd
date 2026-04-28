@@ -172,12 +172,12 @@ func duplicate_ball(source: BallBase, offset: Vector2 = Vector2.ZERO) -> BallBas
 	return controller.spawn_ball_copy(source, offset) if controller != null else null
 
 
-func spawn_ball(ball_id: String, origin_global: Vector2, impulse: Vector2 = Vector2.ZERO, level: int = 1) -> BallBase:
-	return controller.spawn_ball(ball_id, origin_global, impulse, level) if controller != null else null
+func spawn_ball(ball_id: String, origin_global: Vector2, impulse: Vector2 = Vector2.ZERO, rank: int = 1) -> BallBase:
+	return controller.spawn_ball(ball_id, origin_global, impulse, rank) if controller != null else null
 
 
-func drop_ball_in_box(ball_id: String, level: int = 1) -> BallBase:
-	return controller.drop_ball_in_box(ball_id, level) if controller != null else null
+func drop_ball_in_box(ball_id: String, rank: int = 1) -> BallBase:
+	return controller.drop_ball_in_box(ball_id, rank) if controller != null else null
 
 
 func heal_player(amount: int) -> void:

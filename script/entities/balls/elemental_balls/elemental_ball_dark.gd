@@ -49,7 +49,7 @@ static func deploy_enchantment(_ctx: BattleContext, _source: BallBase):
 	pass
 
 static func health_for_damage(_ctx: BattleContext, _source: BallBase):
-	_ctx.damage_enemy(_source.level * 3, _ctx.active_enemy())
+	_ctx.damage_enemy(_source.rank * 3, _ctx.active_enemy())
 	#print("SHOT SUCCESS")
 	#_ctx.consume_ball(_source)
 	pass
@@ -66,19 +66,19 @@ static func enbiggen(_ctx: BattleContext, _source: BallBase):
 	pass
 	
 static func eye_for_an_arm(_ctx: BattleContext, _source: BallBase):
-	_ctx.damage_enemy(_source.level*1.5, _ctx.active_enemy())
-	_ctx.damage_player(_source.level/2)
+	_ctx.damage_enemy(_source.rank * 1.5, _ctx.active_enemy())
+	_ctx.damage_player(_source.rank / 2)
 
 static func create_copy(_ctx: BattleContext, _source: BallBase):
-	_source.rank = 8
-	var ball = _ctx.spawn_ball("ball_normal", _source.global_position, Vector2.ZERO, _source.level) as BallBase
-	ball.rank = 8
+	_source.rank = 7
+	var ball = _ctx.spawn_ball("ball_normal", _source.global_position, Vector2.ZERO, _source.rank) as BallBase
+	ball.rank = 7
 	#_ctx.consume_ball(_source)
 	pass
 
 static func darkness_consume(_ctx: BattleContext, _source: BallBase):
-	_ctx.damage_enemy(_source.level * 3, _ctx.active_enemy())
-	_ctx.damage_player(_source.level)
+	_ctx.damage_enemy(_source.rank * 3, _ctx.active_enemy())
+	_ctx.damage_player(_source.rank)
 
 
 

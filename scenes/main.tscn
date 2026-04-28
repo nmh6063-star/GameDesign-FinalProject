@@ -368,6 +368,17 @@ text = "H"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="InspectAbilityButton" type="Button" parent="UI/BallQueue" unique_id=2140087001]
+layout_mode = 0
+offset_left = 22.0
+offset_top = 410.0
+offset_right = 114.0
+offset_bottom = 450.0
+mouse_filter = 0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 10
+text = "I"
+
 [node name="ManaHUD" type="Control" parent="UI" unique_id=901000000]
 layout_mode = 3
 anchors_preset = 0

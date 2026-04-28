@@ -22,7 +22,7 @@ func start_new_run(seed: int = -1) -> void:
 	_current_room_id = -1
 	_visited_room_ids = []
 	_completed_room_ids = []
-	_available_choice_ids = _run.start_room_ids.duplicate()
+	_available_choice_ids = _initial_choice_ids()
 	_selected_choice_index = 0
 	run_started.emit(_run)
 	state_changed.emit()
@@ -165,7 +165,7 @@ func _refresh_choices() -> void:
 		return
 	var room := current_room()
 	if room == null:
-		_available_choice_ids = _run.start_room_ids.duplicate()
+		_available_choice_ids = _initial_choice_ids()
 	else:
 		for next_room_data in room.next_rooms:
 			_available_choice_ids.append((next_room_data as MapGenerator.Room).id)
@@ -176,3 +176,27 @@ func _refresh_choices() -> void:
 			return left_room.column < right_room.column
 		return left_room.row < right_room.row
 	)
+
+
+func _initial_choice_ids() -> Array:
+	var ids: Array = []
+	if _run == null:
+		return ids
+	for start_id in _run.start_room_ids:
+		var start_room := _run.room(int(start_id))
+		if start_room == null:
+			continue
+		for next_room_data in start_room.next_rooms:
+			var next_room := next_room_data as MapGenerator.Room
+			if next_room != null and next_room.id not in ids:
+				ids.append(next_room.id)
+	ids.sort_custom(func(left, right):
+		var left_room := _run.room(int(left))
+		var right_room := _run.room(int(right))
+		if left_room == null or right_room == null:
+			return int(left) < int(right)
+		if left_room.row == right_room.row:
+			return left_room.column < right_room.column
+		return left_room.row < right_room.row
+	)
+	return ids

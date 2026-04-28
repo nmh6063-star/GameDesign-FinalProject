@@ -2,6 +2,19 @@
 
 [ext_resource type="Script" uid="uid://clbb8867asvwx" path="res://script/map/menu_screen.gd" id="1_e6vgv"]
 [ext_resource type="Texture2D" uid="uid://qvby6aw6lwbs" path="res://assets/MenuScreen.png" id="1_yft84"]
+[ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_menu_btn_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ability_btn"]
+bg_color = Color(0.18, 0.12, 0.28, 0.94)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.92, 0.9, 0.98, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="MenuScreen" type="Node2D" unique_id=455783042]
 position = Vector2(0, 640)
@@ -11,6 +24,31 @@ script = ExtResource("1_e6vgv")
 position = Vector2(576, -280)
 scale = Vector2(0.72865576, 0.7258065)
 texture = ExtResource("1_yft84")
+
+[node name="AbilityCollection" type="Button" parent="MenuScreen" unique_id=884422501]
+show_behind_parent = false
+z_index = 10
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -968.6659
+offset_top = -661.3334
+offset_right = -632.6659
+offset_bottom = -605.3334
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.85, 0.85, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_menu_btn_font")
+theme_override_font_sizes/font_size = 15
+theme_override_styles/normal = SubResource("StyleBoxFlat_ability_btn")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_ability_btn")
+theme_override_styles/hover = SubResource("StyleBoxFlat_ability_btn")
+theme_override_styles/focus = SubResource("StyleBoxFlat_ability_btn")
+text = "Ability collection"
 
 [node name="Setting" type="Button" parent="MenuScreen" unique_id=507625135]
 show_behind_parent = true

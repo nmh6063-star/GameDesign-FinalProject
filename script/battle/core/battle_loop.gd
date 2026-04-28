@@ -11,6 +11,7 @@ const EnemySlotController := preload("res://script/battle/controllers/enemy_slot
 const RewardSelectionController := preload("res://script/battle/controllers/reward_selection_controller.gd")
 const BattleHudAdapter := preload("res://script/battle/ui/battle_hud_adapter.gd")
 const REWARD_SELECTION_SCENE := preload("res://scenes/reward_selection.tscn")
+const CURRENT_ABILITY_SCENE := preload("res://scenes/current_ability.tscn")
 const Effects := preload("res://script/battle/core/general_effects.gd")
 
 const BURST_AREA_RADIUS := 320.0
@@ -39,6 +40,8 @@ var _selected_enemy_index := 0
 var _enemy_slots: Array = []
 
 var _reward_overlay: RewardSelectionController
+var _current_ability_overlay: CanvasLayer
+var _paused_for_ability_overlay := false
 
 @onready var _root := get_tree().current_scene as Node2D
 @onready var _ball_placeholder := _root.get_node("BallHolder/BallPlaceholder") as BallBase
@@ -52,11 +55,14 @@ var _reward_overlay: RewardSelectionController
 @onready var _player_damage_anchor := _root.get_node("PlayerHolder/DamageAnchorPlayer") as Marker2D
 @onready var _enemy_slot_root := _root.get_node("EnemySlot") as Node2D
 @onready var _ui_root := _root.get_node("UI") as CanvasLayer
+@onready var _ability_button := _root.get_node_or_null("UI/BallQueue/InspectAbilityButton") as Button
 
 
 func _ready() -> void:
 	_hud = BattleHudAdapter.new(_ui_root)
 	_enemy_slots = _build_enemy_slots()
+	if _ability_button != null:
+		_ability_button.pressed.connect(_on_inspect_ability_requested)
 	set_physics_process(false)
 	if PlayerState.aim_size_level > 0:
 		_target.scale = Vector2.ONE * (1.0 + PlayerState.aim_size_level * 0.25)
@@ -81,6 +87,7 @@ func _begin_battle() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	_handle_ability_overlay_input()
 	_step_battle_resolution()
 	_handle_selection_input()
 	_handle_hold_input()
@@ -88,6 +95,12 @@ func _physics_process(_delta: float) -> void:
 	_update_target_visual()
 	_handle_shoot_input()
 	_context.tick_combo(_delta)
+
+
+func _handle_ability_overlay_input() -> void:
+	if not Input.is_action_just_pressed("inspect_ability"):
+		return
+	_on_inspect_ability_requested()
 
 
 func _step_battle_resolution() -> void:
@@ -155,7 +168,7 @@ func _try_use_special_slot(index: int) -> bool:
 		return false
 	var mouse_x := _root.get_local_mouse_position().x
 	if _box != null:
-		_box.drop_ball_at_x(item["id"], int(item.get("level", 1)), mouse_x)
+		_box.drop_ball_at_x(item["id"], int(item.get("rank", 1)), mouse_x)
 	_sync_special_bar()
 	return true
 
@@ -180,16 +193,7 @@ func ensure_ball_in_play() -> void:
 func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	if _context.phase != BattleContext.Phase.PLAY or not _context.try_consume_shot():
 		return
-	var target_enemy: EnemyBase = active_enemy()
 	var hit_balls := _targeted_balls(target_area)
-	var damage_total := 0
-	var damage_multiplier := 1.0
-	for ball in hit_balls:
-		if ball.shot_base_damage():
-			damage_total += ball.shot_base_damage()
-			damage_multiplier *= ball.shot_damage_multiplier()
-	if damage_total > 0:
-		damage_enemy(int(round(float(damage_total) * damage_multiplier)), target_enemy, _context)
 	for ball in hit_balls:
 		ball.on_shot(_context)
 	burst_knock_on_balls(burst_origin, SHOOT_BURST_STRENGTH_MULT)
@@ -250,12 +254,12 @@ func spawn_ball_copy(source: BallBase, offset: Vector2 = Vector2.ZERO) -> BallBa
 	return _box.spawn_copy(source, offset) if _box != null else null
 
 
-func spawn_ball(ball_id: String, origin_global: Vector2, impulse: Vector2 = Vector2.ZERO, level: int = 1) -> BallBase:
-	return _box.spawn_ball(ball_id, level, origin_global, impulse) if _box != null else null
+func spawn_ball(ball_id: String, origin_global: Vector2, impulse: Vector2 = Vector2.ZERO, rank: int = 1) -> BallBase:
+	return _box.spawn_ball(ball_id, rank, origin_global, impulse) if _box != null else null
 
 
-func drop_ball_in_box(ball_id: String, level: int = 1) -> BallBase:
-	return _box.drop_ball(ball_id, level) if _box != null else null
+func drop_ball_in_box(ball_id: String, rank: int = 1) -> BallBase:
+	return _box.drop_ball(ball_id, rank) if _box != null else null
 
 
 func spawn_setup_ball() -> BallBase:
@@ -268,6 +272,15 @@ func heal_player(amount: int) -> void:
 	PlayerState.heal(amount)
 	_sync_player_bar()
 	_hud.show_damage(amount, _player_damage_anchor, HEAL_COLOR)
+
+
+func damage_all_enemies(amount: int, ctx: BattleContext = null) -> void:
+	if amount <= 0:
+		return
+	for slot in _alive_enemy_slots():
+		var target: EnemyBase = slot.enemy
+		if target != null and target.is_alive():
+			damage_enemy(amount, target, ctx)
 
 
 func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = null) -> void:
@@ -357,9 +370,7 @@ func _show_reward_selection() -> void:
 	_root.add_child(_reward_overlay)
 
 
-func _on_reward_selection_completed(ball_ids: Array[String]) -> void:
-	for ball_id in ball_ids:
-		BattleLoadout.add_ball_to_pool(ball_id)
+func _on_reward_selection_completed() -> void:
 	_reward_overlay = null
 	_begin_stage()
 
@@ -483,7 +494,7 @@ func _special_slot_entries() -> Array:
 			"id": ball_id,
 			"scene": scene,
 			"data": data,
-			"level": 1,
+			"rank": 1,
 		})
 	return entries
 
@@ -509,7 +520,73 @@ func _finish_battle(text: String) -> void:
 	if text == "Game Over":
 		game_manager.call("restart_run")
 		return
+	if _should_show_post_battle_reward():
+		_show_post_battle_reward_selection()
+		return
 	game_manager.call("complete_current_room")
+
+
+func _should_show_post_battle_reward() -> bool:
+	return true
+
+
+## Dev / hotkey: jump to the same flow as Stage Clear (result → timer → rank reward → map).
+func skip_to_post_battle_reward() -> void:
+	if not is_inside_tree() or _context == null:
+		return
+	if _context.has_battle_result():
+		return
+	_finish_battle("Stage Clear")
+
+
+func _show_post_battle_reward_selection() -> void:
+	if not is_inside_tree():
+		return
+	if _reward_overlay != null and is_instance_valid(_reward_overlay):
+		_reward_overlay.queue_free()
+	_reward_overlay = REWARD_SELECTION_SCENE.instantiate() as RewardSelectionController
+	_reward_overlay.selection_completed.connect(_on_post_battle_reward_selection_completed)
+	_root.add_child(_reward_overlay)
+
+
+func _on_inspect_ability_requested() -> void:
+	if _current_ability_overlay != null and is_instance_valid(_current_ability_overlay):
+		return
+	if _reward_overlay != null and is_instance_valid(_reward_overlay):
+		return
+	if _context.has_battle_result():
+		return
+	if _context.slow_mo_active:
+		_exit_slow_mo()
+	set_physics_process(false)
+	_current_ability_overlay = CURRENT_ABILITY_SCENE.instantiate() as CanvasLayer
+	_current_ability_overlay.process_mode = Node.PROCESS_MODE_WHEN_PAUSED
+	_current_ability_overlay.tree_exited.connect(_on_current_ability_closed)
+	_root.add_child(_current_ability_overlay)
+	if not get_tree().paused:
+		get_tree().paused = true
+		_paused_for_ability_overlay = true
+	else:
+		_paused_for_ability_overlay = false
+
+
+func _on_current_ability_closed() -> void:
+	_current_ability_overlay = null
+	if _paused_for_ability_overlay:
+		get_tree().paused = false
+	_paused_for_ability_overlay = false
+	if _context.has_battle_result():
+		return
+	if _reward_overlay != null and is_instance_valid(_reward_overlay):
+		return
+	set_physics_process(true)
+
+
+func _on_post_battle_reward_selection_completed() -> void:
+	_reward_overlay = null
+	var gm := _game_manager()
+	if gm != null:
+		gm.complete_current_room()
 
 
 func _on_enemy_action_requested(enemy: EnemyBase) -> void:

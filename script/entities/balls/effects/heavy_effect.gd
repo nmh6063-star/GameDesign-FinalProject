@@ -22,9 +22,9 @@ func can_trigger(ctx: BattleContext, source: BallBase) -> bool:
 
 func apply(ctx: BattleContext, source: BallBase) -> void:
 	for ball in _targets(ctx, source):
-		damage += ball.level
+		damage += ball.rank
 		ctx.consume_ball(ball)
 	if damage > max_damage:
 		damage = max_damage
-	source.level = damage
+	source.rank = clampi(damage, 1, 7)
 	source.get_node("Sprite2D").modulate = Color.from_hsv(0.0, 0.0, inverse_lerp(0, max_damage, damage))

@@ -40,6 +40,7 @@ var _pause_menu: CanvasLayer
 var _room_entry_health: int = -1
 var _room_rng_seed: int = 0
 var _current_room_scene: String = ""
+var _pre_map_reward_pending := false
 
 
 func _ready() -> void:
@@ -71,6 +72,7 @@ func active_room_type() -> int:
 func generate_new_run(seed: int = -1) -> void:
 	BattleLoadout.reset_for_run()
 	PlayerState.reset_for_run()
+	_pre_map_reward_pending = true
 	map_view_visible = false
 	_controller.start_new_run(seed)
 
@@ -176,6 +178,12 @@ func restart_run(seed: int = -1) -> void:
 
 func should_skip_battle_rewards() -> bool:
 	return true
+
+
+func consume_pre_map_reward_pending() -> bool:
+	var pending := _pre_map_reward_pending
+	_pre_map_reward_pending = false
+	return pending
 
 
 func get_room_rng_seed() -> int:
@@ -312,6 +320,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		_show_pause_menu(in_room, in_game, can_restart)
 		return
 	if scene.scene_file_path in _NON_GAME_SCENES:
+		return
+	if event.keycode == KEY_P and scene.scene_file_path == BATTLE_SCENE_PATH:
+		var battle := scene.get_node_or_null("BallHolder/BattleController")
+		if battle != null and battle.has_method("skip_to_post_battle_reward"):
+			battle.skip_to_post_battle_reward()
 		return
 	if event.keycode == KEY_P and scene.scene_file_path in _ROOM_SCENES:
 		complete_current_room()

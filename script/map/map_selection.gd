@@ -5,6 +5,8 @@ const MapController := preload("res://script/map/map_controller.gd")
 const MapGenerator := preload("res://script/map/map_generator.gd")
 const MapRoom := preload("res://script/map/map_room.gd")
 const ElementCatalog := preload("res://script/entities/balls/elemental_balls/elemental_ball_catalog.gd")
+const RewardSelectionController := preload("res://script/battle/controllers/reward_selection_controller.gd")
+const REWARD_SELECTION_SCENE := preload("res://scenes/reward_selection.tscn")
 var rank_sizing = {
 	1: null,
 	2: null,
@@ -60,6 +62,7 @@ signal augment_toggled(is_visible)
 ]
 
 var stored_data = []
+var _pre_map_reward_overlay: RewardSelectionController
 
 
 func _ready() -> void:
@@ -73,6 +76,7 @@ func _ready() -> void:
 		if not _game_manager.has_run():
 			_game_manager.generate_new_run(run_seed)
 	_refresh_view()
+	_maybe_show_pre_map_reward()
 	var element_balls = _augment_view.get_node("Panel").get_children()
 	var rank = 7
 	for child in element_balls:
@@ -89,6 +93,8 @@ func _exit_tree() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _pre_map_reward_overlay != null and is_instance_valid(_pre_map_reward_overlay):
+		return
 	if _game_manager == null or not (event is InputEventKey):
 		return
 	var key_event := event as InputEventKey
@@ -181,6 +187,8 @@ func _refresh_view() -> void:
 
 
 func _on_door_gui_input(event: InputEvent, door_index: int) -> void:
+	if _pre_map_reward_overlay != null and is_instance_valid(_pre_map_reward_overlay):
+		return
 	if _game_manager == null:
 		return
 	if not event is InputEventMouseButton:
@@ -192,6 +200,8 @@ func _on_door_gui_input(event: InputEvent, door_index: int) -> void:
 
 
 func _confirm_selection() -> void:
+	if _pre_map_reward_overlay != null and is_instance_valid(_pre_map_reward_overlay):
+		return
 	if _game_manager == null:
 		return
 	#for child in _augment_view.get_children():
@@ -262,3 +272,22 @@ func _refresh_augment():
 
 func _controller() -> MapController:
 	return null if _game_manager == null else _game_manager.controller()
+
+
+func _maybe_show_pre_map_reward() -> void:
+	if _game_manager == null:
+		return
+	if not _game_manager.has_method("consume_pre_map_reward_pending"):
+		return
+	if not bool(_game_manager.call("consume_pre_map_reward_pending")):
+		return
+	_pre_map_reward_overlay = REWARD_SELECTION_SCENE.instantiate() as RewardSelectionController
+	if _pre_map_reward_overlay == null:
+		return
+	_pre_map_reward_overlay.selection_completed.connect(_on_pre_map_reward_done)
+	add_child(_pre_map_reward_overlay)
+
+
+func _on_pre_map_reward_done() -> void:
+	_pre_map_reward_overlay = null
+	_refresh_view()

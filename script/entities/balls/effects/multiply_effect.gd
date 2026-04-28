@@ -18,5 +18,5 @@ func can_trigger(ctx: BattleContext, source: BallBase) -> bool:
 
 func apply(ctx: BattleContext, source: BallBase) -> void:
 	for ball in _targets(ctx, source):
-		ball.multiply_level()
+		ball.multiply_rank()
 	ctx.consume_ball(source)

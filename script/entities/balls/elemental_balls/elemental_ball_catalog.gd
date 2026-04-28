@@ -73,11 +73,15 @@ static func get_color(type):
 			return Color()
 		"Gambler":
 			return Color(1.0, 0.0, 0.0)
+		"Rank":
+			return Color(0.55, 0.75, 1.0)
 		_:
 			return Color(1.0, 1.0, 1.0)
 
 static func get_passive(type):
 	match type:
+		"Rank":
+			return null
 		"Dark":
 			return {
 				"name": "Darkness Consumes",
