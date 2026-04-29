@@ -52,6 +52,7 @@ var _paused_for_ability_overlay := false
 @onready var _player_bar := _root.get_node("UI/PlayerHealthBar/Background") as ColorRect
 @onready var _player_fill := _root.get_node("UI/PlayerHealthBar/Fill") as ColorRect
 @onready var _player_hp_label := _root.get_node("UI/PlayerHealthBar/Label") as Label
+@onready var _player_status_label := _root.get_node_or_null("UI/PlayerHealthBar/Status") as Label
 @onready var _player_damage_anchor := _root.get_node("PlayerHolder/DamageAnchorPlayer") as Marker2D
 @onready var _enemy_slot_root := _root.get_node("EnemySlot") as Node2D
 @onready var _ui_root := _root.get_node("UI") as CanvasLayer
@@ -94,7 +95,9 @@ func _physics_process(_delta: float) -> void:
 	_update_enemy_realtime_views()
 	_update_target_visual()
 	_handle_shoot_input()
+	_context.tick_enemy_poison(_delta)
 	_context.tick_combo(_delta)
+	_sync_status_tags()
 
 
 func _handle_ability_overlay_input() -> void:
@@ -215,7 +218,15 @@ func resolve_enemy_turn(enemy: EnemyBase = null) -> void:
 	var acting_enemy: EnemyBase = active_enemy() if enemy == null else enemy
 	if acting_enemy == null or not acting_enemy.is_alive():
 		return
+	if not _context.on_enemy_attack_started(acting_enemy):
+		return
+	# Charm: redirect the attack to a random other enemy
+	var charm_st := _context.status_for_enemy(acting_enemy)
+	if int(charm_st.get("charm_stack", 0)) > 0:
+		_context.set_charm_redirect(acting_enemy)
 	acting_enemy.on_turn(_context)
+	_context.clear_charm_redirect()
+	_context.on_enemy_attack_resolved(acting_enemy)
 
 
 func active_balls() -> Array:
@@ -302,11 +313,29 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 func damage_player(amount: int) -> void:
 	if amount <= 0 or PlayerState.player_health <= 0:
 		return
+	if _context.should_reflect_damage():
+		var attacker := active_enemy()
+		if attacker != null:
+			damage_enemy(amount, attacker, _context)
+		return
+	# Charm: redirect attack to a random enemy that isn't the charmed attacker
+	var charm_src := _context.charm_redirect_source()
+	if charm_src != null:
+		var others := _alive_enemies_excluding(charm_src)
+		if not others.is_empty():
+			damage_enemy(amount, others[randi() % others.size()], _context)
+			return
+		# Only one enemy (the charmed one) — attack still hits player
 	PlayerState.damage(amount)
 	_player.flash()
 	_sync_player_bar()
 	_hud.show_damage(amount, _player_damage_anchor, PLAYER_DAMAGE_COLOR)
 	if PlayerState.player_health == 0:
+		if _context.can_resurrect():
+			_context.mark_resurrect_used()
+			PlayerState.player_health = max(1, int(PlayerState.player_max_health * 0.2))
+			_sync_player_bar()
+			return
 		_finish_battle("Game Over")
 
 
@@ -397,6 +426,7 @@ func _begin_stage() -> void:
 
 
 func _on_ball_dropped() -> void:
+	_context.consume_freeze_on_ball_drop()
 	_complete_turn_after_drop()
 
 
@@ -436,6 +466,14 @@ func _alive_enemy_slots() -> Array:
 	return slots
 
 
+func _alive_enemies_excluding(excluded: EnemyBase) -> Array:
+	var out: Array = []
+	for slot in _alive_enemy_slots():
+		if slot.enemy != null and slot.enemy.is_alive() and slot.enemy != excluded:
+			out.append(slot.enemy)
+	return out
+
+
 func _selected_enemy_slot() -> EnemySlotController:
 	var slots := _alive_enemy_slots()
 	if slots.is_empty():
@@ -465,6 +503,19 @@ func _spawn_enemies() -> void:
 func _sync_player_bar() -> void:
 	_player_fill.size.x = _player_bar.size.x * float(PlayerState.player_health) / float(PlayerState.player_max_health)
 	_player_hp_label.text = "%d/%d" % [PlayerState.player_health, PlayerState.player_max_health]
+	if _player_status_label != null:
+		var tags: Array[String] = []
+		var shield := int(_context.player_statuses.get("shield", 0))
+		if shield > 0:
+			tags.append("Shield %d" % shield)
+		var atk := int(_context.player_statuses.get("attack_bonus", 0))
+		if atk > 0:
+			tags.append("ATK+%d" % atk)
+		if _context.can_resurrect():
+			tags.append("Resurrect")
+		if _context.has_reflect_active():
+			tags.append("Reflect")
+		_player_status_label.text = " | ".join(tags)
 
 
 func _sync_ball_hud() -> void:
@@ -641,3 +692,10 @@ func _should_skip_reward_selection() -> bool:
 	if not game_manager.has_method("should_skip_battle_rewards"):
 		return false
 	return bool(game_manager.call("should_skip_battle_rewards"))
+
+
+func _sync_status_tags() -> void:
+	_sync_player_bar()
+	for slot in _enemy_slots:
+		if slot != null and slot.has_method("sync_status_tag"):
+			slot.sync_status_tag(_context)

@@ -574,6 +574,16 @@ theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
+[node name="Status" type="Label" parent="UI/PlayerHealthBar" unique_id=1751000200]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 30.0
+offset_right = 320.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 8
+text = ""
+
 [node name="SpecialBar" type="Panel" parent="UI" unique_id=1800000019]
 offset_left = 624.0
 offset_top = 484.0

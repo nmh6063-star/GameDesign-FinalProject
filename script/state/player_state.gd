@@ -55,3 +55,31 @@ func reset_for_run() -> void:
 	aim_size_level = 0
 	player_gold = 200
 	reset_default_rank_slots()
+
+
+## Debug helper: equips a deterministic cross-rank ability set without reward selection.
+func apply_test_current_abilities_set() -> void:
+	var picks := {
+		1: "venom_1",
+		2: "triple_shot_2",
+		3: "fireball_3",
+		4: "chain_spark_4",
+		5: "poison_rain_5",
+		6: "chaos_rain_6",
+		7: "apocalypse_7",
+	}
+	for rank in range(1, 8):
+		var target := String(picks.get(rank, ""))
+		var chosen := RankAbilityCatalog.default_element_for_rank(rank)
+		for row in RankAbilityCatalog.all_display_rows_for_rank(rank):
+			var fn := String(row.get("function", ""))
+			if fn == target:
+				chosen = {
+					"name": row.get("name", ""),
+					"type": RankAbilityCatalog.ELEMENT_TYPE,
+					"function": fn,
+					"description": row.get("description", ""),
+					"rank": rank,
+				}
+				break
+		elements[rank] = chosen

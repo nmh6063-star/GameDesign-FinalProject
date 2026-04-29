@@ -333,3 +333,5 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_tree().change_scene_to_file(CAMPFIRE_SCENE_PATH)
 	elif event.keycode == KEY_7:
 		get_tree().change_scene_to_file(SHOP_SCENE_PATH)
+	elif event.keycode == KEY_T:
+		PlayerState.apply_test_current_abilities_set()

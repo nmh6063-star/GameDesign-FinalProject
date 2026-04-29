@@ -47,3 +47,4 @@ res://script/map/map_controller.gd
 res://script/battle/ui/current_ability.gd
 res://script/battle/controllers/enemy_slot_controller.gd
 res://script/map/map_selection.gd
+res://script/entities/balls/elemental_balls/rank_ability_effects.gd

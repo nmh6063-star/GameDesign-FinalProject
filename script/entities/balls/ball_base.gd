@@ -23,6 +23,7 @@ var last = 0
 var dying = false
 var type = []
 var element_list = []
+var _status_tag_label: Label
 
 
 func _ready() -> void:
@@ -64,6 +65,7 @@ func refresh() -> void:
 		return
 	_sync_rank()
 	_update_collision()
+	_sync_status_tag()
 	queue_redraw()
 
 
@@ -278,6 +280,31 @@ func _update_collision() -> void:
 	var circle := (col.shape as CircleShape2D).duplicate()
 	circle.radius = get_radius()
 	col.shape = circle
+
+
+func _sync_status_tag() -> void:
+	if battle_context == null:
+		if _status_tag_label != null:
+			_status_tag_label.visible = false
+		return
+	if _status_tag_label == null:
+		_status_tag_label = get_node_or_null("StatusTag") as Label
+		if _status_tag_label == null:
+			_status_tag_label = Label.new()
+			_status_tag_label.name = "StatusTag"
+			add_child(_status_tag_label)
+			_status_tag_label.position = Vector2(-30, -42)
+			_status_tag_label.size = Vector2(80, 14)
+			_status_tag_label.add_theme_font_size_override("font_size", 8)
+	var st := battle_context.ball_status_for(self)
+	var tags: Array[String] = []
+	if bool(st.get("trigger_twice", false)):
+		tags.append("x2")
+	var atk := float(st.get("attack_mult", 1.0))
+	if atk > 1.0:
+		tags.append("ATKx%.1f" % atk)
+	_status_tag_label.text = " ".join(tags)
+	_status_tag_label.visible = not tags.is_empty()
 
 
 func _merge_rule() -> MergeRuleBase:

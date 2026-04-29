@@ -1,7 +1,13 @@
 extends RefCounted
 class_name ElementalBallCatalog
 
-static var elemental_database = [
+const RankAbilityCatalog := preload("res://script/entities/balls/elemental_balls/rank_ability_catalog.gd")
+
+static var elemental_database = _build_elemental_database()
+
+
+static func _build_elemental_database() -> Array:
+	var db: Array = [
 	{
 		"name": "Poison Apple",
 		"type": "Dark",
@@ -65,7 +71,17 @@ static var elemental_database = [
 		"description": "Roll the dice! Who's it gonna be? Either you're gonna deal double damage or your enemies are gonna ravage upon you!",
 		"rank": 7
 	}
-]
+	]
+	for rank in range(1, 8):
+		for row in RankAbilityCatalog.all_display_rows_for_rank(rank):
+			db.append({
+				"name": row.get("name", ""),
+				"type": "Rank",
+				"function": row.get("function", ""),
+				"description": row.get("description", ""),
+				"rank": rank,
+			})
+	return db
 
 static func get_color(type):
 	match type:
