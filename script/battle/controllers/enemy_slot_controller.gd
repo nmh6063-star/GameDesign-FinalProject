@@ -245,8 +245,8 @@ func _action_summary() -> String:
 	var script_path := ""
 	if action != null and action.get_script() != null:
 		script_path = String(action.get_script().resource_path)
-	if script_path.ends_with("bomb_drop_action.gd"):
-		return "Drops a bomb into\nthe board."
+	if script_path.ends_with("rock_drop_action.gd"):
+		return "Drops a rock onto\nthe board."
 	return "Direct player\nattack."
 
 

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://cl8iect1tcf25"]
+
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/entities/balls/effects/ball_effect_base.gd" id="1_mt3mh"]
+
+[resource]
+script = ExtResource("1_ball_data")
+id = "ball_rock"
+display_name = "Rock Ball"
+description = "An immovable rock. Occupies space and cannot be merged or destroyed."
+spawn_ranks = null
+symbol = "R"
+tint = Color(0.55, 0.55, 0.55, 1)
+outline_tint = Color(0.3, 0.3, 0.3, 1)
+base_radius = 40.0
