@@ -1,0 +1,240 @@
+[gd_scene format=3 uid="uid://dayn5nyw0cscm"]
+
+[ext_resource type="Script" uid="uid://ctwngpe0ookyo" path="res://script/map/plinko_room.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="2_bg"]
+[ext_resource type="Texture2D" uid="uid://cv37c1rsrb6jg" path="res://assets/buttonTemplate.png" id="3_btn"]
+[ext_resource type="FontFile" uid="uid://bxb64wxaym54g" path="res://assets/dogica/TTF/dogicapixelbold.ttf" id="4_font"]
+[ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="5_ind"]
+[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="6_tgt"]
+[ext_resource type="Texture2D" uid="uid://ctv0hsnbl3lw4" path="res://assets/gun.png" id="7_gun"]
+[ext_resource type="Script" uid="uid://din0icad5qbb7" path="res://script/map/plinko_solo_target.gd" id="8_solo"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_surface"]
+friction = 2.5
+
+[sub_resource type="RectangleShape2D" id="Rect_wall"]
+size = Vector2(106, 449)
+
+[sub_resource type="RectangleShape2D" id="Rect_floor"]
+size = Vector2(429, 58)
+
+[node name="PlinkoRoom" type="Node2D" unique_id=1479749858]
+position = Vector2(328, 323)
+script = ExtResource("1_script")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=362862435]
+position = Vector2(248, 0)
+
+[node name="Background" type="Node2D" parent="." unique_id=577628250]
+
+[node name="Cave" type="Sprite2D" parent="Background" unique_id=907806094]
+z_index = -1
+texture_filter = 1
+position = Vector2(248, 0)
+scale = Vector2(0.7, 0.7)
+texture = ExtResource("2_bg")
+
+[node name="LimitSeparation" type="Node2D" parent="Background" unique_id=2000000001]
+position = Vector2(64, -128)
+
+[node name="GuideLine" type="Line2D" parent="Background/LimitSeparation" unique_id=2000000002]
+z_index = 2
+points = PackedVector2Array(-168, 0, 168, 0)
+width = 3.0
+default_color = Color(0.88, 0.84, 0.95, 0.55)
+
+[node name="Indicator0" type="Sprite2D" parent="Background/LimitSeparation" unique_id=2000000010]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(-135, 14)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("5_ind")
+
+[node name="Indicator1" type="Sprite2D" parent="Background/LimitSeparation" unique_id=2000000011]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(-81, 14)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("5_ind")
+
+[node name="Indicator2" type="Sprite2D" parent="Background/LimitSeparation" unique_id=2000000012]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(-27, 14)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("5_ind")
+
+[node name="Indicator3" type="Sprite2D" parent="Background/LimitSeparation" unique_id=2000000013]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(27, 14)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("5_ind")
+
+[node name="Indicator4" type="Sprite2D" parent="Background/LimitSeparation" unique_id=2000000014]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(81, 14)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("5_ind")
+
+[node name="Indicator5" type="Sprite2D" parent="Background/LimitSeparation" unique_id=2000000015]
+modulate = Color(1, 1, 1, 0.5)
+position = Vector2(135, 14)
+scale = Vector2(1.8, 1.8)
+texture = ExtResource("5_ind")
+
+[node name="GunRoot" type="Node2D" parent="Background" unique_id=2000000020]
+position = Vector2(278, -125)
+
+[node name="GunSprite" type="Sprite2D" parent="Background/GunRoot" unique_id=2000000022]
+texture_filter = 1
+position = Vector2(-30.000008, 124.50001)
+scale = Vector2(1.133221, 1.051389)
+texture = ExtResource("7_gun")
+
+[node name="Box" type="StaticBody2D" parent="Background" unique_id=1834694706]
+position = Vector2(56, 109)
+physics_material_override = SubResource("PhysicsMaterial_surface")
+
+[node name="Interior" type="Polygon2D" parent="Background/Box" unique_id=1256514770]
+position = Vector2(8, -5)
+color = Color(0.24, 0.06, 0.31, 1)
+polygon = PackedVector2Array(-174, -218, 176, -218, 176, 168, -174, 168)
+
+[node name="box_left2" type="Polygon2D" parent="Background/Box" unique_id=245031969]
+position = Vector2(14, -226)
+scale = Vector2(1, 10.75)
+color = Color(0.55, 0.45, 0.63, 1)
+polygon = PackedVector2Array(-198, 0.6511631, -166, 0.6511631, -166, 37.860466, 162, 37.860466, 162, 0.6511631, 194, 0.6511631, 194, 40.83721, -198, 40.83721)
+uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
+
+[node name="box_left3" type="Polygon2D" parent="Background/Box" unique_id=1446731219]
+position = Vector2(14, -659)
+scale = Vector2(1, 10.75)
+color = Color(0.55, 0.45, 0.63, 1)
+polygon = PackedVector2Array(-199, 34.25, -167, 36.75, -166, 37.860466, 162, 37.860466, 160, 36.75, 194.5, 35.75, 194, 40.83721, -198, 40.83721)
+uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
+
+[node name="collision_left" type="CollisionPolygon2D" parent="Background/Box" unique_id=679050946]
+position = Vector2(8, -3)
+scale = Vector2(7.6547318, 8.198811)
+polygon = PackedVector2Array(-25.082527, -26.711191, -25.082527, 25.979378, 26.127628, 25.979378, 26.127628, -26.711191, 21.947208, -26.711191, 21.947208, 22.076374, -20.902105, 22.076374, -20.902105, -26.711191)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Box" unique_id=1674366771]
+visible = false
+position = Vector2(-216, 8)
+shape = SubResource("Rect_wall")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="Background/Box" unique_id=2075804523]
+visible = false
+position = Vector2(248, 4)
+shape = SubResource("Rect_wall")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="Background/Box" unique_id=145636898]
+visible = false
+position = Vector2(33.5, 224)
+shape = SubResource("Rect_floor")
+
+[node name="PlatformsRoot" type="Node2D" parent="Background/Box" unique_id=1891343077]
+position = Vector2(8, -5)
+
+[node name="BallDropLine" type="Node2D" parent="Background/Box" unique_id=1891343078]
+position = Vector2(8, -205)
+
+[node name="LineVisual" type="Line2D" parent="Background/Box/BallDropLine" unique_id=1891343079]
+visible = false
+points = PackedVector2Array(-158, 0, 158, 0)
+width = 2.0
+default_color = Color(1, 0.92, 0.35, 0.45)
+
+[node name="Left" type="Marker2D" parent="Background/Box/BallDropLine" unique_id=795204429]
+position = Vector2(-158, 0)
+
+[node name="Right" type="Marker2D" parent="Background/Box/BallDropLine" unique_id=226893181]
+position = Vector2(158, 0)
+
+[node name="SoloTarget" type="Node2D" parent="Background/Box" unique_id=2000000030]
+z_index = 4
+position = Vector2(8, -260)
+script = ExtResource("8_solo")
+
+[node name="ShootFX" type="Node2D" parent="." unique_id=2100000001]
+z_index = 40
+
+[node name="Laser" type="Line2D" parent="ShootFX" unique_id=2100000002]
+width = 3.5
+default_color = Color(1, 0.88, 0.28, 0)
+
+[node name="Crosshair" type="Sprite2D" parent="ShootFX" unique_id=2100000003]
+visible = false
+z_index = 2
+texture_filter = 1
+scale = Vector2(0.14, 0.14)
+texture = ExtResource("6_tgt")
+
+[node name="PlinkoUI" type="CanvasLayer" parent="." unique_id=2035155398]
+layer = 10
+
+[node name="EarningsLabel" type="Label" parent="PlinkoUI" unique_id=1058605835]
+offset_left = 24.0
+offset_top = 16.0
+offset_right = 350.0
+offset_bottom = 44.0
+theme_override_colors/font_color = Color(1, 0.84, 0, 1)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 18
+text = "Plinko"
+
+[node name="CostLabel" type="Label" parent="PlinkoUI" unique_id=1088990633]
+offset_left = 24.0
+offset_top = 48.0
+offset_right = 350.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(0.6, 0.55, 0.7, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 10
+text = "Drops left: 3 / 3"
+
+[node name="LeaveButton" type="TextureButton" parent="PlinkoUI" unique_id=8619646]
+offset_left = 24.0
+offset_top = 570.0
+offset_right = 184.0
+offset_bottom = 620.0
+texture_normal = ExtResource("3_btn")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Label" type="Label" parent="PlinkoUI/LeaveButton" unique_id=534829331]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.0706, 0.0471, 0.0667, 1)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 12
+text = "Leave"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WinLabel" type="Label" parent="PlinkoUI" unique_id=2060405295]
+offset_left = 380.0
+offset_top = 62.0
+offset_right = 770.0
+offset_bottom = 86.0
+theme_override_colors/font_color = Color(1, 0.9, 0.2, 0)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 1
+
+[node name="DropHint" type="Label" parent="PlinkoUI" unique_id=259491697]
+offset_left = 192.0
+offset_top = 128.0
+offset_right = 598.0
+offset_bottom = 152.0
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_fonts/font = ExtResource("4_font")
+theme_override_font_sizes/font_size = 9
+text = "Click to drop"
+horizontal_alignment = 1
+
+[connection signal="pressed" from="PlinkoUI/LeaveButton" to="." method="_on_leave"]

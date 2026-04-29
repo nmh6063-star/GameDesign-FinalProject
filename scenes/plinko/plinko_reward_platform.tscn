@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://d0a1si0m73x0j"]
+
+[ext_resource type="Script" path="res://script/map/plinko_reward_platform.gd" id="1_script"]
+
+[sub_resource type="PhysicsMaterial" id="PlatMat"]
+bounce = 0.38
+friction = 0.42
+
+[sub_resource type="RectangleShape2D" id="BodyRect"]
+size = Vector2(52, 10)
+
+[sub_resource type="RectangleShape2D" id="ZoneRect"]
+size = Vector2(58, 14)
+
+[node name="RewardPlatform" type="StaticBody2D"]
+physics_material_override = SubResource("PlatMat")
+script = ExtResource("1_script")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("BodyRect")
+
+[node name="Vis" type="Polygon2D" parent="."]
+color = Color(0.55, 0.45, 0.65, 1)
+polygon = PackedVector2Array(-26, -5, 26, -5, 26, 5, -26, 5)
+
+[node name="ValueLabel" type="Label" parent="."]
+z_index = 2
+offset_left = -9.0
+offset_top = -7.0
+offset_right = 9.0
+offset_bottom = 7.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 9
+theme_override_constants/outline_size = 1
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HitZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+
+[node name="ZoneShape" type="CollisionShape2D" parent="HitZone"]
+position = Vector2(0, -2)
+shape = SubResource("ZoneRect")

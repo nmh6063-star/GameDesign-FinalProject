@@ -1,0 +1,69 @@
+[gd_scene load_steps=5 format=3 uid="uid://bobstaclehybrid"]
+
+[ext_resource type="PackedScene" path="res://scenes/plinko/plinko_peg.tscn" id="1_peg"]
+[ext_resource type="Script" path="res://script/map/plinko_moving_shelf.gd" id="2_shelf"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_plat"]
+bounce = 0.3
+friction = 0.42
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf"]
+size = Vector2(72, 12)
+
+[node name="ObstacleHybrid" type="Node2D"]
+
+[node name="Peg" parent="." instance=ExtResource("1_peg")]
+position = Vector2(-48, -130)
+
+[node name="Peg2" parent="." instance=ExtResource("1_peg")]
+position = Vector2(0, -130)
+
+[node name="Peg3" parent="." instance=ExtResource("1_peg")]
+position = Vector2(48, -130)
+
+[node name="Peg4" parent="." instance=ExtResource("1_peg")]
+position = Vector2(-72, -95)
+
+[node name="Peg5" parent="." instance=ExtResource("1_peg")]
+position = Vector2(72, -95)
+
+[node name="Peg6" parent="." instance=ExtResource("1_peg")]
+position = Vector2(0, -60)
+
+[node name="SmallSweeper" type="StaticBody2D" parent="."]
+position = Vector2(0, -22)
+physics_material_override = SubResource("PhysicsMaterial_plat")
+script = ExtResource("2_shelf")
+travel_pixels = 62.0
+period_seconds = 2.1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SmallSweeper"]
+shape = SubResource("RectangleShape2D_shelf")
+
+[node name="Vis" type="Polygon2D" parent="SmallSweeper"]
+color = Color(0.45, 0.72, 0.55, 1)
+polygon = PackedVector2Array(-36, -6, 36, -6, 36, 6, -36, 6)
+
+[node name="DeflectorL" type="StaticBody2D" parent="."]
+position = Vector2(-88, 8)
+rotation = 0.38
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeflectorL"]
+shape = SubResource("RectangleShape2D_shelf")
+
+[node name="Vis" type="Polygon2D" parent="DeflectorL"]
+color = Color(0.5, 0.45, 0.6, 1)
+polygon = PackedVector2Array(-36, -6, 36, -6, 36, 6, -36, 6)
+
+[node name="DeflectorR" type="StaticBody2D" parent="."]
+position = Vector2(88, 8)
+rotation = -0.38
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeflectorR"]
+shape = SubResource("RectangleShape2D_shelf")
+
+[node name="Vis" type="Polygon2D" parent="DeflectorR"]
+color = Color(0.5, 0.45, 0.6, 1)
+polygon = PackedVector2Array(-36, -6, 36, -6, 36, 6, -36, 6)

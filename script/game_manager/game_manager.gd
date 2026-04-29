@@ -7,7 +7,7 @@ const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
-const EVENT_SCENE_PATH := "res://scenes/event_room.tscn"
+const EVENT_SCENE_PATH := "res://scenes/plinko_room.tscn"
 const MENU_SCENE_PATH := "res://scenes/menu_screen.tscn"
 const PAUSE_MENU_SCENE := preload("res://scenes/pause_menu.tscn")
 
@@ -329,9 +329,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.keycode == KEY_P and scene.scene_file_path in _ROOM_SCENES:
 		complete_current_room()
 		return
+	if event.keycode == KEY_L:
+		_debug_enter_event_room()
+		return
 	if event.keycode == KEY_6:
 		get_tree().change_scene_to_file(CAMPFIRE_SCENE_PATH)
 	elif event.keycode == KEY_7:
 		get_tree().change_scene_to_file(SHOP_SCENE_PATH)
 	elif event.keycode == KEY_T:
 		PlayerState.apply_test_current_abilities_set()
+
+
+func _debug_enter_event_room() -> void:
+	# Dev shortcut: jump directly into an event room.
+	_save_room_entry_state(EVENT_SCENE_PATH)
+	_change_scene(EVENT_SCENE_PATH)

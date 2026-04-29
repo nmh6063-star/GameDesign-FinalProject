@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_peg"]
+bounce = 0.55
+friction = 0.25
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_peg"]
+radius = 5.5
+
+[node name="Peg" type="StaticBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_peg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_peg")
+
+[node name="Vis" type="Polygon2D" parent="."]
+color = Color(0.88, 0.84, 0.95, 1)
+polygon = PackedVector2Array(-6, 0, 0, -6, 6, 0, 0, 6)

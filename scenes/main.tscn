@@ -374,7 +374,6 @@ offset_left = 22.0
 offset_top = 410.0
 offset_right = 114.0
 offset_bottom = 450.0
-mouse_filter = 0
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 10
 text = "I"
