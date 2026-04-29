@@ -323,8 +323,9 @@ func tick_enemy_burn(delta: float) -> void:
 		st["burn_accum"] = float(st.get("burn_accum", 0.0)) + maxf(0.0, delta)
 		while float(st.get("burn_accum", 0.0)) >= 1.0 and int(st.get("burn_stack", 0)) > 0:
 			st["burn_accum"] -= 1.0
-			_damage_enemy_dot(1, enemy)
-			st["burn_stack"] = max(0, int(st.get("burn_stack", 0)) - 1)
+			var burn_stacks := int(st.get("burn_stack", 0))
+			_damage_enemy_dot(burn_stacks, enemy)
+			st["burn_stack"] = burn_stacks - 1
 
 
 ## Poison fires before each enemy attack (1 dmg, 1 stack consumed).
@@ -333,9 +334,10 @@ func on_enemy_attack_started(enemy: EnemyBase) -> bool:
 	var st := status_for_enemy(enemy)
 	if now_ms() <= int(st.get("freeze_until_ms", 0)):
 		return false
-	if int(st.get("poison_stack", 0)) > 0:
-		_damage_enemy_dot(1, enemy)
-		st["poison_stack"] = max(0, int(st.get("poison_stack", 0)) - 1)
+	var poison_stacks := int(st.get("poison_stack", 0))
+	if poison_stacks > 0:
+		_damage_enemy_dot(poison_stacks, enemy)
+		st["poison_stack"] = poison_stacks - 1
 	return true
 
 
