@@ -132,7 +132,6 @@ position = Vector2(248, 0)
 z_index = 1
 
 [node name="BallPlaceholder" type="RigidBody2D" parent="BallHolder" unique_id=1860811736]
-visible = false
 position = Vector2(0, -83)
 physics_material_override = SubResource("PhysicsMaterial_ball")
 gravity_scale = 0.0
@@ -165,6 +164,10 @@ text = "[b]1[/b]"
 scroll_active = false
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Base" type="Sprite2D" parent="BallHolder/BallPlaceholder" unique_id=624719255]
+
+[node name="Overlay" type="Sprite2D" parent="BallHolder/BallPlaceholder" unique_id=1029566699]
 
 [node name="LineIndicator" type="Node2D" parent="BallHolder" unique_id=692861044]
 position = Vector2(0, -35)

@@ -2,6 +2,8 @@
 
 [ext_resource type="Script" uid="uid://dfh4q81857jie" path="res://script/battle/controllers/reward_selection_controller.gd" id="1_reward"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_font"]
+[ext_resource type="Texture2D" uid="uid://g544ja0q2f08" path="res://assets/ball_sprites/skull.png" id="3_fp3ql"]
+[ext_resource type="Texture2D" uid="uid://pfgn8y6e7r7d" path="res://assets/ball_sprites/hit.png" id="4_om2c2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_outer"]
 bg_color = Color(0.22, 0.14, 0.32, 1)
@@ -329,7 +331,6 @@ theme_override_font_sizes/font_size = 16
 text = "7"
 
 [node name="RewardsRow" type="HBoxContainer" parent="Overlay/Card/SelectionPanel" unique_id=428217110]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -389,6 +390,36 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0/Margin/VBox/Orb" unique_id=944992831]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_fp3ql")
+
+[node name="TextureRect2" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0/Margin/VBox/Orb" unique_id=339568263]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_om2c2")
+
 [node name="RewardCard1" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=829177488]
 custom_minimum_size = Vector2(180, 220)
 layout_mode = 2
@@ -435,6 +466,36 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
+[node name="TextureRect3" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1/Margin/VBox/Orb" unique_id=205003273]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_fp3ql")
+
+[node name="TextureRect4" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1/Margin/VBox/Orb" unique_id=1938322146]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_om2c2")
+
 [node name="RewardCard2" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=1556927840]
 custom_minimum_size = Vector2(180, 220)
 layout_mode = 2
@@ -480,6 +541,36 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_orb")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
+
+[node name="TextureRect5" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2/Margin/VBox/Orb" unique_id=1671589875]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_fp3ql")
+
+[node name="TextureRect6" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2/Margin/VBox/Orb" unique_id=1411068222]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -25.0
+offset_top = -25.0
+offset_right = 25.0
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("4_om2c2")
 
 [node name="RewardCard3" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=165029589]
 visible = false
@@ -546,8 +637,8 @@ text = "Next"
 [node name="HoverTip" type="Panel" parent="Overlay" unique_id=1511428514]
 visible = false
 z_index = 50
-layout_mode = 0
 custom_minimum_size = Vector2(300, 200)
+layout_mode = 0
 offset_right = 300.0
 offset_bottom = 200.0
 mouse_filter = 2

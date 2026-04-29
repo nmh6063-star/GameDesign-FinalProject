@@ -14,25 +14,25 @@
 
   * Apply **Poison** to all targeted enemies with:
 
-    * **10 stacks**
-    * **1 strength**
+	* **10 stacks**
+	* **1 strength**
   * While Poison is active:
 
-    * Enemy takes damage every second equal to current **Poison strength**.
-    * Poison stacks are consumed over time during ticking.
+	* Enemy takes damage every second equal to current **Poison strength**.
+	* Poison stacks are consumed over time during ticking.
   * If stacks reach 0, Poison ends.
 
 * **Ember**
 
   * Apply **Burn** to all targeted enemies with:
 
-    * **10 stacks**
-    * **2 strength**
+	* **10 stacks**
+	* **2 strength**
   * Burn only triggers when the enemy performs an attack.
   * Each trigger:
 
-    * Enemy takes damage equal to Burn strength.
-    * Consume Burn stack(s).
+	* Enemy takes damage equal to Burn strength.
+	* Consume Burn stack(s).
   * Burn ends when stacks reach 0.
 
 * **Guard**
@@ -46,8 +46,8 @@
 
   * On use, roll 50% chance:
 
-    * Success: deal **5 damage**
-    * Failure: deal **1 damage**
+	* Success: deal **5 damage**
+	* Failure: deal **1 damage**
 
 * **Refresh**
 
@@ -66,22 +66,22 @@
   * Heal **25% of missing HP**.
   * Example:
 
-    * Max HP = 100
-    * Current HP = 60
-    * Missing HP = 40
-    * Heal = 10
+	* Max HP = 100
+	* Current HP = 60
+	* Missing HP = 40
+	* Heal = 10
 
 * **Frost Touch**
 
   * Apply **Freeze** with:
 
-    * **5 stacks**
+	* **5 stacks**
   * While Freeze is active:
 
-    * Enemy action timer is paused.
+	* Enemy action timer is paused.
   * Every time the player drops one ball:
 
-    * Consume 1 Freeze stack.
+	* Consume 1 Freeze stack.
   * Freeze ends when stacks reach 0.
 
 * **Iron Guard**
@@ -94,8 +94,8 @@
   * Perform 3 separate hits.
   * Each hit:
 
-    * Randomly choose an enemy.
-    * Deal **5 damage**.
+	* Randomly choose an enemy.
+	* Deal **5 damage**.
   * Same enemy may be chosen multiple times unless restricted by implementation.
 
 * **Scatter Drop**
@@ -103,32 +103,32 @@
   * Spawn/drop **2 random balls** into the box.
   * Eligible ball ranks:
 
-    * Rank 1
-    * Rank 2
-    * Rank 3
+	* Rank 1
+	* Rank 2
+	* Rank 3
 
 * **Critical Strike**
 
   * 50% chance:
 
-    * Deal **5 damage to all enemies**
+	* Deal **5 damage to all enemies**
   * Otherwise:
 
-    * Deal **5 damage to one enemy**
+	* Deal **5 damage to one enemy**
 
 * **Pollution**
 
   * If target enemy currently has Poison:
 
-    * Double current Poison **strength**
+	* Double current Poison **strength**
   * Poison stacks remain unchanged unless otherwise designed.
 
 * **FireBurn**
 
   * Apply Burn with:
 
-    * **10 stacks**
-    * **5 strength**
+	* **10 stacks**
+	* **5 strength**
   * Burn triggers whenever enemy attacks.
 
 ---
@@ -143,23 +143,23 @@
 
   * Apply Poison:
 
-    * **30 stacks**
-    * **1 strength**
+	* **30 stacks**
+	* **1 strength**
 
 * **Fireball**
 
   * Deal **5 direct damage**
   * Apply Burn:
 
-    * **5 stacks**
-    * **10 strength**
+	* **5 stacks**
+	* **10 strength**
 
 * **Ice Lance**
 
   * Deal **5 direct damage**
   * Apply Freeze:
 
-    * **5 stacks**
+	* **5 stacks**
 
 * **Reinforce**
 
@@ -176,24 +176,24 @@
   * Repeat the most recently resolved damage + effect ability.
   * Should copy:
 
-    * damage value
-    * status effects
-    * targeting logic if desired
+	* damage value
+	* status effects
+	* targeting logic if desired
   * If no previous valid ability exists:
 
-    * either fail gracefully or do nothing.
+	* either fail gracefully or do nothing.
 
 * **Charm**
 
   * Apply Charm:
 
-    * **5 stacks**
+	* **5 stacks**
   * For enemy’s next 5 attacks:
 
-    * Enemy attacks a random enemy unit instead of player.
+	* Enemy attacks a random enemy unit instead of player.
   * If no other enemy exists:
 
-    * Attack is redirected back to player.
+	* Attack is redirected back to player.
   * Consume 1 Charm stack per enemy attack.
 
 ---
@@ -213,7 +213,7 @@
   * Create delayed effect.
   * After **10 seconds**:
 
-    * Deal **50 damage to all enemies**.
+	* Deal **50 damage to all enemies**.
 
 * **Chain Spark**
 
@@ -234,10 +234,10 @@
   * Create hazard zone inside box.
   * Any ball passing through / shot from zone gains:
 
-    * Poison:
+	* Poison:
 
-      * **10 stacks**
-      * **2 strength**
+	  * **10 stacks**
+	  * **2 strength**
 
 ---
 
@@ -247,17 +247,17 @@
 
   * Randomly choose one damage value:
 
-    * 5
-    * 10
-    * 20
-    * 100
+	* 5
+	* 10
+	* 20
+	* 100
   * Deal chosen damage to target.
 
 * **Freeze Wave**
 
   * Apply Freeze:
 
-    * **5 stacks**
+	* **5 stacks**
   * Affect all enemies.
 
 * **Giant Orb**
@@ -265,9 +265,9 @@
   * Randomly choose one ball currently inside box.
   * Chosen ball gains:
 
-    * **x2 attack multiplier**
-    * On hit, damage/effects trigger **2 times**
-    * Visual size becomes **x3**
+	* **x2 attack multiplier**
+	* On hit, damage/effects trigger **2 times**
+	* Visual size becomes **x3**
 
 * **Consume Core**
 
@@ -278,23 +278,23 @@
 
   * In a small area inside box:
 
-    * Upgrade random ball(s) by +1 rank.
+	* Upgrade random ball(s) by +1 rank.
 
 * **Poison Rain**
 
   * Apply Poison to all enemies:
 
-    * **20 stacks**
-    * **1 strength**
+	* **20 stacks**
+	* **1 strength**
 
 * **Time Drift**
 
   * Slow game time for **10 seconds**.
   * Recommended to affect:
 
-    * enemy timers
-    * movement speed
-    * projectile speed
+	* enemy timers
+	* movement speed
+	* projectile speed
 
 ---
 
@@ -314,9 +314,9 @@
   * Spawn **5 random balls** into box.
   * Eligible ranks:
 
-    * Rank 1
-    * Rank 2
-    * Rank 3
+	* Rank 1
+	* Rank 2
+	* Rank 3
   * Consume **1 mana**.
 
 * **Overcharge**
@@ -331,7 +331,7 @@
 
   * For next **20 seconds**:
 
-    * Reflect all enemy direct damage.
+	* Reflect all enemy direct damage.
   * Does not reflect status effects unless explicitly added.
 
 * **Giant Core**
@@ -339,9 +339,9 @@
   * Choose one ball inside box.
   * Ball gains:
 
-    * **x3 attack**
-    * Damage/effect triggers twice
-    * Visual size x3
+	* **x3 attack**
+	* Damage/effect triggers twice
+	* Visual size x3
 
 ---
 
@@ -360,7 +360,7 @@
   * Passive or instant-use depending system design.
   * If player dies:
 
-    * Revive with low HP.
+	* Revive with low HP.
   * Cannot stack multiple Resurrection effects.
 
 * **Time Stop**
@@ -378,25 +378,25 @@
 
   * Poison enchant:
 
-    * 10 stacks
-    * 2 strength
+	* 10 stacks
+	* 2 strength
 
   * Fire enchant:
 
-    * 5 stacks
-    * 5 strength
+	* 5 stacks
+	* 5 strength
 
   * Ice enchant:
 
-    * 5 Freeze stacks
+	* 5 Freeze stacks
 
 * **Miracle Cascade**
 
   * Trigger random effects based on Rank:
 
-    * Rank 3 effect
-    * Rank 4 effect
-    * Rank 5 effect
+	* Rank 3 effect
+	* Rank 4 effect
+	* Rank 5 effect
   * Can include damage and status effects.
 
 * **Sacrifice Nova**
@@ -404,10 +404,10 @@
   * Immediately lose **50% current HP**.
   * After **10 seconds**:
 
-    * Deal **500 damage to all enemies**.
+	* Deal **500 damage to all enemies**.
 
 * **1 Shower**
 
   * For **30 seconds**:
 
-    * Continuously spawn Rank 1 balls into box at intervals.
+	* Continuously spawn Rank 1 balls into box at intervals.
