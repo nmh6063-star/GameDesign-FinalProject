@@ -214,5 +214,24 @@ RANK 7
   Resurrection, Miracle Cascade, Sacrifice Nova — unchanged
 
 ================================================================================
+CHANGE 2 — Poison & Burn damage now scales with current stack count
+Apr 29, 2026
+================================================================================
+
+  Poison (updated):
+    Before : Deals 1 damage before each enemy attack, loses 1 stack per attack.
+    After  : Deals [current stack count] damage before each enemy attack,
+             then reduces stacks by 1.
+             Example (15 stacks): 15 → 14 → 13 → ... → 1 = 120 total damage.
+
+  Burn (updated):
+    Before : Deals 1 damage every second, loses 1 stack per second.
+    After  : Deals [current stack count] damage every second,
+             then reduces stacks by 1.
+             Example (3 stacks): 3 → 2 → 1 = 6 total damage over 3 seconds.
+
+  Freeze — unchanged (each stack = 1 second, no damage).
+
+================================================================================
 END
 ================================================================================
