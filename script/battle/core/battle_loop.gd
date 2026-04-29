@@ -177,6 +177,8 @@ func _try_use_special_slot(index: int) -> bool:
 
 
 func _can_enter_action_mode() -> bool:
+	if int(_context.player_statuses.get("freeze_stacks", 0)) > 0:
+		return false
 	if _context.can_shoot():
 		return true
 	for item in _special_slot_entries():
@@ -414,6 +416,7 @@ func _begin_stage() -> void:
 		_on_ball_dropped,
 		BattleLoadout.queue_ball_pool_ids()
 	)
+	_override_enemy_ids_from_stage()
 	_spawn_enemies()
 	_target.z_index = 999
 	_hud.clear_result()
@@ -427,6 +430,12 @@ func _begin_stage() -> void:
 
 func _on_ball_dropped() -> void:
 	_context.consume_freeze_on_ball_drop()
+	var burn := int(_context.player_statuses.get("burn_stacks", 0))
+	if burn > 0:
+		damage_player(burn * 3)
+	var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
+	if freeze > 0:
+		_context.player_statuses["freeze_stacks"] = freeze - 1
 	_complete_turn_after_drop()
 
 
@@ -679,6 +688,21 @@ func _enemy_id_for_slot(spawn: Marker2D) -> String:
 	if spawn == null or not spawn.name.begins_with("EnemySpawn_"):
 		return ""
 	return spawn.name.trim_prefix("EnemySpawn_")
+
+
+func _override_enemy_ids_from_stage() -> void:
+	var gm := _game_manager()
+	if gm == null or not gm.has_method("get_stage_enemy_ids"):
+		return
+	var room = gm.active_room() if gm.has_method("active_room") else null
+	var row := 0
+	if room != null:
+		var r = room.get("row")
+		if r != null:
+			row = int(r)
+	var ids: Array = gm.get_stage_enemy_ids(row)
+	for i in range(mini(ids.size(), _enemy_slots.size())):
+		_enemy_slots[i]._enemy_id = ids[i]
 
 
 func _game_manager() -> Node:

@@ -25,6 +25,8 @@ var player_statuses := {
 	"reflect_until_ms": 0,
 	"resurrect_ready": false,
 	"resurrect_used": false,
+	"burn_stacks": 0,
+	"freeze_stacks": 0,
 }
 var battle_flags := {
 	"last_damage": 0,
@@ -62,6 +64,8 @@ func reset_for_battle() -> void:
 		"reflect_until_ms": 0,
 		"resurrect_ready": false,
 		"resurrect_used": false,
+		"burn_stacks": 0,
+		"freeze_stacks": 0,
 	}
 	battle_flags = {
 		"last_damage": 0,
