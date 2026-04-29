@@ -17,6 +17,8 @@ var battle_result_text := ""
 var slow_mo_active := false
 var combo := 0
 var combo_timer := 0.0
+var burn_stacks := 0
+var freeze_stacks := 0
 
 
 func _init(p_controller = null) -> void:
@@ -34,6 +36,8 @@ func reset_for_battle() -> void:
 	slow_mo_active = false
 	combo = 0
 	combo_timer = 0.0
+	burn_stacks = 0
+	freeze_stacks = 0
 
 
 func start_turn() -> void:

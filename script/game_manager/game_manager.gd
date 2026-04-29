@@ -5,6 +5,7 @@ const MapGenerator := preload("res://script/map/map_generator.gd")
 
 const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
+const BATTLE_STAGE2_SCENE_PATH := "res://scenes/stage2.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
 const EVENT_SCENE_PATH := "res://scenes/event_room.tscn"
@@ -250,6 +251,8 @@ func _scene_for_room(room) -> String:
 		MapGenerator.Room.Type.EVENT:
 			return EVENT_SCENE_PATH
 		_:
+			if room.row >= 1:
+				return BATTLE_STAGE2_SCENE_PATH
 			return BATTLE_SCENE_PATH
 
 

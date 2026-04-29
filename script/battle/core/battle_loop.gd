@@ -161,6 +161,8 @@ func _try_use_special_slot(index: int) -> bool:
 
 
 func _can_enter_action_mode() -> bool:
+	if _context.freeze_stacks > 0:
+		return false
 	if _context.can_shoot():
 		return true
 	for item in _special_slot_entries():
@@ -386,6 +388,10 @@ func _begin_stage() -> void:
 
 
 func _on_ball_dropped() -> void:
+	if _context.burn_stacks > 0:
+		damage_player(_context.burn_stacks * 3)
+	if _context.freeze_stacks > 0:
+		_context.freeze_stacks -= 1
 	_complete_turn_after_drop()
 
 
