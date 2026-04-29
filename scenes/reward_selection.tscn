@@ -1,56 +1,103 @@
 [gd_scene format=3 uid="uid://fwvlxgv10w5a"]
 
-[ext_resource type="Script" path="res://script/battle/controllers/reward_selection_controller.gd" id="1_reward"]
-
+[ext_resource type="Script" uid="uid://dfh4q81857jie" path="res://script/battle/controllers/reward_selection_controller.gd" id="1_reward"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_font"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card"]
-bg_color = Color(0.15, 0.08, 0.2, 0.92)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_card_outer"]
+bg_color = Color(0.22, 0.14, 0.32, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.45, 0.35, 0.6, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_transparent"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rank_bar"]
+bg_color = Color(0.32, 0.3, 0.36, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_selection"]
+bg_color = Color(0.96, 0.9, 0.72, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.55, 0.45, 0.25, 1)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward_idle"]
+bg_color = Color(0.98, 0.94, 0.82, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.6, 0.5, 0.35, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward_sel"]
+bg_color = Color(1, 0.93, 0.85, 1)
 border_width_left = 4
 border_width_top = 4
 border_width_right = 4
 border_width_bottom = 4
-border_color = Color(0.95, 0.95, 0.95, 1)
-corner_radius_top_left = 24
-corner_radius_top_right = 24
-corner_radius_bottom_right = 24
-corner_radius_bottom_left = 24
+border_color = Color(0.9, 0.15, 0.12, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_slot"]
-bg_color = Color(0.28, 0.2, 0.35, 0.94)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_reward_hover"]
+bg_color = Color(1, 0.96, 0.88, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
 border_width_bottom = 3
-border_color = Color(0.93, 0.93, 0.93, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+border_color = Color(0.85, 0.2, 0.2, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_popup"]
-bg_color = Color(0.95, 0.95, 0.95, 0.96)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.08, 0.08, 0.08, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_orb"]
+bg_color = Color(0.75, 0.72, 0.78, 1)
+corner_radius_top_left = 999
+corner_radius_top_right = 999
+corner_radius_bottom_right = 999
+corner_radius_bottom_left = 999
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_continue"]
-bg_color = Color(0.9, 0.22, 0.12, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_next"]
+bg_color = Color(0.88, 0.18, 0.14, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_hover_tip"]
+bg_color = Color(0.97, 0.84, 0.77, 1)
 corner_radius_top_left = 16
 corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[node name="RewardSelection" type="CanvasLayer" unique_id=1144266803]
+[node name="RewardSelection" type="CanvasLayer" unique_id=1922404331]
+layer = 110
 script = ExtResource("1_reward")
 
-[node name="Overlay" type="Control" parent="." unique_id=134457163]
+[node name="Overlay" type="Control" parent="." unique_id=79273587]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -58,204 +105,480 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Dim" type="ColorRect" parent="Overlay" unique_id=960938994]
+[node name="Dim" type="ColorRect" parent="Overlay" unique_id=1233593701]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.05, 0.03, 0.07, 0.84)
+color = Color(0.05, 0.03, 0.09, 0.82)
 
-[node name="Card" type="Panel" parent="Overlay" unique_id=1095318581]
-layout_mode = 0
-offset_left = 84.0
-offset_top = 48.0
-offset_right = 1068.0
-offset_bottom = 600.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_card")
+[node name="Card" type="Panel" parent="Overlay" unique_id=226833134]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -480.0
+offset_top = -350.0
+offset_right = 480.0
+offset_bottom = 350.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_card_outer")
 
-[node name="Title" type="Label" parent="Overlay/Card" unique_id=984669423]
+[node name="Title" type="Label" parent="Overlay/Card" unique_id=1208009457]
 layout_mode = 0
-offset_top = 28.0
-offset_right = 984.0
-offset_bottom = 68.0
+offset_left = 24.0
+offset_top = 34.0
+offset_right = 912.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(0.95, 0.92, 1, 1)
 theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 24
-text = "Rewards"
+theme_override_font_sizes/font_size = 22
+text = "Reward selection"
 horizontal_alignment = 1
 
-[node name="Slots" type="HBoxContainer" parent="Overlay/Card" unique_id=1751014464]
+[node name="CollectionButton" type="Button" parent="Overlay/Card" unique_id=1602895721]
 layout_mode = 0
-offset_left = 36.0
-offset_top = 110.0
+offset_left = 820.0
+offset_top = 12.0
 offset_right = 948.0
-offset_bottom = 350.0
-theme_override_constants/separation = 18
+offset_bottom = 48.0
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 10
+text = "Collection"
+
+[node name="TopBar" type="Panel" parent="Overlay/Card" unique_id=278389709]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 88.0
+offset_right = 928.0
+offset_bottom = 272.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_transparent")
+
+[node name="Background" type="Panel" parent="Overlay/Card/TopBar" unique_id=1534451128]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_rank_bar")
+
+[node name="RankOrbs" type="HBoxContainer" parent="Overlay/Card/TopBar" unique_id=1671920418]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
 alignment = 1
 
-[node name="Slot0" type="Button" parent="Overlay/Card/Slots" unique_id=1427334281]
-custom_minimum_size = Vector2(168, 220)
+[node name="RankBall1" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1834685346]
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
-theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
-theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="Overlay/Card/Slots/Slot0" unique_id=2051471902]
-position = Vector2(84, 92)
-
-[node name="Name" type="Label" parent="Overlay/Card/Slots/Slot0" unique_id=1931577284]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 166.0
-offset_right = 158.0
-offset_bottom = 212.0
+size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
+text = "1"
 
-[node name="Slot1" type="Button" parent="Overlay/Card/Slots" unique_id=1542356657]
-custom_minimum_size = Vector2(168, 220)
+[node name="RankBall2" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=2057946245]
+custom_minimum_size = Vector2(65, 65)
 layout_mode = 2
-size_flags_horizontal = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
-theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
-theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="Overlay/Card/Slots/Slot1" unique_id=885822603]
-position = Vector2(84, 92)
-
-[node name="Name" type="Label" parent="Overlay/Card/Slots/Slot1" unique_id=140388406]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 166.0
-offset_right = 158.0
-offset_bottom = 212.0
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="Slot2" type="Button" parent="Overlay/Card/Slots" unique_id=1899083382]
-custom_minimum_size = Vector2(168, 220)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
-theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
-theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="Overlay/Card/Slots/Slot2" unique_id=1004940602]
-position = Vector2(84, 92)
-
-[node name="Name" type="Label" parent="Overlay/Card/Slots/Slot2" unique_id=1590962422]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 166.0
-offset_right = 158.0
-offset_bottom = 212.0
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="Slot3" type="Button" parent="Overlay/Card/Slots" unique_id=1405221449]
-custom_minimum_size = Vector2(168, 220)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
-theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
-theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="Overlay/Card/Slots/Slot3" unique_id=1386021102]
-position = Vector2(84, 92)
-
-[node name="Name" type="Label" parent="Overlay/Card/Slots/Slot3" unique_id=412492413]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 166.0
-offset_right = 158.0
-offset_bottom = 212.0
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="Slot4" type="Button" parent="Overlay/Card/Slots" unique_id=749463718]
-custom_minimum_size = Vector2(168, 220)
-layout_mode = 2
-size_flags_horizontal = 4
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_styles/normal = SubResource("StyleBoxFlat_slot")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_slot")
-theme_override_styles/hover = SubResource("StyleBoxFlat_slot")
-theme_override_styles/disabled = SubResource("StyleBoxFlat_slot")
-theme_override_styles/focus = SubResource("StyleBoxFlat_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="Overlay/Card/Slots/Slot4" unique_id=172586793]
-position = Vector2(84, 92)
-
-[node name="Name" type="Label" parent="Overlay/Card/Slots/Slot4" unique_id=432667450]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 166.0
-offset_right = 158.0
-offset_bottom = 212.0
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 11
-horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 2
-
-[node name="DescriptionPopup" type="Panel" parent="Overlay/Card" unique_id=1715444515]
-visible = false
-layout_mode = 0
-offset_left = 112.0
-offset_top = 390.0
-offset_right = 872.0
-offset_bottom = 476.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_popup")
-
-[node name="Description" type="Label" parent="Overlay/Card/DescriptionPopup" unique_id=1576660163]
-layout_mode = 0
-offset_left = 18.0
-offset_top = 16.0
-offset_right = 742.0
-offset_bottom = 70.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
+size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 12
-vertical_alignment = 1
-autowrap_mode = 3
+text = "2"
 
-[node name="Continue" type="Button" parent="Overlay/Card" unique_id=120422054]
-layout_mode = 0
-offset_left = 408.0
-offset_top = 496.0
-offset_right = 580.0
-offset_bottom = 544.0
+[node name="RankBall3" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=365342912]
+custom_minimum_size = Vector2(82, 82)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 13
+text = "3"
+
+[node name="RankBall4" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1901142864]
+custom_minimum_size = Vector2(98, 98)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 14
+text = "4"
+
+[node name="RankBall5" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=47480578]
+custom_minimum_size = Vector2(114, 114)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 15
+text = "5"
+
+[node name="RankBall6" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1864321979]
+custom_minimum_size = Vector2(130, 130)
+layout_mode = 2
+size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_continue")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_continue")
-theme_override_styles/hover = SubResource("StyleBoxFlat_continue")
-theme_override_styles/focus = SubResource("StyleBoxFlat_continue")
+text = "6"
+
+[node name="RankBall7" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=19951802]
+custom_minimum_size = Vector2(148, 148)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 17
+text = "7"
+
+[node name="SelectionPanel" type="Panel" parent="Overlay/Card" unique_id=2137676088]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 284.0
+offset_right = 928.0
+offset_bottom = 622.0
+theme_override_styles/panel = SubResource("StyleBoxEmpty_transparent")
+
+[node name="Background" type="Panel" parent="Overlay/Card/SelectionPanel" unique_id=768731053]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
+
+[node name="RankPickLabel" type="Label" parent="Overlay/Card/SelectionPanel" unique_id=1644265562]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 44.0
+offset_right = 872.0
+offset_bottom = 74.0
+theme_override_colors/font_color = Color(0.2, 0.12, 0.1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 13
+text = "Pick a rank (1-7). This choice is final for this reward."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="RankPickRow" type="HBoxContainer" parent="Overlay/Card/SelectionPanel" unique_id=94966426]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 148.0
+offset_right = 776.0
+offset_bottom = 218.0
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PickRank1" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=1634212873]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "1"
+
+[node name="PickRank2" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=1257292637]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "2"
+
+[node name="PickRank3" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=771544967]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "3"
+
+[node name="PickRank4" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=343923823]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "4"
+
+[node name="PickRank5" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=338900989]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "5"
+
+[node name="PickRank6" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=2060433325]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "6"
+
+[node name="PickRank7" type="Button" parent="Overlay/Card/SelectionPanel/RankPickRow" unique_id=383277628]
+custom_minimum_size = Vector2(60, 52)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "7"
+
+[node name="RewardsRow" type="HBoxContainer" parent="Overlay/Card/SelectionPanel" unique_id=428217110]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 150.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 22
+alignment = 1
+
+[node name="RewardCard0" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=2063722228]
+custom_minimum_size = Vector2(180, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_styles/normal = SubResource("StyleBoxFlat_reward_idle")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_reward_sel")
+theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
+flat = true
+
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0" unique_id=94789400]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0/Margin" unique_id=1451461407]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0/Margin/VBox" unique_id=1756005863]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 12
+text = "Reward 1"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0/Margin/VBox" unique_id=533336823]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_orb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
+theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
+theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
+
+[node name="RewardCard1" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=829177488]
+custom_minimum_size = Vector2(180, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_styles/normal = SubResource("StyleBoxFlat_reward_idle")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_reward_sel")
+theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
+flat = true
+
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1" unique_id=755901083]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1/Margin" unique_id=1197207426]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1/Margin/VBox" unique_id=223800808]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 12
+text = "Reward 2"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1/Margin/VBox" unique_id=409183977]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_orb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
+theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
+theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
+
+[node name="RewardCard2" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=1556927840]
+custom_minimum_size = Vector2(180, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_styles/normal = SubResource("StyleBoxFlat_reward_idle")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_reward_sel")
+theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
+flat = true
+
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2" unique_id=238264363]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2/Margin" unique_id=252351767]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2/Margin/VBox" unique_id=188612053]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 12
+text = "Reward 3"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2/Margin/VBox" unique_id=534829970]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxFlat_orb")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
+theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
+theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
+
+[node name="RewardCard3" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=165029589]
+visible = false
+custom_minimum_size = Vector2(180, 220)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_styles/normal = SubResource("StyleBoxFlat_reward_idle")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_reward_sel")
+theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
+flat = true
+
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard3" unique_id=660072977]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 10
+
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard3/Margin" unique_id=1967531864]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard3/Margin/VBox" unique_id=1323147301]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 12
+text = "Reward 4"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Orb" type="Panel" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard3/Margin/VBox" unique_id=241546836]
+custom_minimum_size = Vector2(72, 72)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_orb")
+
+[node name="Next" type="Button" parent="Overlay/Card" unique_id=164586871]
+layout_mode = 0
+offset_left = 360.0
+offset_top = 638.0
+offset_right = 600.0
+offset_bottom = 688.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(0.95, 0.95, 1, 1)
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_next")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_next")
+theme_override_styles/hover = SubResource("StyleBoxFlat_next")
+theme_override_styles/focus = SubResource("StyleBoxFlat_next")
 disabled = true
-text = "continue"
+text = "Next"
+
+[node name="HoverTip" type="Panel" parent="Overlay" unique_id=1511428514]
+visible = false
+z_index = 50
+layout_mode = 0
+custom_minimum_size = Vector2(300, 200)
+offset_right = 300.0
+offset_bottom = 200.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_hover_tip")
+
+[node name="VBox" type="VBoxContainer" parent="Overlay/HoverTip" unique_id=1197813759]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 14.0
+offset_right = -16.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TipBody" type="Label" parent="Overlay/HoverTip/VBox" unique_id=800868247]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 12
+text = "Description"
+autowrap_mode = 3
+
+[node name="TipStat" type="Label" parent="Overlay/HoverTip/VBox" unique_id=2137696531]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 12
+text = "Stat"
+autowrap_mode = 2

@@ -1,10 +1,10 @@
 extends MergeRuleBase
-class_name LevelMergeRule
+class_name RankMergeRule
 
 @export var tolerance := 4.0
 
 
-func participates_in_level_merge() -> bool:
+func participates_in_rank_merge() -> bool:
 	return true
 
 
@@ -12,7 +12,7 @@ func can_merge(ctx: BattleContext, a: BallBase, b: BallBase) -> bool:
 	return (
 		a.is_elemental()
 		and b.is_elemental()
-		and a.level == b.level
+		and a.rank == b.rank
 		and ctx.are_touching(a, b, tolerance)
 		and a.rank < 7
 		and b.rank < 7

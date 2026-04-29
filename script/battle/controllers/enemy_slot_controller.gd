@@ -7,6 +7,9 @@ const DOGICA_FONT := preload("res://assets/dogica/TTF/dogicabold.ttf")
 const DAMAGE_RISE_PX := 60.0
 const DAMAGE_DURATION := 0.8
 const DAMAGE_FONT_PX := 46
+const DAMAGE_JITTER_X := 42.0
+const DAMAGE_JITTER_Y := 28.0
+const DAMAGE_RISE_JITTER_X := 26.0
 
 var _slot: Node2D
 var _spawn: Marker2D
@@ -23,6 +26,7 @@ var _damage_anchor: Marker2D
 var _attack_tooltip: Panel
 var _attack_summary_label: Label
 var _attack_damage_label: Label
+var _status_tag_label: Label
 
 var enemy: EnemyBase
 var _selected := false
@@ -78,16 +82,21 @@ func show_damage(amount: int, color: Color) -> void:
 		return
 	var floater := Label.new()
 	_damage_floaters.add_child(floater)
-	floater.position = _damage_anchor.position
+	var jitter := Vector2(
+		randf_range(-DAMAGE_JITTER_X, DAMAGE_JITTER_X),
+		randf_range(-DAMAGE_JITTER_Y, DAMAGE_JITTER_Y)
+	)
+	floater.position = _damage_anchor.position + jitter
 	floater.text = str(amount)
 	floater.modulate = color
 	floater.modulate.a = 1.0
 	floater.scale = Vector2.ONE
 	floater.add_theme_font_override("font", DOGICA_FONT)
 	floater.add_theme_font_size_override("font_size", DAMAGE_FONT_PX)
+	var rise_target := floater.position + Vector2(randf_range(-DAMAGE_RISE_JITTER_X, DAMAGE_RISE_JITTER_X), -DAMAGE_RISE_PX)
 	var tween := _slot.create_tween()
 	tween.set_parallel(true)
-	tween.tween_property(floater, "position", floater.position + Vector2(0, -DAMAGE_RISE_PX), DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "position", rise_target, DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	tween.tween_property(floater, "scale", Vector2(1.48, 1.48), DAMAGE_DURATION * 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property(floater, "modulate:a", 0.0, DAMAGE_DURATION).set_delay(DAMAGE_DURATION * 0.15)
 	tween.set_parallel(false)
@@ -129,6 +138,7 @@ func _bind_ui() -> void:
 	_attack_tooltip = _ensure_tooltip_panel()
 	_attack_summary_label = _attack_tooltip.get_node("Summary") as Label
 	_attack_damage_label = _attack_tooltip.get_node("Damage") as Label
+	_status_tag_label = _ensure_status_tag()
 
 
 func _style_ui() -> void:
@@ -200,6 +210,29 @@ func _sync_attack_tooltip() -> void:
 	_attack_tooltip.visible = _is_hovering_cooldown()
 
 
+func sync_status_tag(ctx: BattleContext) -> void:
+	if _status_tag_label == null:
+		return
+	if enemy == null or not enemy.is_alive():
+		_status_tag_label.text = ""
+		return
+	var st := ctx.status_for_enemy(enemy)
+	var tags: Array[String] = []
+	var poison := int(st.get("poison_stack", 0))
+	if poison > 0:
+		tags.append("Poison %d" % poison)
+	var burn := int(st.get("burn_stack", 0))
+	if burn > 0:
+		tags.append("Burn %d" % burn)
+	var freeze := int(st.get("freeze_stack", 0))
+	if freeze > 0:
+		tags.append("Freeze %d" % freeze)
+	var charm := int(st.get("charm_stack", 0))
+	if charm > 0:
+		tags.append("Charm %d" % charm)
+	_status_tag_label.text = " | ".join(tags)
+
+
 func _is_hovering_cooldown() -> bool:
 	var radius := float(_cooldown_ring.get("radius")) + 8.0
 	return _slot.get_global_mouse_position().distance_to(_cooldown_ring.global_position) <= radius
@@ -215,3 +248,17 @@ func _action_summary() -> String:
 	if script_path.ends_with("bomb_drop_action.gd"):
 		return "Drops a bomb into\nthe board."
 	return "Direct player\nattack."
+
+
+func _ensure_status_tag() -> Label:
+	var label := _ui_root.get_node_or_null("StatusTag") as Label
+	if label == null:
+		label = Label.new()
+		label.name = "StatusTag"
+		_ui_root.add_child(label)
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label.position = Vector2(-52, 42)
+	label.size = Vector2(180, 16)
+	label.add_theme_font_override("font", DOGICA_FONT)
+	label.add_theme_font_size_override("font_size", 8)
+	return label

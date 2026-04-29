@@ -12,23 +12,23 @@ signal tutorial_battle_finished(result_text: String)
 signal tutorial_show_hold_hint(show: bool)
 
 const TUTORIAL_BALL_SEQUENCE := [
-	{"id": "ball_normal", "level": 4},
-	{"id": "ball_normal", "level": 4},
-	{"id": "ball_normal", "level": 4},
-	{"id": "ball_normal", "level": 4},
-	{"id": "ball_normal", "level": 1},
-	{"id": "ball_normal", "level": 8},
-	{"id": "ball_normal", "level": 8},
-	{"id": "ball_normal", "level": 8},
-	{"id": "ball_normal", "level": 8},
-	{"id": "ball_normal", "level": 8},
+	{"id": "ball_normal", "rank": 4},
+	{"id": "ball_normal", "rank": 4},
+	{"id": "ball_normal", "rank": 4},
+	{"id": "ball_normal", "rank": 4},
+	{"id": "ball_normal", "rank": 1},
+	{"id": "ball_normal", "rank": 7},
+	{"id": "ball_normal", "rank": 7},
+	{"id": "ball_normal", "rank": 7},
+	{"id": "ball_normal", "rank": 7},
+	{"id": "ball_normal", "rank": 7},
 ]
 
 # MERGES_PER_MANA_PIPE is 5. Starting at 2 means the 3rd merge (8+8→16) tips
 # progress to 5 and awards exactly 1 ammo.
 const TUTORIAL_INITIAL_MERGE_PROGRESS := 2
 
-# True while the level-1 ball is in the placeholder; blocks drop and shoot input.
+# True while the rank-1 ball is in the placeholder; blocks drop and shoot input.
 var _drop_blocked := false
 # Ensures the hold-hint is only triggered once even if the sequence loops.
 var _hold_hint_shown := false
@@ -63,10 +63,10 @@ func _begin_stage() -> void:
 
 func ensure_ball_in_play() -> void:
 	super.ensure_ball_in_play()
-	# After the base spawns the ball, check if it is the level-1 hold-hint ball.
+	# After the base spawns the ball, check if it is the rank-1 hold-hint ball.
 	# Only trigger once per run (_hold_hint_shown guards against sequence repeats).
 	var ball := _context.current_ball as BallBase
-	if not _hold_hint_shown and is_instance_valid(ball) and ball.level == 1:
+	if not _hold_hint_shown and is_instance_valid(ball) and ball.rank == 1:
 		_hold_hint_shown = true
 		_drop_blocked = true
 		# Disable the ball's physics process so Input.is_action_just_pressed("drop")
@@ -99,6 +99,10 @@ func _handle_hold_input() -> void:
 		_drop_blocked = false
 		tutorial_show_hold_hint.emit(false)
 		track_ball(_context.current_ball)
+
+
+func _should_show_post_battle_reward() -> bool:
+	return false
 
 
 func _finish_battle(text: String) -> void:

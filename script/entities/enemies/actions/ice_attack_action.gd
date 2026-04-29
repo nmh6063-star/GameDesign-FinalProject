@@ -6,4 +6,4 @@ const FREEZE_DURATION := 3
 
 func execute(ctx: BattleContext, enemy: EnemyBase) -> void:
 	ctx.damage_player(enemy.data.attack_damage)
-	ctx.freeze_stacks = FREEZE_DURATION
+	ctx.player_statuses["freeze_stacks"] = FREEZE_DURATION

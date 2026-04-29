@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://plinkoball01"]
+
+[sub_resource type="PhysicsMaterial" id="BallMat"]
+bounce = 0.42
+friction = 0.35
+
+[sub_resource type="CircleShape2D" id="BallShape"]
+radius = 9.0
+
+[node name="PlinkoBall" type="RigidBody2D"]
+gravity_scale = 1.05
+continuous_cd = 1
+physics_material_override = SubResource("BallMat")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("BallShape")
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(1.0, 0.35, 0.45, 1)
+polygon = PackedVector2Array(9, 0, 8.31, 3.44, 6.36, 6.36, 3.44, 8.31, 0, 9, -3.44, 8.31, -6.36, 6.36, -8.31, 3.44, -9, 0, -8.31, -3.44, -6.36, -6.36, -3.44, -8.31, 0, -9, 3.44, -8.31, 6.36, -6.36, 8.31, -3.44)

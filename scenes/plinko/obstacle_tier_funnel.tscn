@@ -1,0 +1,85 @@
+[gd_scene load_steps=5 format=3 uid="uid://bobstacletier"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_plat"]
+bounce = 0.32
+friction = 0.45
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_top"]
+size = Vector2(72, 11)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mid"]
+size = Vector2(56, 9)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_low"]
+size = Vector2(64, 10)
+
+[node name="ObstacleTierFunnel" type="Node2D"]
+
+[node name="TopShelf" type="StaticBody2D" parent="."]
+position = Vector2(0, -138)
+rotation = 0.0
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopShelf"]
+shape = SubResource("RectangleShape2D_top")
+
+[node name="Vis" type="Polygon2D" parent="TopShelf"]
+color = Color(0.62, 0.52, 0.72, 1)
+polygon = PackedVector2Array(-36, -5, 36, -5, 36, 5, -36, 5)
+
+[node name="MidLeft" type="StaticBody2D" parent="."]
+position = Vector2(-62, -92)
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidLeft"]
+shape = SubResource("RectangleShape2D_mid")
+
+[node name="Vis" type="Polygon2D" parent="MidLeft"]
+color = Color(0.58, 0.48, 0.68, 1)
+polygon = PackedVector2Array(-28, -4, 28, -4, 28, 4, -28, 4)
+
+[node name="MidRight" type="StaticBody2D" parent="."]
+position = Vector2(62, -92)
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidRight"]
+shape = SubResource("RectangleShape2D_mid")
+
+[node name="Vis" type="Polygon2D" parent="MidRight"]
+color = Color(0.58, 0.48, 0.68, 1)
+polygon = PackedVector2Array(-28, -4, 28, -4, 28, 4, -28, 4)
+
+[node name="LowLeftTilt" type="StaticBody2D" parent="."]
+position = Vector2(-92, -38)
+rotation = 0.45
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LowLeftTilt"]
+shape = SubResource("RectangleShape2D_low")
+
+[node name="Vis" type="Polygon2D" parent="LowLeftTilt"]
+color = Color(0.52, 0.42, 0.62, 1)
+polygon = PackedVector2Array(-32, -5, 32, -5, 32, 5, -32, 5)
+
+[node name="LowCenter" type="StaticBody2D" parent="."]
+position = Vector2(0, -44)
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LowCenter"]
+shape = SubResource("RectangleShape2D_low")
+
+[node name="Vis" type="Polygon2D" parent="LowCenter"]
+color = Color(0.55, 0.45, 0.65, 1)
+polygon = PackedVector2Array(-32, -5, 32, -5, 32, 5, -32, 5)
+
+[node name="LowRightTilt" type="StaticBody2D" parent="."]
+position = Vector2(92, -38)
+rotation = -0.45
+physics_material_override = SubResource("PhysicsMaterial_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LowRightTilt"]
+shape = SubResource("RectangleShape2D_low")
+
+[node name="Vis" type="Polygon2D" parent="LowRightTilt"]
+color = Color(0.52, 0.42, 0.62, 1)
+polygon = PackedVector2Array(-32, -5, 32, -5, 32, 5, -32, 5)

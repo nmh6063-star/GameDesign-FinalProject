@@ -2,7 +2,7 @@ extends Resource
 class_name MergeRuleBase
 
 
-func participates_in_level_merge() -> bool:
+func participates_in_rank_merge() -> bool:
 	return false
 
 

@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://x1o3wvsumkfe"]
+[gd_scene format=3 uid="uid://c05de2nvcjb74"]
 
-[ext_resource type="Script" uid="uid://bvctcilcffilb" path="res://script/map/event_room.gd" id="1_script"]
+[ext_resource type="Script" path="res://script/map/event_room.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cv37c1rsrb6jg" path="res://assets/buttonTemplate.png" id="2_btn"]
 [ext_resource type="FontFile" uid="uid://bxb64wxaym54g" path="res://assets/dogica/TTF/dogicapixelbold.ttf" id="3_font"]
 

@@ -65,7 +65,7 @@ func _explode(ctx: BattleContext, source: BallBase) -> void:
 		#	victims.append(ball)
 		if ball in inRadius:
 			victims.append(ball)
-			damage += ball.level
+			damage += ball.rank
 	for ball in victims:
 		ctx.consume_ball(ball)
 	source.remove_child(inst)

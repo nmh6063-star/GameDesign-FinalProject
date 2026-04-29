@@ -9,7 +9,7 @@ func check_merge(ctx: BattleContext, other: BallBase) -> bool:
 	return rule != null and rule.can_merge(ctx, self, other)
 
 
-func merge_with(ctx: BattleContext, other: BallBase, level: float) -> void:
+func merge_with(ctx: BattleContext, other: BallBase, rank_strength: float) -> void:
 	var rule: MergeRuleBase = _merge_rule()
 	if rule == null:
 		return
@@ -17,4 +17,4 @@ func merge_with(ctx: BattleContext, other: BallBase, level: float) -> void:
 	for effect in _effects():
 		effect.on_merge(ctx, self, other)
 	ctx.register_merge()
-	ctx.burst(global_position, level)
+	ctx.burst(global_position, rank_strength)

@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=3 uid="uid://bobstaclesweep"]
+
+[ext_resource type="PackedScene" path="res://scenes/plinko/plinko_peg.tscn" id="1_peg"]
+[ext_resource type="Script" path="res://script/map/plinko_moving_shelf.gd" id="2_shelf"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_plat"]
+bounce = 0.28
+friction = 0.5
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf"]
+size = Vector2(118, 14)
+
+[node name="ObstacleMovingSweeper" type="Node2D"]
+
+[node name="Peg" parent="." instance=ExtResource("1_peg")]
+position = Vector2(-40, -135)
+
+[node name="Peg2" parent="." instance=ExtResource("1_peg")]
+position = Vector2(0, -135)
+
+[node name="Peg3" parent="." instance=ExtResource("1_peg")]
+position = Vector2(40, -135)
+
+[node name="Peg4" parent="." instance=ExtResource("1_peg")]
+position = Vector2(-70, -100)
+
+[node name="Peg5" parent="." instance=ExtResource("1_peg")]
+position = Vector2(0, -100)
+
+[node name="Peg6" parent="." instance=ExtResource("1_peg")]
+position = Vector2(70, -100)
+
+[node name="Peg7" parent="." instance=ExtResource("1_peg")]
+position = Vector2(-35, -65)
+
+[node name="Peg8" parent="." instance=ExtResource("1_peg")]
+position = Vector2(35, -65)
+
+[node name="MovingShelf" type="StaticBody2D" parent="."]
+position = Vector2(0, -18)
+physics_material_override = SubResource("PhysicsMaterial_plat")
+script = ExtResource("2_shelf")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovingShelf"]
+shape = SubResource("RectangleShape2D_shelf")
+
+[node name="Vis" type="Polygon2D" parent="MovingShelf"]
+color = Color(0.75, 0.35, 0.42, 1)
+polygon = PackedVector2Array(-59, -7, 59, -7, 59, 7, -59, 7)

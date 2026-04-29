@@ -19,7 +19,7 @@ func can_trigger(ctx: BattleContext, source: BallBase) -> bool:
 func apply(ctx: BattleContext, source: BallBase) -> void:
 	var heal_amount := 0
 	for ball in _targets(ctx, source):
-		heal_amount += ball.level
+		heal_amount += ball.rank
 		ctx.consume_ball(ball)
 	ctx.consume_ball(source)
 	ctx.heal_player(heal_amount)

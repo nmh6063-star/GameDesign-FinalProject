@@ -33,12 +33,14 @@ const DATA_BY_ID := {
 const ELEMENT_IDS: Array[String] = [
 	"normal",
 	"dark",
-	"gambler"
+	"gambler",
+	"rank"
 ]
 const ELEMENT_BY_IDS := {
 	#ELEMENT_IDS[0]: preload("res://script/entities/balls/elemental_balls/elemental_ball_base.gd"),
 	ELEMENT_IDS[1]: preload("res://script/entities/balls/elemental_balls/elemental_ball_dark.gd"),
-	ELEMENT_IDS[2]: preload("res://script/entities/balls/elemental_balls/elemental_ball_gambler.gd")
+	ELEMENT_IDS[2]: preload("res://script/entities/balls/elemental_balls/elemental_ball_gambler.gd"),
+	ELEMENT_IDS[3]: preload("res://script/entities/balls/elemental_balls/elemental_rank_abilities.gd"),
 }
 
 
