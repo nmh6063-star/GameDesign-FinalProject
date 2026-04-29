@@ -180,6 +180,14 @@ func should_skip_battle_rewards() -> bool:
 	return true
 
 
+func get_stage_enemy_ids(row: int) -> Array:
+	if row >= 7:
+		return ["enemy_small_spider", "enemy_spider_queen", "enemy_small_spider"]
+	if row >= 4:
+		return ["enemy_fire", "enemy_fire", "enemy_ice"]
+	return ["enemy1", "enemy2", ""]
+
+
 func consume_pre_map_reward_pending() -> bool:
 	var pending := _pre_map_reward_pending
 	_pre_map_reward_pending = false

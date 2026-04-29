@@ -151,7 +151,7 @@ func _on_rank_picked(rank: int) -> void:
 	var pool := RankAbilityCatalog.reward_options_for_rank(rank)
 	pool.shuffle()
 	_ability_entries = pool.slice(0, min(REWARD_SLOT_COUNT, pool.size()))
-	_picked_index = -1
+	_picked_index = 0 if _ability_entries.size() > 0 else -1
 	_refresh_reward_cards()
 	_refresh_next_state()
 
