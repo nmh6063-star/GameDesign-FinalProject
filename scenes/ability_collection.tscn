@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://c8abilitycollect01"]
+[gd_scene format=3 uid="uid://bmgg3aehaxmr5"]
 
 [ext_resource type="Script" path="res://script/battle/ui/ability_collection.gd" id="1_script"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]

@@ -6,6 +6,7 @@ const MapGenerator := preload("res://script/map/map_generator.gd")
 const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
 const BATTLE_STAGE2_SCENE_PATH := "res://scenes/stage2.tscn"
+const BATTLE_STAGE3_SCENE_PATH := "res://scenes/stage3.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
 const EVENT_SCENE_PATH := "res://scenes/plinko_room.tscn"
@@ -20,6 +21,8 @@ const _NON_GAME_SCENES := [
 
 const _ROOM_SCENES := [
 	BATTLE_SCENE_PATH,
+	BATTLE_STAGE2_SCENE_PATH,
+	BATTLE_STAGE3_SCENE_PATH,
 	CAMPFIRE_SCENE_PATH,
 	SHOP_SCENE_PATH,
 	EVENT_SCENE_PATH,
@@ -259,7 +262,9 @@ func _scene_for_room(room) -> String:
 		MapGenerator.Room.Type.EVENT:
 			return EVENT_SCENE_PATH
 		_:
-			if room.row >= 1:
+			if room.row >= 7:
+				return BATTLE_STAGE3_SCENE_PATH
+			if room.row >= 4:
 				return BATTLE_STAGE2_SCENE_PATH
 			return BATTLE_SCENE_PATH
 
@@ -324,7 +329,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if scene.scene_file_path in _NON_GAME_SCENES:
 		return
-	if event.keycode == KEY_P and scene.scene_file_path == BATTLE_SCENE_PATH:
+	var _battle_scenes := [BATTLE_SCENE_PATH, BATTLE_STAGE2_SCENE_PATH, BATTLE_STAGE3_SCENE_PATH]
+	if event.keycode == KEY_P and scene.scene_file_path in _battle_scenes:
 		var battle := scene.get_node_or_null("BallHolder/BattleController")
 		if battle != null and battle.has_method("skip_to_post_battle_reward"):
 			battle.skip_to_post_battle_reward()

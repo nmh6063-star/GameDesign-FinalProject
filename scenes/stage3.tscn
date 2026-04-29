@@ -1,19 +1,19 @@
-[gd_scene format=3 uid="uid://blsvjh35i2jsx"]
+[gd_scene format=3 uid="uid://dq53wqevi2hjh"]
 
-[ext_resource type="Script" uid="uid://bu5eudvsydkcp" path="res://script/entities/balls/ball_base.gd" id="1_drotj"]
-[ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="2_lo6ek"]
-[ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_w5a8x"]
-[ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="4_ic6gb"]
-[ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="5_ecj4f"]
-[ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="6_lbynx"]
-[ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/mana_hud.gd" id="7_ly1ci"]
-[ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="8_fmxss"]
-[ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_bcuri"]
-[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="10_7h4bs"]
-[ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="11_se6ya"]
-[ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="12_6dj6g"]
-[ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="13_g7s17"]
-[ext_resource type="Script" uid="uid://cpctoqyaugfnj" path="res://script/ui/line_limit.gd" id="14_vvpmc"]
+[ext_resource type="Script" uid="uid://bu5eudvsydkcp" path="res://script/entities/balls/ball_base.gd" id="1_mddvm"]
+[ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="2_r6oc3"]
+[ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="3_miulw"]
+[ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="4_lqmne"]
+[ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="5_1ql6a"]
+[ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="6_fty31"]
+[ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/mana_hud.gd" id="7_f80v2"]
+[ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="8_s87j3"]
+[ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_ovysb"]
+[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="10_8kcjd"]
+[ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="11_rfxtn"]
+[ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="12_isstm"]
+[ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="13_7rjfr"]
+[ext_resource type="Script" uid="uid://cpctoqyaugfnj" path="res://script/ui/line_limit.gd" id="14_jwyyr"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
 friction = 2.5
@@ -23,7 +23,7 @@ bounce = 0.4
 radius = 20.0
 
 [sub_resource type="FontVariation" id="FontVariation_ya4ey"]
-base_font = ExtResource("3_w5a8x")
+base_font = ExtResource("3_miulw")
 spacing_glyph = -2
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_queue_card"]
@@ -140,12 +140,12 @@ contact_monitor = true
 max_contacts_reported = 1
 linear_damp = 4.0
 angular_damp = 4.0
-script = ExtResource("1_drotj")
+script = ExtResource("1_mddvm")
 
 [node name="Sprite2D" type="Sprite2D" parent="BallHolder/BallPlaceholder" unique_id=1556687559]
 texture_filter = 1
 scale = Vector2(1.25, 1.25)
-texture = ExtResource("2_lo6ek")
+texture = ExtResource("2_r6oc3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BallHolder/BallPlaceholder" unique_id=186235093]
 shape = SubResource("CircleShape2D_o5qli")
@@ -168,45 +168,45 @@ vertical_alignment = 1
 
 [node name="LineIndicator" type="Node2D" parent="BallHolder" unique_id=692861044]
 position = Vector2(0, -35)
-script = ExtResource("4_ic6gb")
+script = ExtResource("4_lqmne")
 
 [node name="Indicator0" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=904600577]
 modulate = Color(1, 1, 1, 0.5019608)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator1" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=1996945942]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(0, 56)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator2" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=499207096]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(0, 112)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator3" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=418435843]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(0, 168)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator4" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=2087160603]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(0, 224)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator5" type="Sprite2D" parent="BallHolder/LineIndicator" unique_id=1431413002]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(0, 280)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="BattleController" type="Node2D" parent="BallHolder" unique_id=1775782920]
-script = ExtResource("6_lbynx")
+script = ExtResource("6_fty31")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
 
@@ -238,7 +238,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_queue_header")
 layout_mode = 0
 offset_right = 92.0
 offset_bottom = 20.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "Next"
 horizontal_alignment = 1
@@ -339,7 +339,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_queue_header")
 layout_mode = 0
 offset_right = 92.0
 offset_bottom = 20.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "Hold"
 horizontal_alignment = 1
@@ -362,19 +362,19 @@ layout_mode = 0
 offset_top = 76.0
 offset_right = 92.0
 offset_bottom = 92.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "H"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="InspectAbilityButton" type="Button" parent="UI/BallQueue" unique_id=1605113626]
+[node name="InspectAbilityButton" type="Button" parent="UI/BallQueue" unique_id=1652643379]
 layout_mode = 0
 offset_left = 22.0
 offset_top = 410.0
 offset_right = 114.0
 offset_bottom = 450.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "I"
 
@@ -386,7 +386,7 @@ offset_top = 398.0
 offset_right = 985.0
 offset_bottom = 430.0
 mouse_filter = 2
-script = ExtResource("7_ly1ci")
+script = ExtResource("7_f80v2")
 
 [node name="Row" type="VBoxContainer" parent="UI/ManaHUD" unique_id=901000001]
 layout_mode = 1
@@ -466,7 +466,7 @@ offset_right = 188.0
 offset_bottom = 194.0
 scale = Vector2(0.9, 0.9)
 pivot_offset = Vector2(72, 80)
-script = ExtResource("8_fmxss")
+script = ExtResource("8_s87j3")
 
 [node name="VBox" type="Control" parent="UI/ComboHUD" unique_id=2117429973]
 layout_mode = 1
@@ -482,7 +482,7 @@ offset_top = -1.0
 offset_right = 144.0
 offset_bottom = 9.5
 theme_override_colors/font_color = Color(0.96, 0.8, 0.12, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 12
 text = "COMBO"
 horizontal_alignment = 1
@@ -494,7 +494,7 @@ offset_right = 144.0
 offset_bottom = 48.0
 pivot_offset = Vector2(73, 12)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 32
 text = "0"
 horizontal_alignment = 1
@@ -505,7 +505,7 @@ offset_top = 55.0
 offset_right = 144.0
 offset_bottom = 67.25
 theme_override_colors/font_color = Color(0.35, 0.92, 0.55, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 14
 text = "x 1.0"
 horizontal_alignment = 1
@@ -569,17 +569,17 @@ anchor_bottom = 1.0
 offset_right = -12.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 16
 vertical_alignment = 1
 
-[node name="Status" type="Label" parent="UI/PlayerHealthBar" unique_id=1721763587]
+[node name="Status" type="Label" parent="UI/PlayerHealthBar" unique_id=727196071]
 layout_mode = 0
 offset_left = 6.0
 offset_top = 30.0
 offset_right = 320.0
 offset_bottom = 46.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 8
 
 [node name="SpecialBar" type="Panel" parent="UI" unique_id=1800000019]
@@ -614,7 +614,7 @@ offset_left = 10.0
 offset_top = 24.0
 offset_right = 74.0
 offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 8
 vertical_alignment = 1
 
@@ -633,7 +633,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -643,7 +643,7 @@ layout_mode = 0
 offset_top = 56.0
 offset_right = 84.0
 offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "1"
 horizontal_alignment = 1
@@ -664,7 +664,7 @@ offset_left = 10.0
 offset_top = 24.0
 offset_right = 74.0
 offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 8
 vertical_alignment = 1
 
@@ -683,7 +683,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -693,7 +693,7 @@ layout_mode = 0
 offset_top = 56.0
 offset_right = 84.0
 offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "2"
 horizontal_alignment = 1
@@ -714,7 +714,7 @@ offset_left = 10.0
 offset_top = 24.0
 offset_right = 74.0
 offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 8
 vertical_alignment = 1
 
@@ -733,7 +733,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -743,7 +743,7 @@ layout_mode = 0
 offset_top = 56.0
 offset_right = 84.0
 offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "3"
 horizontal_alignment = 1
@@ -764,7 +764,7 @@ offset_left = 10.0
 offset_top = 24.0
 offset_right = 74.0
 offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 8
 vertical_alignment = 1
 
@@ -783,7 +783,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -793,7 +793,7 @@ layout_mode = 0
 offset_top = 56.0
 offset_right = 84.0
 offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "4"
 horizontal_alignment = 1
@@ -820,7 +820,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "1"
 horizontal_alignment = 1
@@ -832,7 +832,7 @@ offset_left = 6.0
 offset_top = 18.0
 offset_right = 86.0
 offset_bottom = 42.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -842,7 +842,7 @@ layout_mode = 0
 offset_top = 56.0
 offset_right = 92.0
 offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "X"
 horizontal_alignment = 1
@@ -861,7 +861,7 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("9_bcuri")
+script = ExtResource("9_ovysb")
 
 [node name="RichTextLabel" type="RichTextLabel" parent="UI/LineLimit" unique_id=1879806430]
 layout_mode = 0
@@ -906,14 +906,14 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="UI/GameOver/Panel/Margin/Column" unique_id=555100005]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 22
 text = "GAME OVER"
 horizontal_alignment = 1
 
 [node name="Caption" type="Label" parent="UI/GameOver/Panel/Margin/Column" unique_id=555100006]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 12
 text = "All health lost."
 horizontal_alignment = 1
@@ -946,14 +946,14 @@ theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="UI/StageClear/Panel/Margin/Column" unique_id=555100011]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 22
 text = "STAGE CLEAR"
 horizontal_alignment = 1
 
 [node name="Caption" type="Label" parent="UI/StageClear/Panel/Margin/Column" unique_id=555100012]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 12
 text = "All enemies defeated."
 horizontal_alignment = 1
@@ -967,14 +967,14 @@ shape = SubResource("CircleShape2D_jkv2x")
 
 [node name="Sprite2D" type="Sprite2D" parent="Aim" unique_id=1555519289]
 scale = Vector2(0.15, 0.15)
-texture = ExtResource("10_7h4bs")
+texture = ExtResource("10_8kcjd")
 
 [node name="PlayerHolder" type="Node2D" parent="." unique_id=269755286]
 position = Vector2(16, -243)
 
 [node name="Player" type="Node2D" parent="PlayerHolder" unique_id=1652955601]
 position = Vector2(152, -96)
-script = ExtResource("11_se6ya")
+script = ExtResource("11_rfxtn")
 
 [node name="Timer" type="Timer" parent="PlayerHolder/Player" unique_id=321131043]
 wait_time = 0.1
@@ -1023,7 +1023,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1037,7 +1037,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
 [node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=978039901]
 position = Vector2(91, 64)
-script = ExtResource("12_6dj6g")
+script = ExtResource("12_isstm")
 radius = 14.0
 base_color = Color(0.18, 0.12, 0.1, 0.9)
 
@@ -1053,7 +1053,7 @@ vertical_alignment = 1
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=181201766]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn_enemy_fire" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
+[node name="EnemySpawn_enemy_small_spider" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=144872954]
 position = Vector2(12, -8)
 
 [node name="EnemyHolder2" type="Node2D" parent="EnemySlot" unique_id=1419468957]
@@ -1093,7 +1093,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1107,7 +1107,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
 [node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=1777201990]
 position = Vector2(91, 64)
-script = ExtResource("12_6dj6g")
+script = ExtResource("12_isstm")
 radius = 14.0
 base_color = Color(0.18, 0.12, 0.1, 0.9)
 
@@ -1123,7 +1123,7 @@ vertical_alignment = 1
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1307839188]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn_enemy_fire" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
+[node name="EnemySpawn_enemy_spider_queen" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=144872955]
 position = Vector2(12, -8)
 
 [node name="EnemyHolder3" type="Node2D" parent="EnemySlot" unique_id=1419468959]
@@ -1163,7 +1163,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 vertical_alignment = 1
@@ -1177,7 +1177,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
 [node name="CooldownRing" type="Node2D" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=222874641]
 position = Vector2(91, 64)
-script = ExtResource("12_6dj6g")
+script = ExtResource("12_isstm")
 radius = 14.0
 base_color = Color(0.18, 0.12, 0.1, 0.9)
 
@@ -1193,7 +1193,7 @@ vertical_alignment = 1
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=1800000043]
 position = Vector2(40, -32)
 
-[node name="EnemySpawn_enemy_ice" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=144872956]
+[node name="EnemySpawn_enemy_small_spider" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=144872956]
 position = Vector2(12, -8)
 
 [node name="Background" type="Node2D" parent="." unique_id=1116332561]
@@ -1203,7 +1203,7 @@ z_index = -1
 texture_filter = 1
 position = Vector2(248, 0)
 scale = Vector2(0.7, 0.7)
-texture = ExtResource("13_g7s17")
+texture = ExtResource("13_7rjfr")
 
 [node name="Box" type="StaticBody2D" parent="Background" unique_id=953407219]
 position = Vector2(56, 109)
@@ -1251,7 +1251,7 @@ shape = SubResource("RectangleShape2D_a8y0u")
 [node name="Limit" type="Node2D" parent="Background" unique_id=876298834]
 position = Vector2(0, -67)
 rotation = -1.5707964
-script = ExtResource("14_vvpmc")
+script = ExtResource("14_jwyyr")
 
 [node name="Area2D" type="Area2D" parent="Background/Limit" unique_id=1377853102]
 position = Vector2(-280, -3.0517578e-05)
@@ -1267,37 +1267,37 @@ shape = SubResource("RectangleShape2D_jkv2x")
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(51.200016, -75.20001)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator1" type="Sprite2D" parent="Background/Limit" unique_id=1615771166]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(51.200016, -19.200012)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator2" type="Sprite2D" parent="Background/Limit" unique_id=1233836906]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(51.200016, 36.799988)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator3" type="Sprite2D" parent="Background/Limit" unique_id=1185555479]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(51.200016, 92.79999)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator4" type="Sprite2D" parent="Background/Limit" unique_id=777286870]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(51.200016, 148.79999)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [node name="Indicator5" type="Sprite2D" parent="Background/Limit" unique_id=1821844430]
 modulate = Color(1, 1, 1, 0.5019608)
 position = Vector2(51.200016, 204.79999)
 scale = Vector2(1.8, 1.8)
-texture = ExtResource("5_ecj4f")
+texture = ExtResource("5_1ql6a")
 
 [connection signal="timeout" from="UI/LineLimit/Timer" to="UI/LineLimit" method="_on_timer_timeout"]
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
