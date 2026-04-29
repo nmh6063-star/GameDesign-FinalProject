@@ -95,7 +95,7 @@ func _physics_process(_delta: float) -> void:
 	_update_enemy_realtime_views()
 	_update_target_visual()
 	_handle_shoot_input()
-	_context.tick_enemy_poison(_delta)
+	_context.tick_enemy_burn(_delta)
 	_context.tick_combo(_delta)
 	_sync_status_tags()
 

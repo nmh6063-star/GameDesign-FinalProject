@@ -225,16 +225,47 @@ func heal_player(amount: int) -> void:
 		controller.heal_player(amount)
 
 
+## Direct damage (benefits from attack_bonus, poison_apple, and clone stacks).
 func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
-	if controller != null:
-		controller.damage_enemy(amount + int(player_statuses.get("attack_bonus", 0)), enemy, self)
+	if controller == null:
+		return
+	var base := amount + int(player_statuses.get("attack_bonus", 0))
+	# Poison Apple: +10% per charge, consumes charge, costs a bit of self-HP
+	var pa := int(player_statuses.get("poison_apple_charges", 0))
+	if pa > 0:
+		base = int(round(base * 1.1))
+		player_statuses["poison_apple_charges"] = pa - 1
+		_damage_player_raw(2)
+	# Clone stacks: each stack doubles all direct damage (max 4 stacks)
+	var clones := int(player_statuses.get("clone_stacks", 0))
+	for _i in range(mini(clones, 4)):
+		base *= 2
+	controller.damage_enemy(base, enemy, self)
+	battle_flags["last_damage"] = amount
 
 
+## Player takes damage. During Time Drift, incoming damage is stored
+## and will be reflected back to enemies as continuous DOT.
 func damage_player(amount: int) -> void:
+	if bool(battle_flags.get("time_drift_active", false)):
+		battle_flags["time_drift_stored"] = \
+				int(battle_flags.get("time_drift_stored", 0)) + amount
+		return
+	_damage_player_raw(amount)
+
+
+## Damage to player that bypasses Time Drift storage (e.g. self-inflicted costs).
+func _damage_player_raw(amount: int) -> void:
 	if controller != null:
 		var reduced := _consume_player_shield(amount)
 		if reduced > 0:
 			controller.damage_player(reduced)
+
+
+## DOT damage: bypasses attack_bonus and clone multipliers.
+func _damage_enemy_dot(amount: int, enemy: EnemyBase) -> void:
+	if controller != null:
+		controller.damage_enemy(amount, enemy, self)
 
 
 func burst(origin_global: Vector2, strength_scale: float = 1.0) -> void:
@@ -253,25 +284,24 @@ func status_for_enemy(enemy: EnemyBase) -> Dictionary:
 	if not enemy_statuses.has(key):
 		enemy_statuses[key] = {
 			"poison_stack": 0,
-			"poison_strength": 0,
 			"burn_stack": 0,
-			"burn_strength": 0,
-			"freeze_stack": 0,
+			"burn_accum": 0.0,
 			"freeze_until_ms": 0,
 			"charm_stack": 0,
 		}
 	return enemy_statuses[key]
 
 
-func add_enemy_status(enemy: EnemyBase, key: String, stack: int, strength: int = 0) -> void:
+## Stacks = total damage charges. Freeze: each stack = 1 second freeze (additive).
+func add_enemy_status(enemy: EnemyBase, key: String, stack: int, _strength: int = 0) -> void:
 	if enemy == null:
 		return
 	var st := status_for_enemy(enemy)
-	st[key + "_stack"] = int(st.get(key + "_stack", 0)) + max(0, stack)
-	if strength > 0:
-		st[key + "_strength"] = max(int(st.get(key + "_strength", 0)), strength)
-	if key == "poison" and not st.has("poison_accum"):
-		st["poison_accum"] = 0.0
+	if key == "freeze":
+		var current_until := maxi(now_ms(), int(st.get("freeze_until_ms", 0)))
+		st["freeze_until_ms"] = current_until + stack * 1000
+	else:
+		st[key + "_stack"] = int(st.get(key + "_stack", 0)) + max(0, stack)
 
 
 func consume_enemy_stack(enemy: EnemyBase, key: String, amount: int = 1) -> void:
@@ -280,45 +310,41 @@ func consume_enemy_stack(enemy: EnemyBase, key: String, amount: int = 1) -> void
 	st[k] = max(0, int(st.get(k, 0)) - max(0, amount))
 
 
-func tick_enemy_poison(delta: float) -> void:
+## Burn ticks every real second: deals 1 damage and consumes 1 stack per tick.
+func tick_enemy_burn(delta: float) -> void:
 	for enemy in _alive_enemies():
 		var st := status_for_enemy(enemy)
-		if int(st.get("poison_stack", 0)) <= 0:
+		if int(st.get("burn_stack", 0)) <= 0:
 			continue
-		st["poison_accum"] = float(st.get("poison_accum", 0.0)) + max(0.0, delta)
-		while float(st.get("poison_accum", 0.0)) >= 1.0 and int(st.get("poison_stack", 0)) > 0:
-			st["poison_accum"] = float(st.get("poison_accum", 0.0)) - 1.0
-			var dmg := int(st.get("poison_strength", 0))
-			if dmg > 0:
-				damage_enemy(dmg, enemy)
-			st["poison_stack"] = max(0, int(st.get("poison_stack", 0)) - 1)
+		st["burn_accum"] = float(st.get("burn_accum", 0.0)) + maxf(0.0, delta)
+		while float(st.get("burn_accum", 0.0)) >= 1.0 and int(st.get("burn_stack", 0)) > 0:
+			st["burn_accum"] -= 1.0
+			_damage_enemy_dot(1, enemy)
+			st["burn_stack"] = max(0, int(st.get("burn_stack", 0)) - 1)
 
 
+## Poison fires before each enemy attack (1 dmg, 1 stack consumed).
+## Returns false if enemy is frozen (attack blocked).
 func on_enemy_attack_started(enemy: EnemyBase) -> bool:
 	var st := status_for_enemy(enemy)
-	if int(st.get("freeze_stack", 0)) > 0:
-		return false
 	if now_ms() <= int(st.get("freeze_until_ms", 0)):
 		return false
+	if int(st.get("poison_stack", 0)) > 0:
+		_damage_enemy_dot(1, enemy)
+		st["poison_stack"] = max(0, int(st.get("poison_stack", 0)) - 1)
 	return true
 
 
+## Called after enemy resolves its attack. Charm stack consumed here.
 func on_enemy_attack_resolved(enemy: EnemyBase) -> void:
 	var st := status_for_enemy(enemy)
-	if int(st.get("burn_stack", 0)) > 0:
-		var burn := int(st.get("burn_strength", 0))
-		if burn > 0:
-			damage_enemy(burn, enemy)
-		consume_enemy_stack(enemy, "burn", 1)
 	if int(st.get("charm_stack", 0)) > 0:
 		consume_enemy_stack(enemy, "charm", 1)
 
 
+## Kept for API compatibility; freeze is now purely time-based.
 func consume_freeze_on_ball_drop() -> void:
-	for enemy in _alive_enemies():
-		var st := status_for_enemy(enemy)
-		if int(st.get("freeze_stack", 0)) > 0:
-			st["freeze_stack"] = max(0, int(st.get("freeze_stack", 0)) - 1)
+	pass
 
 
 func add_player_shield(amount: int) -> void:

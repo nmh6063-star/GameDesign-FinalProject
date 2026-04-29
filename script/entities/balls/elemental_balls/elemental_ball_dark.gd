@@ -48,11 +48,11 @@ static func on_merge(_ctx: BattleContext, _source: BallBase, function: String) -
 static func deploy_enchantment(_ctx: BattleContext, _source: BallBase):
 	pass
 
+## Poison Apple: grant 3 charges of +10% damage that also cost 2 self-HP each.
+## (UI: color the next 3 mana-ball slots black while charges remain.)
 static func health_for_damage(_ctx: BattleContext, _source: BallBase):
-	_ctx.damage_enemy(_source.rank * 3, _ctx.active_enemy())
-	#print("SHOT SUCCESS")
-	#_ctx.consume_ball(_source)
-	pass
+	_ctx.player_statuses["poison_apple_charges"] = \
+			int(_ctx.player_statuses.get("poison_apple_charges", 0)) + 3
 
 static func slow_time(_ctx: BattleContext, _source: BallBase):
 	pass
@@ -69,16 +69,27 @@ static func eye_for_an_arm(_ctx: BattleContext, _source: BallBase):
 	_ctx.damage_enemy(_source.rank * 1.5, _ctx.active_enemy())
 	_ctx.damage_player(_source.rank / 2)
 
+## Clone: spawn a rank-7 ball copy, double all direct damage this battle,
+## and permanently reduce max HP by 5%. Stacks up to 4 additional times.
 static func create_copy(_ctx: BattleContext, _source: BallBase):
+	var current_stacks := int(_ctx.player_statuses.get("clone_stacks", 0))
+	if current_stacks >= 4:
+		return
 	_source.rank = 7
-	var ball = _ctx.spawn_ball("ball_normal", _source.global_position, Vector2.ZERO, _source.rank) as BallBase
-	ball.rank = 7
-	#_ctx.consume_ball(_source)
-	pass
+	var ball := _ctx.spawn_ball("ball_normal", _source.global_position, Vector2.ZERO, 7) as BallBase
+	if ball != null:
+		ball.rank = 7
+	_ctx.player_statuses["clone_stacks"] = current_stacks + 1
+	# Permanently reduce max HP by 5%
+	var new_max := int(round(PlayerState.player_max_health * 0.95))
+	PlayerState.player_max_health = new_max
+	if PlayerState.player_health > new_max:
+		PlayerState.player_health = new_max
 
+## Passive: every shot deals ×1.5 damage but also hurts the player.
 static func darkness_consume(_ctx: BattleContext, _source: BallBase):
-	_ctx.damage_enemy(_source.rank * 3, _ctx.active_enemy())
-	_ctx.damage_player(_source.rank)
+	_ctx.damage_enemy(int(round(_source.rank * 3 * 1.5)), _ctx.active_enemy())
+	_ctx._damage_player_raw(_source.rank)
 
 
 

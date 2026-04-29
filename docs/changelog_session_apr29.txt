@@ -1,0 +1,218 @@
+================================================================================
+ABILITY BALANCE CHANGES — Apr 29, 2026
+================================================================================
+
+STATUS EFFECT RULES (new)
+  - Stacks = total damage charges. 1 stack = 1 damage trigger.
+  - Burn   : deals 1 damage every second, loses 1 stack per second.
+  - Poison : deals 1 damage before each enemy attack, loses 1 stack per attack.
+  - Freeze : each stack = 1 second of freeze (additive).
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 1
+────────────────────────────────────────────────────────────────────────────────
+
+  Strike (default)
+    Before : Deal 1 damage to all enemies
+    After  : Deal 5 damage to current enemy
+
+  Mend
+    Before : Heal 3 HP
+    After  : Heal 5 HP
+
+  Venom
+    Before : Poison current enemy (10 stacks, 1 strength)
+    After  : Poison current enemy (15 stacks)
+
+  Ember
+    Before : Burn current enemy (10 stacks, 2 strength)
+    After  : Burn ALL enemies (3 stacks)
+
+  Critical
+    Before : 50% deal 5 to current enemy, else deal 1 to current enemy
+    After  : 50% deal 5 to ALL enemies, else deal 5 to current enemy
+
+  Refresh, Guard — unchanged
+
+  Poison Apple (Dark)
+    Before : Deal rank×3 damage to enemy on shot
+    After  : Grant 3 charges. Each charge: +10% damage on next shot and cost
+             2 self-HP. (Next 3 mana-ball slots should appear black — UI TBD.)
+
+  Buy In (Gambler)
+    Before : 50% heal 5–15, 50% take 1–10 damage (on merge)
+    After  : 75% heal 10, 25% take 10 damage (on merge)
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 2
+────────────────────────────────────────────────────────────────────────────────
+
+  Heavy Strike (default) — unchanged (10 damage to one enemy)
+
+  Recovery
+    Before : Heal 25% of missing HP
+    After  : Heal 15% of missing HP
+
+  Frost Touch
+    Before : Freeze current enemy (5 stacks, drain 1 per ball dropped)
+    After  : Freeze ALL enemies for 5 seconds
+
+  Triple Shot
+    Before : Hit 3 random enemies for 5 each
+    After  : Hit 3 random enemies for 8 each
+
+  Critical Strike
+    Before : 50% deal 5 to all, else deal 5 to one
+    After  : 50% deal 8 to all, else deal 8 to one
+
+  Pollution
+    Before : Double poison strength on current enemy
+    After  : Double poison stacks on current enemy
+
+  FireBurn
+    Before : Burn current enemy (10 stacks, 5 strength)
+    After  : Burn ALL enemies (5 stacks)
+
+  Iron Guard, Scatter Drop — unchanged
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 3
+────────────────────────────────────────────────────────────────────────────────
+
+  Power Slash (default) — unchanged (30 damage to one target)
+
+  Toxic Burst
+    Before : Poison current enemy (30 stacks, 1 strength)
+    After  : Poison ALL enemies (20 stacks)
+
+  Fireball
+    Before : Deal 5 damage to current enemy + Burn (5 stacks, 10 strength)
+    After  : Hit 2 random enemies for 5 each, apply Burn (5 stacks) to each hit
+
+  Ice Lance → Ice Shield (renamed)
+    Before : Deal 5 damage + Freeze current enemy (5 stacks)
+    After  : Gain 10 Shield + Freeze current enemy (5 seconds)
+
+  Reinforce
+    Before : +3 attack damage this battle
+    After  : +2 attack damage this battle (excludes DOT damage)
+
+  Charm
+    Before : Apply 5 charm stacks to current enemy
+    After  : Apply 1 charm stack to ALL enemies (each redirects their next attack)
+
+  Convert, Echo Shot — unchanged
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 4
+────────────────────────────────────────────────────────────────────────────────
+
+  Cleave (default) — unchanged (20 damage to all)
+
+  Greater Heal
+    Before : Heal 50% of missing HP
+    After  : Heal 30% of missing HP
+
+  Mirror Shield
+    Before : Reflect next 1 incoming damage instance
+    After  : Reflect next 2 incoming damage instances
+
+  Corrupt Field
+    Before : Apply Poison (10 stacks, 2 strength) to balls in hazard zone
+    After  : Apply Poison (20 stacks) to ALL enemies
+
+  Bomb Orb, Chain Spark — unchanged
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 5
+────────────────────────────────────────────────────────────────────────────────
+
+  Critical Edge (default) — unchanged (random 5 / 10 / 20 / 100)
+
+  Giant Orb
+    Before : One ball gets ×2 attack, triggers twice, ×3 visual size
+    After  : One ball gets ×3 attack, ×2 visual size (no double-trigger)
+
+  Poison Rain
+    Before : Poison all enemies (20 stacks, 1 strength)
+    After  : Poison all enemies (20 stacks)
+
+  Time Drift
+    Before : Slow game time for 10 seconds
+    After  : Slow game time for 10 seconds. Damage you receive in the first 5s
+             is stored; reflected back to enemies as continuous DOT over final 5s.
+
+  Freeze Wave, Consume Core, Upgrade Pulse — unchanged
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 6
+────────────────────────────────────────────────────────────────────────────────
+
+  Meteor Crash (default)
+    Before : Deal 100 damage to all enemies
+    After  : Deal 50 damage to all enemies
+
+  Full Recovery
+    Before : Restore HP to full
+    After  : Restore 30% of max HP
+
+  Chaos Rain
+    Before : Spawn 5 random balls (rank 1–3), always costs 1 mana
+    After  : Spawn 3 balls free; spend 1 mana to spawn 6 instead
+
+  Overcharge
+    Before : +10 attack damage this battle
+    After  : +5 attack damage this battle
+
+  Reflect Wall
+    Before : Reflect all incoming damage for 20 seconds
+    After  : Reflect all incoming damage for 12 seconds
+
+  Giant Core
+    Before : One ball (any rank) gets ×3 attack, triggers twice, ×3 visual size
+    After  : One rank 1–5 ball gets ×3 attack, triggers twice, ×2 visual size
+
+  Mass Morph — unchanged
+
+────────────────────────────────────────────────────────────────────────────────
+RANK 7
+────────────────────────────────────────────────────────────────────────────────
+
+  Final Judgment (default)
+    Before : Deal 1000 damage to one target
+    After  : Deal 300 damage to one target
+
+  Apocalypse
+    Before : Deal 100 damage to all enemies
+    After  : Deal 100 damage to all enemies (number rounded from 86)
+
+  Time Stop
+    Before : Delete half the balls in the box + freeze all enemies for 20s
+    After  : Clear ALL balls from the box + freeze all enemies for 10s
+
+  Magic Flood
+    Before : Random enchantment — Poison (10 stacks, 2 str) / Burn (5 stacks,
+             5 str) / Freeze (5 stacks) on each enemy
+    After  : Random enchantment — Poison (8 stacks) / Burn (3 stacks) /
+             Freeze (3 stacks) on each enemy
+
+  1 Shower
+    Before : Spawn rank 1 balls continuously for 30 seconds (30 balls)
+    After  : Spawn rank 1–3 balls for 10 seconds (10 balls)
+
+  Clone (Dark)
+    Before : Spawn a copy of the rank-7 ball
+    After  : Spawn a rank-7 ball copy + add 1 clone stack (each stack doubles
+             all direct damage) + permanently reduce max HP by 5%.
+             Stacks up to 4 times total.
+
+  Roll For Initiative (Gambler)
+    Before : 50% enemies rampage; 50% deal 100 damage to current enemy
+    After  : 50% enemies execute all actions × 3; 50% deal 100 damage +
+             trigger a random rank-7 rank ability as a bonus
+
+  Resurrection, Miracle Cascade, Sacrifice Nova — unchanged
+
+================================================================================
+END
+================================================================================

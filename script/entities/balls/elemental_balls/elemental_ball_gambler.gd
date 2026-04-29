@@ -32,26 +32,33 @@ static func on_shot(_ctx: BattleContext, _source: BallBase, function: String) ->
 static func on_merge(_ctx: BattleContext, _source: BallBase, function: String) -> void:
 	functions_by_id[function][0].call(_ctx, _source)
 
-static func buy_in(_ctx, _source):
-	if randi_range(1, 2) == 1:
-		_ctx.heal_player(randi_range(5, 15))
+## Buy In: on merge — 75% chance heal 10, 25% chance take 10 damage.
+static func buy_in(_ctx: BattleContext, _source: BallBase):
+	if randi_range(1, 4) <= 3:
+		_ctx.heal_player(10)
 	else:
-		_ctx.damage_player(randi_range(1, 10))
-	pass
+		_ctx._damage_player_raw(10)
 
-static func roll_for_initiative(_ctx, _source):
+## Roll For Initiative: 50/50 — enemies go wild (all actions × 3) OR deal 100
+## damage to current enemy and trigger a random rank-7 rank ability.
+static func roll_for_initiative(_ctx: BattleContext, _source: BallBase):
 	if randi_range(1, 2) == 1:
-		for x in range(3):
-			for i in _ctx.active_enemy().data.actions:
-				i.execute(_ctx, _ctx.active_enemy())
+		var ae := _ctx.active_enemy()
+		if ae != null:
+			for _x in range(3):
+				for action in ae.data.actions:
+					action.execute(_ctx, ae)
 	else:
 		_ctx.damage_enemy(100, _ctx.active_enemy())
-	_source.rank = 7
-	pass
+		# Trigger a random rank-7 rank ability as a bonus
+		var r7: Array = ["apocalypse", "time_stop", "magic_flood", "miracle_cascade",
+				"sacrifice_nova", "one_shower"]
+		RankAbilityEffects.execute(_ctx, _source, r7[randi() % r7.size()], 7)
 
+## Gambling Fallacy (passive on merge): randomly hurt player or hurt enemy.
 static func gambling_fallacy(_ctx: BattleContext, _source: BallBase):
 	if randi_range(1, 2) == 1:
-		_ctx.damage_player(_source.rank)
+		_ctx._damage_player_raw(_source.rank)
 	else:
 		_ctx.damage_enemy(_source.rank * 2, _ctx.active_enemy())
 
