@@ -277,29 +277,31 @@ static func _delete_half_balls(ctx: BattleContext) -> void:
 
 
 static func _magic_flood(ctx: BattleContext) -> void:
-	# Float all balls upward
+	# Float every ball upward
 	for ball in ctx.active_balls():
 		(ball as BallBase).apply_central_impulse(Vector2(0.0, -300.0))
-	# Apply a random enchantment to every active enemy
+	# Apply a random enchantment status to each active enemy
 	for e in _alive_enemies(ctx):
-		match randi_range(1, 3):
-			1:
-				ctx.add_enemy_status(e, "poison", 10, 2)
-			2:
-				ctx.add_enemy_status(e, "burn", 5, 5)
-			3:
-				ctx.add_enemy_status(e, "freeze", 5, 0)
+		var r := randi_range(1, 3)
+		if r == 1:
+			ctx.add_enemy_status(e, "poison", 10, 2)    # Poison enchant
+		elif r == 2:
+			ctx.add_enemy_status(e, "burn", 5, 5)       # Fire enchant
+		else:
+			ctx.add_enemy_status(e, "freeze", 5, 0)     # Ice enchant
 
 
 static func _miracle_cascade(ctx: BattleContext, source: BallBase) -> void:
-	# Randomly trigger one effect from rank 3, 4, or 5
-	var options: Array = [
-		["power_slash", 3], ["toxic_burst", 3], ["charm", 3],
-		["cleave", 4], ["chain_spark", 4], ["bomb_orb", 4],
-		["critical_edge", 5], ["poison_rain", 5], ["freeze_wave", 5],
-	]
-	var pick: Array = options[randi() % options.size()]
-	execute(ctx, source, String(pick[0]), int(pick[1]))
+	# Trigger one random effect from EACH of rank 3, 4, and 5
+	var r3: Array = [["power_slash", 3], ["toxic_burst", 3], ["fireball", 3], ["ice_lance", 3], ["charm", 3]]
+	var r4: Array = [["cleave", 4], ["chain_spark", 4], ["bomb_orb", 4], ["greater_heal", 4], ["mirror_shield", 4]]
+	var r5: Array = [["critical_edge", 5], ["poison_rain", 5], ["freeze_wave", 5], ["giant_orb", 5], ["time_drift", 5]]
+	var p3: Array = r3[randi() % r3.size()] as Array
+	var p4: Array = r4[randi() % r4.size()] as Array
+	var p5: Array = r5[randi() % r5.size()] as Array
+	execute(ctx, source, String(p3[0]), int(p3[1]))
+	execute(ctx, source, String(p4[0]), int(p4[1]))
+	execute(ctx, source, String(p5[0]), int(p5[1]))
 
 
 static func _sacrifice_nova(ctx: BattleContext) -> void:
