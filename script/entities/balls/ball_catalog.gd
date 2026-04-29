@@ -7,7 +7,7 @@ const ELEMENTAL_BALL_SCENE := preload("res://script/entities/balls/elemental_bal
 const MODIFIER_BALL_SCENE := preload("res://script/entities/balls/modifier_balls/modifier_ball_scene.tscn")
 const IDS: Array[String] = [
 	"ball_amplifier",
-	"ball_bomb",
+	"ball_rock",
 	"ball_duplication",
 	"ball_heal",
 	"ball_magnet",
@@ -19,7 +19,7 @@ const IDS: Array[String] = [
 ]
 const DATA_BY_ID := {
 	IDS[0]: preload("res://data/balls/amplifier_ball.tres"),
-	IDS[1]: preload("res://data/balls/bomb_ball.tres"),
+	IDS[1]: preload("res://data/balls/rock_ball.tres"),
 	IDS[2]: preload("res://data/balls/duplication_ball.tres"),
 	IDS[3]: preload("res://data/balls/heal_ball.tres"),
 	IDS[4]: preload("res://data/balls/magnet_ball.tres"),

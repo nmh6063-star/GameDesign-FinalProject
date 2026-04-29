@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://cqolqbxg7waos"]
+
+[ext_resource type="Script" uid="uid://dfjkgbul5ucni" path="res://scenes/visual_effects/throw_effect.gd" id="1_throw_effect"]
+
+[node name="ThrowEffect" type="Node2D" unique_id=180510969]
+script = ExtResource("1_throw_effect")

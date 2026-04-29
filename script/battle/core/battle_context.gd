@@ -216,6 +216,10 @@ func spawn_ball(ball_id: String, origin_global: Vector2, impulse: Vector2 = Vect
 	return controller.spawn_ball(ball_id, origin_global, impulse, rank) if controller != null else null
 
 
+func drop_zone_global() -> Vector2:
+	return controller.drop_zone_global() if controller != null else Vector2.ZERO
+
+
 func drop_ball_in_box(ball_id: String, rank: int = 1) -> BallBase:
 	return controller.drop_ball_in_box(ball_id, rank) if controller != null else null
 

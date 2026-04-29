@@ -271,6 +271,10 @@ func spawn_ball(ball_id: String, origin_global: Vector2, impulse: Vector2 = Vect
 	return _box.spawn_ball(ball_id, rank, origin_global, impulse) if _box != null else null
 
 
+func drop_zone_global() -> Vector2:
+	return _box.drop_center_global() if _box != null else Vector2.ZERO
+
+
 func drop_ball_in_box(ball_id: String, rank: int = 1) -> BallBase:
 	return _box.drop_ball(ball_id, rank) if _box != null else null
 
@@ -433,6 +437,7 @@ func _on_ball_dropped() -> void:
 	var burn := int(_context.player_statuses.get("burn_stacks", 0))
 	if burn > 0:
 		damage_player(burn * 3)
+		_context.player_statuses["burn_stacks"] = burn - 1
 	var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
 	if freeze > 0:
 		_context.player_statuses["freeze_stacks"] = freeze - 1

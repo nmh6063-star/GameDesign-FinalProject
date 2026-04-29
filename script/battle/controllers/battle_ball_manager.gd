@@ -63,12 +63,8 @@ func consume(ball: BallBase) -> void:
 	_root.add_child(effect)
 	var effect2 = Effects.new()
 	_root.add_child(effect2)
-	if str(ball.data.id) == "ball_bomb":
-		effect2.freeze_frame(0.1)
-		effect.shake(10.0)
-	else:
-		effect2.freeze_frame(float(ball.rank) / 1000.0)
-		effect.shake(ball.rank / 10.0)
+	effect2.freeze_frame(float(ball.rank) / 1000.0)
+	effect.shake(ball.rank / 10.0)
 	ball.die()
 
 
@@ -90,6 +86,10 @@ func spawn_ball(ball_id: String, rank: int, global_position: Vector2, impulse: V
 	spawned.apply_central_impulse(impulse)
 	spawned.sleeping = false
 	return spawned
+
+
+func drop_center_global() -> Vector2:
+	return _ball_placeholder.global_position
 
 
 func drop_ball(ball_id: String, rank: int = 1) -> BallBase:
