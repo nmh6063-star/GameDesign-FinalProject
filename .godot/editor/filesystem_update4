@@ -1,3 +1,4 @@
+res://script/map/plinko_room.gd
 res://scenes/stage3.tscn
 res://data/balls/amplifier_ball.tres
 res://data/balls/bomb_ball.tres
@@ -23,3 +24,4 @@ res://data/enemies/enemy_guard.tres
 res://data/enemies/enemy_small_soldier.tres
 res://data/enemies/enemy_mage.tres
 res://data/enemies/enemy_machine_core.tres
+res://scenes/plinko_room.tscn
