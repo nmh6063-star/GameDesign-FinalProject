@@ -17,6 +17,7 @@ var battle_context: BattleContext
 var aim_target: Node2D
 var set_up := false
 var rank := 1
+var typing = null
 var ui_preview := false
 var touchingDir = ""
 var last = 0
@@ -37,6 +38,7 @@ func _ready() -> void:
 		gravity_scale = 0.0
 		contact_monitor = true
 		max_contacts_reported = 10
+	#set sprites
 	refresh()
 
 
@@ -63,6 +65,24 @@ func set_preview(ball_data: BallData, ball_rank: int) -> void:
 func refresh() -> void:
 	if data == null:
 		return
+	for elements in element_list:
+		if elements["element"].matching_function(self, elements["effect"]):
+			var sprites = elements["element"].get_sprite_files(elements["effect"])
+			var base = get_node_or_null("base")
+			var overlay = get_node_or_null("overlay")
+			if get_node_or_null("base") == null:
+				base = Sprite2D.new()
+				overlay = Sprite2D.new()
+				base.name = "base"
+				overlay.name = "overlay"
+				self.add_child(base)
+				self.add_child(overlay)
+			base.texture = sprites["base"]
+			overlay.texture = sprites["overlay"]
+			base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			overlay.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			typing = elements["element"].get_function_info(elements["effect"])["class"]
+			break
 	_sync_rank()
 	_update_collision()
 	_sync_status_tag()

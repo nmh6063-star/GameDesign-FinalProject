@@ -16,6 +16,7 @@ func can_merge(ctx: BattleContext, a: BallBase, b: BallBase) -> bool:
 		and ctx.are_touching(a, b, tolerance)
 		and a.rank < 7
 		and b.rank < 7
+		and a.typing == b.typing
 	)
 
 
