@@ -31,7 +31,6 @@ res://data/enemies/enemy_spider_queen.tres::68bc84863f6d2e5729175e785ce58bf8::17
 res://data/enemies/enemy_stone_thrower.tres::f13153a17e4d3965072c54395674651d::1777500591::res://.godot/exported/133200997/export-395467317dd2b80b3ed9604d0f5ccb7c-enemy_stone_thrower.res
 res://data/enemies/enemy_tutorial.tres::4efb53a37485745cd4cf0ede29faafe0::1777500591::res://.godot/exported/133200997/export-564f88264d6ea09510f31853f88c2529-enemy_tutorial.res
 res://scenes/map/map_graph.tscn::95513748ea2f4319cfd0ecc7b874c4c4::1777482314::res://.godot/exported/133200997/export-3d56af2888fbf99b9bb4365abc7905be-map_graph.scn
-res://scenes/map/map_selection.tscn::53e20b5dd3777a9aa61484891c9bf136::1777482314::res://.godot/exported/133200997/export-5b547f23a64b3f37977419a0f741c1cf-map_selection.scn
 res://scenes/map/room.tscn::5c32e046292dff380a706c10b107398c::1777482314::res://.godot/exported/133200997/export-1416ec8387ec0b0d623e1b0862f3cf5e-room.scn
 res://scenes/plinko/obstacle_classic.tscn::8b610c83d45a0a30a1ee2aa0d26fc1f1::1777482314::res://.godot/exported/133200997/export-409b23814b44c0321d4647bc168d32c3-obstacle_classic.scn
 res://scenes/plinko/obstacle_hybrid.tscn::ed0f7bb7a01462e15052f909bbc7c4f8::1777482314::res://.godot/exported/133200997/export-7a7b5afdf7b2e09b7c09432dc3d436cd-obstacle_hybrid.scn

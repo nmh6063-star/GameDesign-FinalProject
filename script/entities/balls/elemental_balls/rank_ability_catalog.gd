@@ -25,6 +25,26 @@ static func default_element_for_rank(rank: int) -> Dictionary:
 	return _ability("strike", rank, "Strike", "Deal 5 damage to current enemy.")
 
 
+## Combined reward pools for reward tiers: 0 → ranks 1–3, 1 → 4–6, 2 → rank 7 only.
+static func reward_pool_for_reward_range(range_id: int) -> Array[Dictionary]:
+	match range_id:
+		0:
+			return _reward_pool_for_ranks(1, 3)
+		1:
+			return _reward_pool_for_ranks(4, 6)
+		2:
+			return _reward_pool_for_ranks(7, 7)
+	return []
+
+
+static func _reward_pool_for_ranks(low: int, high: int) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for r in range(low, high + 1):
+		for opt in reward_options_for_rank(r):
+			out.append(opt)
+	return out
+
+
 static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 	match rank:
 		1:

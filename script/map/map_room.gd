@@ -2,6 +2,7 @@ extends Area2D
 class_name MapRoom
 
 const MapGenerator := preload("res://script/map/map_generator.gd")
+const _MapRoute := preload("res://script/map/map_route_colors.gd")
 
 const TEXTURES := {
 	MapGenerator.Room.Type.MONSTER: preload("res://assets/tempAssets/sword.png"),
@@ -43,21 +44,24 @@ const TINTS := {
 
 const BASE_ICON_SCALE := Vector2(0.015, 0.015)
 const BORDER_RADIUS := 8.0
+const CLICK_RADIUS := 28.0
 const BORDER_WIDTH := 2.0
 const BORDER_SUPERSAMPLE := 4.0
 const BORDER_COLOR := Color(0.10, 0.08, 0.14, 0.72)
-const HIGHLIGHT_COLOR := Color(1.0, 0.32, 0.36, 0.96)
+## Inside the ring: same geometry as `_border_texture` (centerline at BORDER_RADIUS in node space, stroke BORDER_WIDTH).
+const FILL_INSET := 0.12
+const FILL_DISK_SEGMENTS := 48
+const ICON_ON_ROUTE := Color(0.98, 0.96, 0.95, 1.0)
+const FILL_CLEAR := Color(1, 1, 1, 0)
 
 signal selected(room: MapGenerator.Room)
-
-@onready var animation_player := $AnimationPlayer as AnimationPlayer
-@onready var visuals := $Visuals as Node2D
-@onready var border := $Visuals/Border as Sprite2D
-@onready var sprite_2d := $Visuals/Sprite2D as Sprite2D
-@onready var collision_shape := $CollisionShape2D as CollisionShape2D
+signal hover_choice_changed(room: MapGenerator.Room, hovering: bool)
 
 var room: MapGenerator.Room
 var selectable := false
+var _visited := false
+var _current := false
+var _hover := false
 static var _border_textures := {}
 
 
@@ -77,56 +81,122 @@ static func tint_for_type(room_type: int) -> Color:
 	return TINTS.get(room_type, Color.WHITE)
 
 
+static func _disk_polygon(radius: float, segments: int) -> PackedVector2Array:
+	var pts := PackedVector2Array()
+	for i in range(segments):
+		var a := TAU * float(i) / float(segments)
+		pts.append(Vector2(cos(a), sin(a)) * radius)
+	return pts
+
+
+static func _fill_disk_radius() -> float:
+	return maxf(0.1, BORDER_RADIUS - BORDER_WIDTH * 0.5 - FILL_INSET)
+
+
 func set_room(room_data: MapGenerator.Room) -> void:
+	if not mouse_entered.is_connected(_on_mouse_entered):
+		mouse_entered.connect(_on_mouse_entered)
+		mouse_exited.connect(_on_mouse_exited)
+	input_pickable = true
+	monitoring = true
+	monitorable = true
 	room = room_data
 	var texture := texture_for_type(int(room.type))
-	var shape := collision_shape.shape as CircleShape2D
-	if shape != null:
-		shape.radius = BORDER_RADIUS
-	border.texture = _border_texture(BORDER_RADIUS, BORDER_WIDTH, BORDER_SUPERSAMPLE)
-	border.scale = Vector2.ONE / BORDER_SUPERSAMPLE
-	border.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	border.modulate = BORDER_COLOR
-	sprite_2d.texture = texture
-	sprite_2d.visible = texture != null
-	sprite_2d.scale = BASE_ICON_SCALE
-	sprite_2d.modulate = tint_for_type(int(room.type))
-	visuals.scale = Vector2.ONE
-	animation_player.play("RESET")
+	# MapGraph calls this in the same stack frame as add_child, before this node's _ready — use $, not @onready.
+	var col := $CollisionShape2D as CollisionShape2D
+	var fill := $Visuals/Fill as Polygon2D
+	var brd := $Visuals/Border as Sprite2D
+	var spr := $Visuals/Sprite2D as Sprite2D
+	var vis := $Visuals as Node2D
+	var anim := $AnimationPlayer as AnimationPlayer
+	fill.polygon = _disk_polygon(_fill_disk_radius(), FILL_DISK_SEGMENTS)
+	fill.color = FILL_CLEAR
+	fill.z_index = -1
+	brd.z_index = 0
+	spr.z_index = 1
+	if col.shape == null or not col.shape is CircleShape2D:
+		col.shape = CircleShape2D.new()
+	(col.shape as CircleShape2D).radius = CLICK_RADIUS
+	brd.texture = _border_texture(BORDER_RADIUS, BORDER_WIDTH, BORDER_SUPERSAMPLE)
+	brd.scale = Vector2.ONE / BORDER_SUPERSAMPLE
+	brd.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
+	brd.modulate = BORDER_COLOR
+	spr.texture = texture
+	spr.visible = texture != null
+	spr.scale = BASE_ICON_SCALE
+	spr.modulate = tint_for_type(int(room.type))
+	vis.scale = Vector2.ONE
+	anim.play("RESET")
 
 
-func set_state(is_available: bool, is_current: bool, is_visited: bool, is_selected: bool) -> void:
+func set_state(is_available: bool, is_current: bool, is_visited: bool) -> void:
 	if room == null:
 		return
 	selectable = is_available
-	var hidden := room.mystery and not is_visited and not is_current
+	_visited = is_visited
+	_current = is_current
+	_apply_appearance()
+
+
+func _apply_appearance() -> void:
+	if room == null:
+		return
+	var fill := $Visuals/Fill as Polygon2D
+	var spr := $Visuals/Sprite2D as Sprite2D
+	var brd := $Visuals/Border as Sprite2D
+	var anim := $AnimationPlayer as AnimationPlayer
+	var route := _MapRoute.ROUTE
+	var hidden := room.mystery and not _visited and not _current
 	if hidden:
-		sprite_2d.visible = false
-		sprite_2d.modulate = Color("d4a017")
+		spr.visible = false
+		spr.modulate = Color("d4a017")
+		fill.color = FILL_CLEAR
+		brd.modulate = Color("d4a017")
 	else:
 		var texture := texture_for_type(int(room.type))
-		sprite_2d.texture = texture
-		sprite_2d.visible = texture != null
-		sprite_2d.scale = BASE_ICON_SCALE
-		sprite_2d.modulate = tint_for_type(int(room.type))
+		spr.texture = texture
+		spr.visible = texture != null
+		spr.scale = BASE_ICON_SCALE
+		spr.modulate = tint_for_type(int(room.type))
 	var modulate_color := Color("d4a017") if hidden else tint_for_type(int(room.type))
-	if not is_visited and not is_available and not is_current:
+	if not _visited and not selectable and not _current:
 		modulate_color = modulate_color.darkened(0.45)
-	if is_current:
-		modulate_color = Color.WHITE
+	var hot := _hover and selectable
+	var on_route := hot or _visited
 	if not hidden:
-		sprite_2d.modulate = modulate_color
-	border.modulate = HIGHLIGHT_COLOR if is_current or is_selected else BORDER_COLOR
-	if is_current or is_selected:
-		animation_player.play("highlight")
-	else:
-		animation_player.play("RESET")
+		if on_route:
+			spr.modulate = ICON_ON_ROUTE
+			fill.color = route
+			brd.modulate = route
+		else:
+			spr.modulate = modulate_color
+			fill.color = FILL_CLEAR
+			brd.modulate = BORDER_COLOR
+	anim.play("highlight" if hot else "RESET")
+
+
+func _on_mouse_entered() -> void:
+	if not selectable:
+		return
+	_hover = true
+	hover_choice_changed.emit(room, true)
+	_apply_appearance()
+
+
+func _on_mouse_exited() -> void:
+	if selectable:
+		hover_choice_changed.emit(room, false)
+	_hover = false
+	_apply_appearance()
 
 
 func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
-	if not selectable or room == null or not event.is_action_pressed("left_mouse"):
+	if not selectable or room == null:
 		return
-	selected.emit(room)
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.button_index == MOUSE_BUTTON_LEFT and mb.pressed:
+			selected.emit(room)
 
 
 func _border_texture(radius: float, width: float, supersample: float) -> Texture2D:

@@ -2,7 +2,6 @@ extends Node2D
 class_name BattleLoop
 
 const BallBase := preload("res://script/entities/balls/ball_base.gd")
-const BallCatalog := preload("res://script/entities/balls/ball_catalog.gd")
 const EnemyBase := preload("res://script/entities/enemies/enemy_base.gd")
 const BattleContext := preload("res://script/battle/core/battle_context.gd")
 const BattleResolver := preload("res://script/battle/core/battle_resolver.gd")
@@ -24,12 +23,6 @@ const MERGE_SETTLE_TIME := 0.5
 const SHOOT_BURST_STRENGTH_MULT := 10.0
 const SLOW_MO_SCALE := 0.2
 const HOLD_ACTION := "hold_ball"
-const SPECIAL_SLOT_ACTIONS := [
-	"special_slot_1",
-	"special_slot_2",
-	"special_slot_3",
-	"special_slot_4",
-]
 
 var _context := BattleContext.new(self)
 var _resolver := BattleResolver.new()
@@ -49,10 +42,10 @@ var _paused_for_ability_overlay := false
 @onready var _target := _root.get_node("Aim") as Node2D
 @onready var _target_area := _target.get_node("Area2D") as Area2D
 @onready var _player := _root.get_node("PlayerHolder/Player")
-@onready var _player_bar := _root.get_node("UI/PlayerHealthBar/Background") as ColorRect
-@onready var _player_fill := _root.get_node("UI/PlayerHealthBar/Fill") as ColorRect
-@onready var _player_hp_label := _root.get_node("UI/PlayerHealthBar/Label") as Label
-@onready var _player_status_label := _root.get_node_or_null("UI/PlayerHealthBar/Status") as Label
+@onready var _player_bar := _root.get_node("UI/StatsHUD/Row/PlayerHealthBar/Background") as ColorRect
+@onready var _player_fill := _root.get_node("UI/StatsHUD/Row/PlayerHealthBar/Fill") as ColorRect
+@onready var _player_hp_label := _root.get_node("UI/StatsHUD/Row/PlayerHealthBar/Label") as Label
+@onready var _player_status_label := _root.get_node_or_null("UI/StatsHUD/Row/PlayerHealthBar/Status") as Label
 var _player_shield_fill: ColorRect = null
 @onready var _player_damage_anchor := _root.get_node("PlayerHolder/DamageAnchorPlayer") as Marker2D
 @onready var _enemy_slot_root := _root.get_node("EnemySlot") as Node2D
@@ -144,11 +137,6 @@ func _handle_hold_input() -> void:
 
 func _handle_shoot_input() -> void:
 	if _context.slow_mo_active:
-		for i in range(SPECIAL_SLOT_ACTIONS.size()):
-			if Input.is_action_just_pressed(SPECIAL_SLOT_ACTIONS[i]):
-				if _try_use_special_slot(i):
-					_exit_slow_mo()
-				return
 		if Input.is_action_just_pressed("drop"):
 			if _context.can_shoot():
 				try_shoot(_target_area, _target.global_position)
@@ -162,30 +150,10 @@ func _handle_shoot_input() -> void:
 		_enter_slow_mo()
 
 
-func _try_use_special_slot(index: int) -> bool:
-	var slot_items := _special_slot_entries()
-	if index < 0 or index >= slot_items.size():
-		return false
-	var item: Dictionary = slot_items[index]
-	var cost := BallCatalog.special_cost(item["id"])
-	if not _context.try_spend_mana(cost):
-		return false
-	var mouse_x := _root.get_local_mouse_position().x
-	if _box != null:
-		_box.drop_ball_at_x(item["id"], int(item.get("rank", 1)), mouse_x)
-	_sync_special_bar()
-	return true
-
-
 func _can_enter_action_mode() -> bool:
 	if int(_context.player_statuses.get("freeze_stacks", 0)) > 0:
 		return false
-	if _context.can_shoot():
-		return true
-	for item in _special_slot_entries():
-		if _context.can_spend_mana(BallCatalog.special_cost(item["id"])):
-			return true
-	return false
+	return _context.can_shoot()
 
 
 func ensure_ball_in_play() -> void:
@@ -203,7 +171,6 @@ func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	for ball in hit_balls:
 		ball.on_shot(_context)
 	burst_knock_on_balls(burst_origin, SHOOT_BURST_STRENGTH_MULT)
-	_sync_special_bar()
 
 
 func _complete_turn_after_drop() -> void:
@@ -391,13 +358,11 @@ func sync_enemy_views() -> void:
 func _enter_slow_mo() -> void:
 	_context.slow_mo_active = true
 	Engine.time_scale = SLOW_MO_SCALE
-	_sync_special_bar()
 
 
 func _exit_slow_mo() -> void:
 	_context.slow_mo_active = false
 	Engine.time_scale = 1.0
-	_sync_special_bar()
 
 
 func _show_reward_selection() -> void:
@@ -428,7 +393,6 @@ func _begin_stage() -> void:
 	track_ball(null)
 	_sync_player_bar()
 	sync_mana_hud()
-	_sync_special_bar()
 	set_physics_process(true)
 	_begin_turn()
 
@@ -449,7 +413,6 @@ func _begin_turn() -> void:
 	_context.start_turn()
 	sync_enemy_views()
 	sync_mana_hud()
-	_sync_special_bar()
 	ensure_ball_in_play()
 
 
@@ -516,23 +479,26 @@ func _spawn_enemies() -> void:
 
 
 func _sync_player_bar() -> void:
-	var bar_w    := _player_bar.size.x
-	var bar_h    := _player_bar.size.y
-	var hp_frac  := float(PlayerState.player_health) / float(maxf(1.0, PlayerState.player_max_health))
-	_player_fill.size.x = bar_w * hp_frac
+	var bar_visual_w := PlayerHealthBarSync.bar_visual_width(_player_bar)
+	var bar_h := _player_bar.size.y
+	var hp_frac := float(PlayerState.player_health) / float(maxf(1.0, PlayerState.player_max_health))
+	var hp_visual_w := PlayerHealthBarSync.apply_hp_fill(_player_bar, _player_fill, hp_frac)
 	_player_hp_label.text = "%d/%d" % [PlayerState.player_health, PlayerState.player_max_health]
 
 	# Shield: golden bar segment defined in .tscn, resolved once here.
 	if _player_shield_fill == null:
 		_player_shield_fill = _root.get_node_or_null(
-				"UI/PlayerHealthBar/ShieldFill") as ColorRect
+				"UI/StatsHUD/Row/PlayerHealthBar/ShieldFill") as ColorRect
 	var shield := int(_context.player_statuses.get("shield", 0))
 	if shield > 0:
 		var shield_frac := minf(float(shield) / float(maxf(1.0, PlayerState.player_max_health)),
 				1.0 - hp_frac)
-		_player_shield_fill.position = Vector2(_player_fill.position.x + bar_w * hp_frac,
+		_player_shield_fill.position = Vector2(_player_fill.position.x + hp_visual_w,
 				_player_fill.position.y)
-		_player_shield_fill.size = Vector2(maxf(0.0, bar_w * shield_frac), bar_h)
+		var shield_visual_w := bar_visual_w * shield_frac
+		_player_shield_fill.size = Vector2(
+				maxf(0.0, shield_visual_w / maxf(absf(_player_shield_fill.scale.x), 0.0001)),
+				bar_h)
 		_player_shield_fill.visible = true
 	else:
 		_player_shield_fill.visible = false
@@ -562,34 +528,6 @@ func _sync_ball_hud() -> void:
 		_hud.sync_ball_queue({}, [], {})
 		return
 	_hud.sync_ball_queue(_box.next_entry(), _box.queue_preview(), _box.held_entry())
-
-
-func _sync_special_bar() -> void:
-	_hud.sync_special_bar(
-		_special_slot_entries(),
-		_context.mana_pipes,
-		_context.slow_mo_active,
-		_context.can_shoot()
-	)
-
-
-func _special_slot_entries() -> Array:
-	var entries: Array = []
-	for ball_id in BattleLoadout.special_ball_ids():
-		var data := BallCatalog.data_for_id(ball_id)
-		var scene := BallCatalog.scene_for_id(ball_id)
-		if data == null or scene == null:
-			continue
-		var drop_rank := 1
-		if int(data.special_drop_rank) > 0:
-			drop_rank = int(data.special_drop_rank)
-		entries.append({
-			"id": ball_id,
-			"scene": scene,
-			"data": data,
-			"rank": drop_rank,
-		})
-	return entries
 
 
 func _finish_battle(text: String) -> void:

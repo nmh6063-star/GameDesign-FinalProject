@@ -2,9 +2,18 @@
 
 [ext_resource type="Script" path="res://script/map/map_graph.gd" id="1_script"]
 [ext_resource type="FontFile" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]
+[ext_resource type="Script" path="res://script/ui/map_player_health_bar.gd" id="3_hp_script"]
+[ext_resource type="Script" path="res://script/map/map_graph_edges.gd" id="4_edges"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_root"]
+bg_color = Color(0.25, 0.08, 0.34, 1)
+border_width_left = 0
+border_width_top = 0
+border_width_right = 0
+border_width_bottom = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.86, 0.70, 0.21, 0.86)
+bg_color = Color(0.96, 0.92, 0.76, 1)
 border_width_left = 3
 border_width_top = 3
 border_width_right = 3
@@ -16,11 +25,147 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [node name="MapGraph" type="Panel"]
-custom_minimum_size = Vector2(360, 360)
+mouse_filter = 2
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_root")
 script = ExtResource("1_script")
+
+[node name="CurrentRoomLabel" type="Label" parent="."]
+mouse_filter = 2
+layout_mode = 0
+offset_left = 48.0
+offset_top = 34.0
+offset_right = 514.0
+offset_bottom = 60.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "CURRENT ROOM: START"
+
+[node name="PlayerHealthBar" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -348.0
+offset_top = 28.0
+offset_right = -24.0
+offset_bottom = 66.0
+grow_horizontal = 0
+grow_vertical = 0
+script = ExtResource("3_hp_script")
+
+[node name="Background" type="ColorRect" parent="PlayerHealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.1, 1)
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="PlayerHealthBar"]
+layout_mode = 1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 2.0
+offset_right = 0.0
+offset_bottom = 2.0
+grow_vertical = 2
+size = Vector2(1, 0)
+scale = Vector2(1, 1)
+color = Color(0, 0.7607843, 0, 1)
+
+[node name="ShieldFill" type="ColorRect" parent="PlayerHealthBar"]
+layout_mode = 0
+z_index = 1
+visible = false
+mouse_filter = 2
+color = Color(0.96, 0.78, 0.12, 0.85)
+size = Vector2(0, 34)
+
+[node name="Label" type="Label" parent="PlayerHealthBar"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 1
+
+[node name="Status" type="Label" parent="PlayerHealthBar"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 30.0
+offset_right = 320.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
+text = ""
+
+[node name="SeedLabel" type="Label" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 0
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 72.0
+offset_right = -24.0
+offset_bottom = 94.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 12
+text = "Seed 0"
+horizontal_alignment = 2
+
+[node name="StatusLabel" type="Label" parent="."]
+mouse_filter = 2
+layout_mode = 0
+offset_left = 318.0
+offset_top = 96.0
+offset_right = 836.0
+offset_bottom = 120.0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 14
+text = "CHOOSE YOUR PATH"
+horizontal_alignment = 1
+
+[node name="GraphPanel" type="Panel" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 128.0
+offset_right = -48.0
+offset_bottom = -56.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="Title" type="Label" parent="."]
+[node name="EdgeDrawer" type="Node2D" parent="GraphPanel"]
+z_index = 0
+script = ExtResource("4_edges")
+
+[node name="Title" type="Label" parent="GraphPanel"]
+mouse_filter = 2
+layout_mode = 0
 offset_left = 16.0
 offset_top = 10.0
 offset_right = 140.0
@@ -29,4 +174,23 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "MAP"
 
-[node name="Rooms" type="Node2D" parent="."]
+[node name="Rooms" type="Node2D" parent="GraphPanel"]
+z_index = 2
+
+[node name="InstructionsLabel" type="Label" parent="."]
+mouse_filter = 2
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = -44.0
+offset_right = -48.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 10
+text = "CLICK AN AVAILABLE ROOM TO TRAVEL"
+horizontal_alignment = 1

@@ -42,6 +42,7 @@ func _init(
 	_ball_placeholder.set_runtime(_context, _target)
 	_ball_placeholder.set_collision_enabled(false)
 	_capture_drop_bounds()
+	_apply_playfield_bounds_to_ball(_ball_placeholder)
 
 
 func active() -> Array:
@@ -89,7 +90,7 @@ func spawn_ball(ball_id: String, rank: int, global_position: Vector2, impulse: V
 
 
 func drop_center_global() -> Vector2:
-	return _ball_placeholder.global_position
+	return _ball_parent.to_global(Vector2(_cursor_x_clamped(0.0), _drop_y))
 
 
 func drop_ball(ball_id: String, rank: int = 1) -> BallBase:
@@ -110,7 +111,7 @@ func drop_ball_at_x(ball_id: String, rank: int = 1, x: float = INF) -> BallBase:
 	if ball == null:
 		return null
 	var radius: float = data.radius_for_rank(rank)
-	var drop_x := _clamp_drop_x(_ball_placeholder.position.x if is_inf(x) else x, radius)
+	var drop_x := _cursor_x_clamped(radius) if is_inf(x) else _clamp_drop_x(x, radius)
 	var spawned := _spawn_instance(ball, data, rank, Vector2(drop_x, _drop_y), false)
 	spawned.sleeping = false
 	return spawned
@@ -139,7 +140,9 @@ func spawn_setup_ball() -> BallBase:
 			}
 			new_data.append(obj)
 	base.element_list = new_data
-	return _spawn_instance(base, entry["data"], entry["rank"], _ball_placeholder.position, true)
+	var entry_data = entry["data"]
+	var setup_radius: float = entry_data.radius_for_rank(int(entry["rank"]))
+	return _spawn_instance(base, entry["data"], entry["rank"], _setup_ball_position(setup_radius), true)
 
 
 func hold_swap(current_ball: BallBase) -> bool:
@@ -150,7 +153,9 @@ func hold_swap(current_ball: BallBase) -> bool:
 		return false
 	_held_entry = _entry_from_ball(current_ball)
 	current_ball.configure(replacement["data"], replacement["rank"], _context, _target)
-	current_ball.position = _ball_placeholder.position
+	_apply_playfield_bounds_to_ball(current_ball)
+	var swap_radius: float = current_ball.data.radius_for_rank(current_ball.rank)
+	current_ball.position = _setup_ball_position(swap_radius)
 	current_ball.linear_velocity = Vector2.ZERO
 	current_ball.angular_velocity = 0.0
 	current_ball.rotation = 0.0
@@ -189,8 +194,9 @@ func preview() -> Array:
 
 
 func _spawn_instance(ball: BallBase, data, rank: int, position: Vector2, is_set_up: bool) -> BallBase:
-	ball.configure(data, rank, _context, _target)
 	_ball_parent.add_child(ball)
+	ball.configure(data, rank, _context, _target)
+	_apply_playfield_bounds_to_ball(ball)
 	ball.position = position
 	ball.visible = true
 	ball.set_collision_enabled(true)
@@ -267,20 +273,55 @@ func _rng_percent() -> int:
 
 func _capture_drop_bounds() -> void:
 	_drop_y = _ball_placeholder.position.y
-	var interior := _root.get_node("Background/Box/Interior") as Polygon2D
+	var interior := _root.get_node_or_null("Background/Box/Interior") as Polygon2D
+	if interior == null:
+		push_error("BattleBallManager: expected node Background/Box/Interior (Polygon2D)")
+		_drop_left_x = _ball_placeholder.position.x - 100.0
+		_drop_right_x = _ball_placeholder.position.x + 100.0
+		return
 	var points := interior.polygon
 	_drop_left_x = INF
 	_drop_right_x = -INF
 	for point in points:
-		var x: float = interior.to_global(point).x
-		_drop_left_x = minf(_drop_left_x, x)
-		_drop_right_x = maxf(_drop_right_x, x)
-	_drop_left_x -= _root.global_position.x
-	_drop_right_x -= _root.global_position.x
+		var lp: Vector2 = _ball_parent.to_local(interior.to_global(point))
+		_drop_left_x = minf(_drop_left_x, lp.x)
+		_drop_right_x = maxf(_drop_right_x, lp.x)
+	if not is_finite(_drop_left_x) or not is_finite(_drop_right_x) or _drop_right_x <= _drop_left_x:
+		push_error("BattleBallManager: Interior polygon is empty or invalid")
+		_drop_left_x = _ball_placeholder.position.x - 100.0
+		_drop_right_x = _ball_placeholder.position.x + 100.0
+
+
+func _apply_playfield_bounds_to_ball(ball: BallBase) -> void:
+	ball.set_playfield_x_bounds(_drop_left_x, _drop_right_x)
+
+
+## Call after editing the box / Interior polygon at runtime (editor changes are read on battle start).
+func refresh_drop_bounds() -> void:
+	_capture_drop_bounds()
+	_apply_playfield_bounds_to_ball(_ball_placeholder)
+	for node in _ball_parent.get_children():
+		if node is BallBase and node != _ball_placeholder:
+			_apply_playfield_bounds_to_ball(node as BallBase)
 
 
 func _clamp_drop_x(x: float, radius: float) -> float:
 	return clampf(x, _drop_left_x + radius, _drop_right_x - radius)
+
+
+func _cursor_x_clamped(radius: float) -> float:
+	var w := _drop_right_x - _drop_left_x
+	if w <= 0.001:
+		return _ball_placeholder.position.x
+	var cursor_x: float = _ball_parent.to_local(_ball_parent.get_global_mouse_position()).x
+	return _clamp_drop_x(cursor_x, radius)
+
+
+func _setup_ball_position(radius: float) -> Vector2:
+	var w := _drop_right_x - _drop_left_x
+	if w <= 0.001:
+		return _ball_placeholder.position
+	return Vector2(_cursor_x_clamped(radius), _drop_y)
 
 
 func _entry_from_ball(ball: BallBase) -> Dictionary:

@@ -6,7 +6,8 @@
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="4_lqmne"]
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="5_1ql6a"]
 [ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="6_fty31"]
-[ext_resource type="Script" uid="uid://d0di4mfjr71jr" path="res://script/ui/mana_hud.gd" id="7_f80v2"]
+[ext_resource type="Script" path="res://script/ui/stats_hud.gd" id="7_f80v2"]
+[ext_resource type="Script" path="res://script/ui/cursor_mana_pipes.gd" id="16_cursorpipes"]
 [ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="8_s87j3"]
 [ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_ovysb"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="10_8kcjd"]
@@ -49,39 +50,6 @@ corner_radius_top_left = 24
 corner_radius_top_right = 24
 corner_radius_bottom_right = 24
 corner_radius_bottom_left = 24
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_special_bar"]
-bg_color = Color(0.24, 0.24, 0.24, 0.95)
-corner_radius_top_left = 28
-corner_radius_top_right = 28
-corner_radius_bottom_right = 28
-corner_radius_bottom_left = 28
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_special_slot"]
-bg_color = Color(0.13, 0.13, 0.13, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cost_badge"]
-bg_color = Color(0.06, 0.06, 0.1, 0.95)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.92, 0.92, 1, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_attack_slot"]
-bg_color = Color(0.98, 0.58, 0.13, 1)
-corner_radius_top_left = 18
-corner_radius_top_right = 18
-corner_radius_bottom_right = 18
-corner_radius_bottom_left = 18
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_result"]
 bg_color = Color(0.15, 0.08, 0.2, 0.94)
@@ -378,17 +346,17 @@ theme_override_fonts/font = ExtResource("3_miulw")
 theme_override_font_sizes/font_size = 10
 text = "I"
 
-[node name="ManaHUD" type="Control" parent="UI" unique_id=901000000]
+[node name="StatsHUD" type="Control" parent="UI" unique_id=901000000]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 775.0
-offset_top = 398.0
-offset_right = 985.0
+offset_left = 752.0
+offset_top = 338.0
+offset_right = 1076.0
 offset_bottom = 430.0
 mouse_filter = 2
 script = ExtResource("7_f80v2")
 
-[node name="Row" type="VBoxContainer" parent="UI/ManaHUD" unique_id=901000001]
+[node name="Row" type="VBoxContainer" parent="UI/StatsHUD" unique_id=901000001]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -397,50 +365,75 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 8
 
-[node name="ManaPipes" type="HBoxContainer" parent="UI/ManaHUD/Row" unique_id=901000006]
+[node name="PlayerHealthBar" type="Control" parent="UI/StatsHUD/Row" unique_id=1800000008]
 layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 12
+size_flags_horizontal = 3
+size_flags_vertical = 0
+custom_minimum_size = Vector2(0, 38)
 
-[node name="Pip0" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000007]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
+[node name="Background" type="ColorRect" parent="UI/StatsHUD/Row/PlayerHealthBar" unique_id=1800000009]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 2.0
+offset_bottom = 2.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.1, 1)
+color = Color(0, 0, 0, 1)
 
-[node name="Pip1" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000008]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
+[node name="Fill" type="ColorRect" parent="UI/StatsHUD/Row/PlayerHealthBar" unique_id=1800000014]
+layout_mode = 1
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 0.0
+offset_top = 2.0
+offset_right = 0.0
+offset_bottom = 2.0
+grow_vertical = 2
+size = Vector2(1, 0)
+scale = Vector2(1, 1)
+color = Color(0, 0.7607843, 0, 1)
 
-[node name="Pip2" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000009]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
+[node name="ShieldFill" type="ColorRect" parent="UI/StatsHUD/Row/PlayerHealthBar" unique_id=4100000001]
+layout_mode = 0
+z_index = 1
+visible = false
+mouse_filter = 2
+color = Color(0.96, 0.78, 0.12, 0.85)
+size = Vector2(0, 34)
 
-[node name="Pip3" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000010]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
+[node name="Label" type="Label" parent="UI/StatsHUD/Row/PlayerHealthBar" unique_id=832688741]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -12.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_miulw")
+theme_override_font_sizes/font_size = 16
+vertical_alignment = 1
 
-[node name="Pip4" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000011]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
+[node name="Status" type="Label" parent="UI/StatsHUD/Row/PlayerHealthBar" unique_id=727196071]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 30.0
+offset_right = 320.0
+offset_bottom = 46.0
+theme_override_fonts/font = ExtResource("3_miulw")
+theme_override_font_sizes/font_size = 8
 
-[node name="Pip5" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000012]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
-
-[node name="Pip6" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000013]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
-
-[node name="Pip7" type="Panel" parent="UI/ManaHUD/Row/ManaPipes" unique_id=901000014]
-custom_minimum_size = Vector2(22, 22)
-layout_mode = 2
-
-[node name="Meter" type="Control" parent="UI/ManaHUD/Row" unique_id=901000002]
+[node name="Meter" type="Control" parent="UI/StatsHUD/Row" unique_id=901000002]
 custom_minimum_size = Vector2(122, 14)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 
-[node name="Background" type="ColorRect" parent="UI/ManaHUD/Row/Meter" unique_id=901000003]
+[node name="Background" type="ColorRect" parent="UI/StatsHUD/Row/Meter" unique_id=901000003]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -449,13 +442,60 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.12, 0.08, 0.02, 1)
 
-[node name="Fill" type="ColorRect" parent="UI/ManaHUD/Row/Meter" unique_id=901000004]
+[node name="Fill" type="ColorRect" parent="UI/StatsHUD/Row/Meter" unique_id=901000004]
 layout_mode = 0
 offset_left = 1.0
 offset_top = 1.0
 offset_right = 1.0
 offset_bottom = 13.0
 color = Color(0.33, 0.66, 1, 1)
+
+[node name="CursorManaPipes" type="Control" parent="UI" unique_id=901000099]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("16_cursorpipes")
+
+[node name="ManaPipes" type="HBoxContainer" parent="UI/CursorManaPipes" unique_id=901000006]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 12
+
+[node name="Pip0" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000007]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip1" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000008]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip2" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000009]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip3" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000010]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip4" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000011]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip5" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000012]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip6" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000013]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
+
+[node name="Pip7" type="Panel" parent="UI/CursorManaPipes/ManaPipes" unique_id=901000014]
+custom_minimum_size = Vector2(22, 22)
+layout_mode = 2
 
 [node name="ComboHUD" type="Control" parent="UI" unique_id=1357639289]
 layout_mode = 3
@@ -532,329 +572,6 @@ layout_mode = 0
 offset_right = 124.0
 offset_bottom = 8.0
 color = Color(1.6845763e-06, 0.7855929, 0.19968045, 1)
-
-[node name="PlayerHealthBar" type="Control" parent="UI" unique_id=1800000008]
-layout_mode = 3
-anchors_preset = 0
-offset_left = 752.0
-offset_top = 338.0
-offset_right = 1076.0
-offset_bottom = 376.0
-
-[node name="Background" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000009]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 2.0
-offset_bottom = 2.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(1.1, 0.90000004)
-color = Color(0, 0, 0, 1)
-
-[node name="Fill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=1800000014]
-layout_mode = 1
-offset_top = 2.0
-offset_right = 240.0
-offset_bottom = 32.0
-scale = Vector2(1, 1.1)
-color = Color(0, 0.7607843, 0, 1)
-
-[node name="ShieldFill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=4100000001]
-layout_mode = 0
-z_index = 1
-visible = false
-mouse_filter = 2
-color = Color(0.96, 0.78, 0.12, 0.85)
-size = Vector2(0, 30)
-
-[node name="Label" type="Label" parent="UI/PlayerHealthBar" unique_id=832688741]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -12.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 16
-vertical_alignment = 1
-
-[node name="Status" type="Label" parent="UI/PlayerHealthBar" unique_id=727196071]
-layout_mode = 0
-offset_left = 6.0
-offset_top = 30.0
-offset_right = 320.0
-offset_bottom = 46.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 8
-
-[node name="SpecialBar" type="Panel" parent="UI" unique_id=1800000019]
-offset_left = 624.0
-offset_top = 484.0
-offset_right = 1144.0
-offset_bottom = 578.0
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_special_bar")
-
-[node name="Slots" type="HBoxContainer" parent="UI/SpecialBar" unique_id=1800000020]
-layout_mode = 0
-offset_left = 18.0
-offset_top = 10.0
-offset_right = 502.0
-offset_bottom = 84.0
-mouse_filter = 2
-theme_override_constants/separation = 12
-
-[node name="Slot0" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000021]
-custom_minimum_size = Vector2(84, 74)
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000022]
-position = Vector2(42, 32)
-
-[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000023]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 74.0
-offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 8
-vertical_alignment = 1
-
-[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000050]
-layout_mode = 0
-offset_left = 62.0
-offset_top = -8.0
-offset_right = 82.0
-offset_bottom = 12.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
-
-[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot0/CostBadge" unique_id=1800000024]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot0" unique_id=1800000025]
-layout_mode = 0
-offset_top = 56.0
-offset_right = 84.0
-offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-text = "1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Slot1" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000026]
-custom_minimum_size = Vector2(84, 74)
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000027]
-position = Vector2(42, 32)
-
-[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000028]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 74.0
-offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 8
-vertical_alignment = 1
-
-[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000051]
-layout_mode = 0
-offset_left = 62.0
-offset_top = -8.0
-offset_right = 82.0
-offset_bottom = 12.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
-
-[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot1/CostBadge" unique_id=1800000029]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot1" unique_id=1800000030]
-layout_mode = 0
-offset_top = 56.0
-offset_right = 84.0
-offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-text = "2"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Slot2" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000031]
-custom_minimum_size = Vector2(84, 74)
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000032]
-position = Vector2(42, 32)
-
-[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000033]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 74.0
-offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 8
-vertical_alignment = 1
-
-[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000052]
-layout_mode = 0
-offset_left = 62.0
-offset_top = -8.0
-offset_right = 82.0
-offset_bottom = 12.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
-
-[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot2/CostBadge" unique_id=1800000034]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot2" unique_id=1800000035]
-layout_mode = 0
-offset_top = 56.0
-offset_right = 84.0
-offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-text = "3"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Slot3" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000036]
-custom_minimum_size = Vector2(84, 74)
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_special_slot")
-
-[node name="PreviewRoot" type="Node2D" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000037]
-position = Vector2(42, 32)
-
-[node name="Name" type="Label" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000038]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 24.0
-offset_right = 74.0
-offset_bottom = 48.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 8
-vertical_alignment = 1
-
-[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000053]
-layout_mode = 0
-offset_left = 62.0
-offset_top = -8.0
-offset_right = 82.0
-offset_bottom = 12.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
-
-[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/Slot3/CostBadge" unique_id=1800000039]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Key" type="Label" parent="UI/SpecialBar/Slots/Slot3" unique_id=1800000044]
-layout_mode = 0
-offset_top = 56.0
-offset_right = 84.0
-offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-text = "4"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="AttackSlot" type="Panel" parent="UI/SpecialBar/Slots" unique_id=1800000040]
-custom_minimum_size = Vector2(92, 74)
-layout_mode = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_attack_slot")
-
-[node name="CostBadge" type="Panel" parent="UI/SpecialBar/Slots/AttackSlot" unique_id=1800000054]
-layout_mode = 0
-offset_left = 70.0
-offset_top = -8.0
-offset_right = 90.0
-offset_bottom = 12.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_cost_badge")
-
-[node name="Cost" type="Label" parent="UI/SpecialBar/Slots/AttackSlot/CostBadge" unique_id=1800000055]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_colors/font_color = Color(0.98, 0.98, 1, 1)
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-text = "1"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Title" type="Label" parent="UI/SpecialBar/Slots/AttackSlot" unique_id=1800000041]
-layout_mode = 0
-offset_left = 6.0
-offset_top = 18.0
-offset_right = 86.0
-offset_bottom = 42.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Key" type="Label" parent="UI/SpecialBar/Slots/AttackSlot" unique_id=1800000042]
-layout_mode = 0
-offset_top = 56.0
-offset_right = 92.0
-offset_bottom = 72.0
-theme_override_fonts/font = ExtResource("3_miulw")
-theme_override_font_sizes/font_size = 10
-text = "X"
-horizontal_alignment = 1
-vertical_alignment = 1
 
 [node name="LineLimit" type="Control" parent="UI" unique_id=1133250344]
 layout_mode = 3

@@ -56,7 +56,6 @@ func _begin_stage() -> void:
 		TUTORIAL_INITIAL_MERGE_PROGRESS, 0, BattleContext.MERGES_PER_MANA_PIPE - 1
 	)
 	sync_mana_hud()
-	_sync_special_bar()
 	set_physics_process(true)
 	_begin_turn()
 
