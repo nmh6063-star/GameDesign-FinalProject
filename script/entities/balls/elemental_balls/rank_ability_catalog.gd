@@ -73,6 +73,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("upgrade_pulse", 5, "Upgrade Pulse", "Upgrade a random nearby ball by +1 rank."),
 				_ability("poison_rain", 5, "Poison Rain", "Poison all enemies (20 stacks)."),
 				_ability("time_drift", 5, "Time Drift", "Slow time 10s. Damage you take in the first 5s is stored and reflected back to enemies over the final 5s."),
+				_ability("contagion", 5, "Contagion", "Copy current enemy debuffs to one random other enemy (stacks with theirs)."),
 			]
 		6:
 			return [
@@ -82,6 +83,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("mass_morph", 6, "Mass Morph", "Upgrade all rank 1 and 2 balls in the box by +1."),
 				_ability("reflect_wall", 6, "Reflect Wall", "Reflect all incoming damage for 12 seconds."),
 				_ability("giant_core", 6, "Giant Core", "One rank 1-5 ball gets ×3 attack, triggers twice, ×2 visual size."),
+				_ability("dot_siphon", 6, "Siphon", "This battle: heal 20% of all DOT damage dealt to enemies."),
 			]
 		7:
 			return [
@@ -92,6 +94,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("miracle_cascade", 7, "Miracle Cascade", "Trigger one random ability from each of ranks 3, 4, and 5."),
 				_ability("sacrifice_nova", 7, "Sacrifice Nova", "Lose 50% current HP → deal 500 damage to all enemies after 10s."),
 				_ability("one_shower", 7, "1 Shower", "Continuously spawn rank 1-3 balls for 10 seconds."),
+				_ability("dot_echo", 7, "Echo", "This battle: every DOT damage instance triggers twice."),
 			]
 	return []
 

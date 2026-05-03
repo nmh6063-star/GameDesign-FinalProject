@@ -337,18 +337,5 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.keycode == KEY_P and scene.scene_file_path in _ROOM_SCENES:
 		complete_current_room()
 		return
-	if event.keycode == KEY_L:
-		_debug_enter_event_room()
-		return
-	if event.keycode == KEY_6:
-		get_tree().change_scene_to_file(CAMPFIRE_SCENE_PATH)
-	elif event.keycode == KEY_7:
-		get_tree().change_scene_to_file(SHOP_SCENE_PATH)
-	elif event.keycode == KEY_T:
+	if event.keycode == KEY_T:
 		PlayerState.apply_test_current_abilities_set()
-
-
-func _debug_enter_event_room() -> void:
-	# Dev shortcut: jump directly into an event room.
-	_save_room_entry_state(EVENT_SCENE_PATH)
-	_change_scene(EVENT_SCENE_PATH)

@@ -130,7 +130,7 @@ func _refresh_view() -> void:
 		_current_room_label.text = "CURRENT ROOM: NONE"
 		_status_label.text = "NO MAP"
 		_seed_label.text = "Seed -"
-		_instructions_label.text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M TOGGLE MAP"
+		_instructions_label.text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M MAP     Q AUGMENTS"
 		for door in _doors:
 			(door as Control).visible = false
 		return
@@ -144,7 +144,7 @@ func _refresh_view() -> void:
 		_status_label.text = "CHOOSE YOUR PATH"
 	else:
 		_status_label.text = "ROOM RESOLVED"
-	_instructions_label.text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M TOGGLE MAP"
+	_instructions_label.text = "LEFT / RIGHT SELECT     ENTER CONFIRM     M MAP     Q AUGMENTS"
 	if _map_graph != null:
 		_map_graph.visible = bool(_game_manager.map_view_visible)
 	var choices: Array = controller.available_choices()

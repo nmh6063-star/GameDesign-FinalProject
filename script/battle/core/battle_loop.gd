@@ -53,6 +53,7 @@ var _paused_for_ability_overlay := false
 @onready var _player_fill := _root.get_node("UI/PlayerHealthBar/Fill") as ColorRect
 @onready var _player_hp_label := _root.get_node("UI/PlayerHealthBar/Label") as Label
 @onready var _player_status_label := _root.get_node_or_null("UI/PlayerHealthBar/Status") as Label
+var _player_shield_fill: ColorRect = null
 @onready var _player_damage_anchor := _root.get_node("PlayerHolder/DamageAnchorPlayer") as Marker2D
 @onready var _enemy_slot_root := _root.get_node("EnemySlot") as Node2D
 @onready var _ui_root := _root.get_node("UI") as CanvasLayer
@@ -515,21 +516,45 @@ func _spawn_enemies() -> void:
 
 
 func _sync_player_bar() -> void:
-	_player_fill.size.x = _player_bar.size.x * float(PlayerState.player_health) / float(PlayerState.player_max_health)
+	var bar_w    := _player_bar.size.x
+	var bar_h    := _player_bar.size.y
+	var hp_frac  := float(PlayerState.player_health) / float(maxf(1.0, PlayerState.player_max_health))
+	_player_fill.size.x = bar_w * hp_frac
 	_player_hp_label.text = "%d/%d" % [PlayerState.player_health, PlayerState.player_max_health]
+
+	# Shield: golden bar segment defined in .tscn, resolved once here.
+	if _player_shield_fill == null:
+		_player_shield_fill = _root.get_node_or_null(
+				"UI/PlayerHealthBar/ShieldFill") as ColorRect
+	var shield := int(_context.player_statuses.get("shield", 0))
+	if shield > 0:
+		var shield_frac := minf(float(shield) / float(maxf(1.0, PlayerState.player_max_health)),
+				1.0 - hp_frac)
+		_player_shield_fill.position = Vector2(_player_fill.position.x + bar_w * hp_frac,
+				_player_fill.position.y)
+		_player_shield_fill.size = Vector2(maxf(0.0, bar_w * shield_frac), bar_h)
+		_player_shield_fill.visible = true
+	else:
+		_player_shield_fill.visible = false
+
 	if _player_status_label != null:
 		var tags: Array[String] = []
-		var shield := int(_context.player_statuses.get("shield", 0))
 		if shield > 0:
-			tags.append("Shield %d" % shield)
+			tags.append("🛡 %d" % shield)
 		var atk := int(_context.player_statuses.get("attack_bonus", 0))
 		if atk > 0:
-			tags.append("ATK+%d" % atk)
+			tags.append("⚔ ATK+%d" % atk)
 		if _context.can_resurrect():
-			tags.append("Resurrect")
+			tags.append("✚ Revive")
 		if _context.has_reflect_active():
-			tags.append("Reflect")
-		_player_status_label.text = " | ".join(tags)
+			tags.append("↩ Reflect")
+		var pa := int(_context.player_statuses.get("poison_apple_charges", 0))
+		if pa > 0:
+			tags.append("☠ PA×%d" % pa)
+		var cl := int(_context.player_statuses.get("clone_stacks", 0))
+		if cl > 0:
+			tags.append("✦ Clone×%d" % cl)
+		_player_status_label.text = "  ".join(tags)
 
 
 func _sync_ball_hud() -> void:
@@ -555,11 +580,14 @@ func _special_slot_entries() -> Array:
 		var scene := BallCatalog.scene_for_id(ball_id)
 		if data == null or scene == null:
 			continue
+		var drop_rank := 1
+		if int(data.special_drop_rank) > 0:
+			drop_rank = int(data.special_drop_rank)
 		entries.append({
 			"id": ball_id,
 			"scene": scene,
 			"data": data,
-			"rank": 1,
+			"rank": drop_rank,
 		})
 	return entries
 

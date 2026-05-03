@@ -27,6 +27,8 @@ var player_statuses := {
 	"resurrect_used": false,
 	"burn_stacks": 0,
 	"freeze_stacks": 0,
+	"dot_damage_heal_ratio": 0.0,
+	"dot_triggers_twice": false,
 }
 var battle_flags := {
 	"last_damage": 0,
@@ -66,6 +68,8 @@ func reset_for_battle() -> void:
 		"resurrect_used": false,
 		"burn_stacks": 0,
 		"freeze_stacks": 0,
+		"dot_damage_heal_ratio": 0.0,
+		"dot_triggers_twice": false,
 	}
 	battle_flags = {
 		"last_damage": 0,
@@ -268,8 +272,48 @@ func _damage_player_raw(amount: int) -> void:
 
 ## DOT damage: bypasses attack_bonus and clone multipliers.
 func _damage_enemy_dot(amount: int, enemy: EnemyBase) -> void:
-	if controller != null:
+	if controller == null or enemy == null or amount <= 0:
+		return
+	var repeat := 2 if bool(player_statuses.get("dot_triggers_twice", false)) else 1
+	var total_dealt := 0
+	for _i in range(repeat):
 		controller.damage_enemy(amount, enemy, self)
+		total_dealt += amount
+	var ratio := float(player_statuses.get("dot_damage_heal_ratio", 0.0))
+	if ratio > 0.0 and total_dealt > 0:
+		var heal_amt := maxi(1, int(round(float(total_dealt) * ratio)))
+		heal_player(heal_amt)
+
+
+## Copies poison/burn/charm stacks and remaining freeze duration from one enemy onto another (additive).
+func copy_enemy_debuffs(from_enemy: EnemyBase, to_enemy: EnemyBase) -> void:
+	if from_enemy == null or to_enemy == null or from_enemy == to_enemy:
+		return
+	var sf := status_for_enemy(from_enemy)
+	var st := status_for_enemy(to_enemy)
+	st["poison_stack"] = int(st.get("poison_stack", 0)) + int(sf.get("poison_stack", 0))
+	st["burn_stack"] = int(st.get("burn_stack", 0)) + int(sf.get("burn_stack", 0))
+	st["charm_stack"] = int(st.get("charm_stack", 0)) + int(sf.get("charm_stack", 0))
+	var now := now_ms()
+	var src_until := int(sf.get("freeze_until_ms", 0))
+	var src_remain := maxi(0, src_until - now)
+	if src_remain > 0:
+		var tgt_base := maxi(now, int(st.get("freeze_until_ms", 0)))
+		st["freeze_until_ms"] = tgt_base + src_remain
+
+
+func spread_debuffs_from_active_to_random_other() -> void:
+	var from_enemy := active_enemy()
+	if from_enemy == null or not from_enemy.is_alive():
+		return
+	var candidates: Array = []
+	for e in _alive_enemies():
+		if e != from_enemy and e.is_alive():
+			candidates.append(e)
+	if candidates.is_empty():
+		return
+	var to_enemy: EnemyBase = candidates[randi() % candidates.size()]
+	copy_enemy_debuffs(from_enemy, to_enemy)
 
 
 func burst(origin_global: Vector2, strength_scale: float = 1.0) -> void:
@@ -314,7 +358,7 @@ func consume_enemy_stack(enemy: EnemyBase, key: String, amount: int = 1) -> void
 	st[k] = max(0, int(st.get(k, 0)) - max(0, amount))
 
 
-## Burn ticks every real second: deals 1 damage and consumes 1 stack per tick.
+## Burn ticks every second
 func tick_enemy_burn(delta: float) -> void:
 	for enemy in _alive_enemies():
 		var st := status_for_enemy(enemy)
@@ -348,7 +392,6 @@ func on_enemy_attack_resolved(enemy: EnemyBase) -> void:
 		consume_enemy_stack(enemy, "charm", 1)
 
 
-## Kept for API compatibility; freeze is now purely time-based.
 func consume_freeze_on_ball_drop() -> void:
 	pass
 

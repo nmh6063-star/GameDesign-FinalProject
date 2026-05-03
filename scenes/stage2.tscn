@@ -561,6 +561,14 @@ offset_bottom = 32.0
 scale = Vector2(1, 1.1)
 color = Color(0, 0.7607843, 0, 1)
 
+[node name="ShieldFill" type="ColorRect" parent="UI/PlayerHealthBar" unique_id=4100000001]
+layout_mode = 0
+z_index = 1
+visible = false
+mouse_filter = 2
+color = Color(0.96, 0.78, 0.12, 0.85)
+size = Vector2(0, 30)
+
 [node name="Label" type="Label" parent="UI/PlayerHealthBar" unique_id=832688741]
 layout_mode = 1
 anchors_preset = 15
@@ -1049,6 +1057,49 @@ offset_bottom = 8.0
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
+[node name="StatusPoison" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=4201]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(-52, 80)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(0.35, 0.9, 0.35, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusBurn" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=4202]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(8, 80)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(1.0, 0.52, 0.1, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusFreeze" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=4203]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(-52, 92)
+size = Vector2(78, 12)
+theme_override_colors/font_color = Color(0.35, 0.85, 1.0, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusCharm" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=4204]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(8, 92)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(0.88, 0.45, 1.0, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=181201766]
 position = Vector2(40, -32)
@@ -1119,6 +1170,49 @@ offset_bottom = 8.0
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
+[node name="StatusPoison" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=4211]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(-52, 80)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(0.35, 0.9, 0.35, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusBurn" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=4212]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(8, 80)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(1.0, 0.52, 0.1, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusFreeze" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=4213]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(-52, 92)
+size = Vector2(78, 12)
+theme_override_colors/font_color = Color(0.35, 0.85, 1.0, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusCharm" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=4214]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(8, 92)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(0.88, 0.45, 1.0, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1307839188]
 position = Vector2(40, -32)
@@ -1189,6 +1283,49 @@ offset_bottom = 8.0
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
+[node name="StatusPoison" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=4221]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(-52, 80)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(0.35, 0.9, 0.35, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusBurn" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=4222]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(8, 80)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(1.0, 0.52, 0.1, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusFreeze" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=4223]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(-52, 92)
+size = Vector2(78, 12)
+theme_override_colors/font_color = Color(0.35, 0.85, 1.0, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
+
+[node name="StatusCharm" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=4224]
+layout_mode = 0
+z_index = 2
+visible = false
+mouse_filter = 2
+position = Vector2(8, 92)
+size = Vector2(68, 12)
+theme_override_colors/font_color = Color(0.88, 0.45, 1.0, 1.0)
+theme_override_fonts/font = ExtResource("3_w5a8x")
+theme_override_font_sizes/font_size = 7
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=1800000043]
 position = Vector2(40, -32)
