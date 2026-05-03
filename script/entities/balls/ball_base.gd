@@ -39,6 +39,7 @@ func _ready() -> void:
 		contact_monitor = true
 		max_contacts_reported = 10
 	#set sprites
+	$RichTextLabel.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	refresh()
 
 
@@ -61,27 +62,89 @@ func set_preview(ball_data: BallData, ball_rank: int) -> void:
 	set_collision_enabled(false)
 	refresh()
 
+func center(poly: PackedVector2Array, size: Vector2) -> PackedVector2Array:
+	var half = size * 0.5
+	var result = PackedVector2Array()
+
+	for p in poly:
+		result.append((p - half) * get_radius() * 0.05)
+
+	return result
+
+func soften_alpha(img: Image):
+	var w = img.get_width()
+	var h = img.get_height()
+
+	var temp = Image.create(w, h, false, Image.FORMAT_RGBA8)
+
+	# number of blur passes (increase for stronger smoothing)
+	var passes = 3
+
+	for p in range(passes):
+		for y in range(h):
+			for x in range(w):
+				var sum = 0.0
+				var count = 0
+
+				# 5x5 kernel (stronger than before)
+				for oy in range(-2, 3):
+					for ox in range(-2, 3):
+						var nx = x + ox
+						var ny = y + oy
+
+						if nx >= 0 and nx < w and ny >= 0 and ny < h:
+							var c = img.get_pixel(nx, ny)
+							sum += c.a
+							count += 1
+
+				var avg = sum / max(count, 1)
+
+				var c = img.get_pixel(x, y)
+				c.a = avg
+				temp.set_pixel(x, y, c)
+
+		# copy back for next pass
+		img.copy_from(temp)
 
 func refresh() -> void:
 	if data == null:
 		return
 	for elements in element_list:
 		if elements["element"].matching_function(self, elements["effect"]):
+			var polygon = get_node_or_null("Polygon2D")
+			if polygon:
+				polygon.queue_free()
 			var sprites = elements["element"].get_sprite_files(elements["effect"])
-			var base = get_node_or_null("base")
+			var base = get_node_or_null("Sprite2D")
 			var overlay = get_node_or_null("overlay")
-			if get_node_or_null("base") == null:
-				base = Sprite2D.new()
+			var collision = get_node_or_null("collision")
+			if get_node_or_null("overlay") == null:
 				overlay = Sprite2D.new()
-				base.name = "base"
 				overlay.name = "overlay"
-				self.add_child(base)
+				collision = CollisionPolygon2D.new()
+				collision.name = "collision"
 				self.add_child(overlay)
-			base.texture = sprites["base"]
+				self.add_child(collision)
+				get_node("CollisionShape2D").queue_free()
+			base.texture = sprites["base"][rank]
 			overlay.texture = sprites["overlay"]
-			base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
-			overlay.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			#base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			overlay.scale = Vector2(1.0 + get_radius()/50.0, 1.0 + get_radius()/50.0)
 			typing = elements["element"].get_function_info(elements["effect"])["class"]
+			var image = base.texture.get_image()
+			image.convert(Image.FORMAT_RGBA8)
+			soften_alpha(image)
+			var bitmap = BitMap.new()
+			bitmap.create_from_image_alpha(image)
+			var polys = bitmap.opaque_to_polygons(
+				Rect2(Vector2.ZERO, image.get_size()),
+				0.5
+			)
+
+			var poly = center(polys[0], image.get_size())
+
+			collision.polygon = poly
+			collision.position = base.position + Vector2(0, 1.0)
 			break
 	_sync_rank()
 	_update_collision()
@@ -94,7 +157,10 @@ func _sync_rank() -> void:
 
 
 func set_collision_enabled(enabled: bool) -> void:
-	($CollisionShape2D as CollisionShape2D).disabled = not enabled
+	if get_node_or_null("collision"):
+		(get_node("collision") as CollisionPolygon2D).disabled = not enabled
+	else:
+		($CollisionShape2D as CollisionShape2D).disabled = not enabled
 
 
 func set_playfield_state(is_set_up: bool) -> void:
@@ -110,7 +176,10 @@ func die():
 	timer.one_shot = true
 	timer.timeout.connect(_on_timer_timeout)
 	self.freeze = true
-	$CollisionShape2D.disabled = true
+	if get_node_or_null("collision"):
+		$collision.disabled = true
+	else:
+		$CollisionShape2D.disabled = true
 	dying = true
 	timer.start()
 
@@ -131,7 +200,10 @@ func has_tag(tag: String) -> bool:
 
 
 func get_radius() -> float:
-	return 20.0 if data == null else data.radius_for_rank(rank)
+	var plus = 0
+	if typing:
+		plus = 20.0
+	return 20.0 if data == null else data.radius_for_rank(rank) + plus
 
 
 func is_setup_ball() -> bool:
@@ -226,6 +298,12 @@ func rank_state():
 
 
 func _physics_process(_delta: float) -> void:
+	var base = get_node_or_null("Sprite2D")
+	var text = get_node_or_null("RichTextLabel")
+	var overlay = get_node_or_null("overlay")
+	if overlay:
+		#overlay.rotation = -self.rotation
+		print("work")
 	if type.size() > 0:
 		var base_color = Vector3.ZERO
 		for i in type:
@@ -285,7 +363,7 @@ func _draw() -> void:
 		return
 	var radius := get_radius()
 	var color := data.display_color(rank)
-	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(rank), OUTLINE_WIDTH, true)
+	#draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(rank), OUTLINE_WIDTH, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale

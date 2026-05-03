@@ -1,4 +1,4 @@
-res://scenes/plinko_room.tscn
+res://scenes/ball.tscn
 res://data/balls/amplifier_ball.tres
 res://data/balls/bomb_ball.tres
 res://data/balls/duplication_ball.tres
@@ -23,6 +23,6 @@ res://data/enemies/enemy_guard.tres
 res://data/enemies/enemy_small_soldier.tres
 res://data/enemies/enemy_mage.tres
 res://data/enemies/enemy_machine_core.tres
-res://script/entities/balls/elemental_balls/elemental_rank_abilities.gd
 res://script/entities/balls/ball_base.gd
-res://script/entities/balls/elemental_balls/level_merge_rule.gd
+res://script/entities/balls/elemental_balls/elemental_rank_abilities.gd
+res://script/entities/balls/ball_data.gd

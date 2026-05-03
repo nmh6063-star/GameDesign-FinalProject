@@ -264,19 +264,37 @@ static var typing_by_id = {
 	}
 
 static var sprite_map = {
-	"block": preload("res://assets/ball_sprites/block.png"),
-	"block_plus": preload("res://assets/ball_sprites/block_plus.png"),
+	"fire": [
+		preload("res://assets/ball_sprites/flame1.png"),
+		preload("res://assets/ball_sprites/flame2.png"),
+		preload("res://assets/ball_sprites/flame3.png"),
+		preload("res://assets/ball_sprites/flame4.png"),
+		preload("res://assets/ball_sprites/flame5.png"),
+		preload("res://assets/ball_sprites/flame6.png"),
+		preload("res://assets/ball_sprites/flame7.png")
+	],
+	"alchemist": [
+		preload("res://assets/ball_sprites/flask1.png"),
+		preload("res://assets/ball_sprites/flask2.png"),
+		preload("res://assets/ball_sprites/flask3.png"),
+		preload("res://assets/ball_sprites/flask4.png"),
+		preload("res://assets/ball_sprites/flask5.png"),
+		preload("res://assets/ball_sprites/flask6.png"),
+		preload("res://assets/ball_sprites/flask7.png")
+	],
+	#"block": preload("res://assets/ball_sprites/block.png"),
+	#"block_plus": preload("res://assets/ball_sprites/block_plus.png"),
 	"bomb": preload("res://assets/ball_sprites/bomb.png"),
 	"crit": preload("res://assets/ball_sprites/crit.png"),
-	"dot": preload("res://assets/ball_sprites/dot.png"),
-	"fire": preload("res://assets/ball_sprites/fire.png"),
-	"gambler": preload("res://assets/ball_sprites/gambler.png"),
-	"heal": preload("res://assets/ball_sprites/heal.png"),
-	"hit": preload("res://assets/ball_sprites/hit.png"),
-	"ice": preload("res://assets/ball_sprites/ice.png"),
-	"knight": preload("res://assets/ball_sprites/knight.png"),
-	"misc": preload("res://assets/ball_sprites/misc.png"),
-	"poison": preload("res://assets/ball_sprites/skull.png")
+	#"dot": preload("res://assets/ball_sprites/dot.png"),
+	#"fire": preload("res://assets/ball_sprites/fire.png"),
+	#"gambler": preload("res://assets/ball_sprites/gambler.png"),
+	#"heal": preload("res://assets/ball_sprites/heal.png"),
+	#"hit": preload("res://assets/ball_sprites/hit.png"),
+	#"ice": preload("res://assets/ball_sprites/ice.png"),
+	#"knight": preload("res://assets/ball_sprites/knight.png"),
+	#"misc": preload("res://assets/ball_sprites/misc.png"),
+	#"poison": preload("res://assets/ball_sprites/skull.png")
 }
 static func _init_registry() -> void:
 	if not functions_by_id.is_empty():
@@ -289,6 +307,11 @@ static func get_function_info(function: String):
 	return typing_by_id[parsed["kind"]]
 
 static func get_sprite_files(function: String):
+	if get_function_info(function)["class"] == "knight":
+		return {
+			"base": sprite_map["alchemist"],
+			"overlay": sprite_map["bomb"]
+		}
 	var base = sprite_map[get_function_info(function)["class"]]
 	var overlay = sprite_map[get_function_info(function)["ability"]]
 	return {
