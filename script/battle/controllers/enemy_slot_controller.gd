@@ -32,7 +32,10 @@ var _damage_anchor: Marker2D
 var _attack_tooltip: Panel
 var _attack_summary_label: Label
 var _attack_damage_label: Label
-var _status_tag_label: Label
+var _poison_label:  Label
+var _burn_label:    Label
+var _freeze_label:  Label
+var _charm_label:   Label
 
 var enemy: EnemyBase
 var _selected := false
@@ -194,7 +197,7 @@ func _bind_ui() -> void:
 	_attack_tooltip = _ensure_tooltip_panel()
 	_attack_summary_label = _attack_tooltip.get_node("Summary") as Label
 	_attack_damage_label = _attack_tooltip.get_node("Damage") as Label
-	_status_tag_label = _ensure_status_tag()
+	_ensure_status_labels()
 
 
 func _style_ui() -> void:
@@ -273,26 +276,36 @@ func _sync_attack_tooltip() -> void:
 
 
 func sync_status_tag(ctx: BattleContext) -> void:
-	if _status_tag_label == null:
-		return
-	if enemy == null or not enemy.is_alive():
-		_status_tag_label.text = ""
+	var alive := enemy != null and enemy.is_alive()
+	if not alive:
+		if _poison_label != null: _poison_label.visible = false
+		if _burn_label   != null: _burn_label.visible   = false
+		if _freeze_label != null: _freeze_label.visible = false
+		if _charm_label  != null: _charm_label.visible  = false
 		return
 	var st := ctx.status_for_enemy(enemy)
-	var tags: Array[String] = []
+
 	var poison := int(st.get("poison_stack", 0))
-	if poison > 0:
-		tags.append("Poison %d" % poison)
+	if _poison_label != null:
+		_poison_label.visible = poison > 0
+		_poison_label.text = "☠ Psn %d" % poison
+
 	var burn := int(st.get("burn_stack", 0))
-	if burn > 0:
-		tags.append("Burn %d" % burn)
-	var freeze := int(st.get("freeze_stack", 0))
-	if freeze > 0:
-		tags.append("Freeze %d" % freeze)
+	if _burn_label != null:
+		_burn_label.visible = burn > 0
+		_burn_label.text = "🔥 Brn %d" % burn
+
+	# Freeze: stored as freeze_until_ms, convert to remaining seconds for display
+	var freeze_ms := int(st.get("freeze_until_ms", 0))
+	var freeze_secs := int(ceil(maxi(0, freeze_ms - ctx.now_ms()) / 1000.0))
+	if _freeze_label != null:
+		_freeze_label.visible = freeze_secs > 0
+		_freeze_label.text = "❄ Frz %ds" % freeze_secs
+
 	var charm := int(st.get("charm_stack", 0))
-	if charm > 0:
-		tags.append("Charm %d" % charm)
-	_status_tag_label.text = " | ".join(tags)
+	if _charm_label != null:
+		_charm_label.visible = charm > 0
+		_charm_label.text = "💫 Chm %d" % charm
 
 
 func _is_hovering_cooldown() -> bool:
@@ -312,15 +325,9 @@ func _action_summary() -> String:
 	return "Direct player\nattack."
 
 
-func _ensure_status_tag() -> Label:
-	var label := _ui_root.get_node_or_null("StatusTag") as Label
-	if label == null:
-		label = Label.new()
-		label.name = "StatusTag"
-		_ui_root.add_child(label)
-	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	label.position = Vector2(-52, 42)
-	label.size = Vector2(180, 16)
-	label.add_theme_font_override("font", DOGICA_FONT)
-	label.add_theme_font_size_override("font_size", 8)
-	return label
+func _ensure_status_labels() -> void:
+	# Nodes are defined in the .tscn; just look them up.
+	_poison_label = _ui_root.get_node_or_null("StatusPoison") as Label
+	_burn_label   = _ui_root.get_node_or_null("StatusBurn")   as Label
+	_freeze_label = _ui_root.get_node_or_null("StatusFreeze") as Label
+	_charm_label  = _ui_root.get_node_or_null("StatusCharm")  as Label

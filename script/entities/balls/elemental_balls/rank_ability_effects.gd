@@ -10,7 +10,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"mend":
 			ctx.heal_player(5)
 		"venom":
-			ctx.add_enemy_status(ctx.active_enemy(), "poison", 15)
+			ctx.add_enemy_status(ctx.active_enemy(), "poison", 8)
 		"ember":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "burn", 3)
@@ -36,7 +36,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "freeze", 5)
 		"iron_guard":
-			ctx.add_player_shield(20)
+			ctx.add_player_shield(25)
 		"triple_shot":
 			for _i in range(3):
 				_deal_random_enemy(ctx, 8)
@@ -59,10 +59,10 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 3 ────────────────────────────────────────────────────────────
 		"power_slash":
-			_deal_single(ctx, 30)
+			_deal_single(ctx, 18)
 		"toxic_burst":
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "poison", 20)
+				ctx.add_enemy_status(e, "poison", 15)
 		"fireball":
 			# Two hits on random enemies, each also applies 5 burn stacks
 			for _i in range(2):
@@ -89,7 +89,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 4 ────────────────────────────────────────────────────────────
 		"cleave":
-			_deal_all(ctx, 20)
+			_deal_all(ctx, 15)
 		"greater_heal":
 			var lost_g: int = maxi(0, PlayerState.player_max_health - PlayerState.player_health)
 			ctx.heal_player(int(round(lost_g * 0.30)))
@@ -105,11 +105,11 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 5 ────────────────────────────────────────────────────────────
 		"critical_edge":
-			var pool := [5, 10, 20, 100]
+			var pool := [25, 30]
 			_deal_single(ctx, int(pool[randi() % pool.size()]))
 		"freeze_wave":
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "freeze", 5)
+				ctx.add_enemy_status(e, "freeze", 3)
 		"giant_orb":
 			# ×3 attack, ×2 size — no double-trigger
 			_apply_giant_orb(ctx)
@@ -119,13 +119,15 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			_upgrade_random_ball(ctx, 1)
 		"poison_rain":
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "poison", 20)
+				ctx.add_enemy_status(e, "poison", 25)
 		"time_drift":
 			_time_drift(ctx)
+		"contagion":
+			ctx.spread_debuffs_from_active_to_random_other()
 
 		# ── Rank 6 ────────────────────────────────────────────────────────────
 		"meteor_crash":
-			_deal_all(ctx, 50)
+			_deal_all(ctx, 30)
 		"full_recovery":
 			ctx.heal_player(int(PlayerState.player_max_health * 0.30))
 		"chaos_rain":
@@ -145,18 +147,21 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"giant_core":
 			# ×3 attack, ×2 trigger, ×2 size — only affects rank 1–5 balls
 			_apply_giant_core(ctx)
+		"dot_siphon":
+			var cur_siphon := float(ctx.player_statuses.get("dot_damage_heal_ratio", 0.0))
+			ctx.player_statuses["dot_damage_heal_ratio"] = maxf(cur_siphon, 0.2)
 
 		# ── Rank 7 ────────────────────────────────────────────────────────────
 		"final_judgment":
-			_deal_single(ctx, 300)
+			_deal_single(ctx, 45)
 		"apocalypse":
-			_deal_all(ctx, 100)
+			_deal_all(ctx, 48)
 		"resurrection":
 			ctx.set_resurrection_ready()
 		"time_stop":
 			_clear_all_balls(ctx)
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "freeze", 10)
+				ctx.add_enemy_status(e, "freeze", 6)
 		"magic_flood":
 			_magic_flood(ctx)
 		"miracle_cascade":
@@ -165,6 +170,8 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			_sacrifice_nova(ctx)
 		"one_shower":
 			_one_shower(ctx, source)
+		"dot_echo":
+			ctx.player_statuses["dot_triggers_twice"] = true
 
 	# Preserve last effect for Echo Shot (never record echo_shot itself)
 	if kind != "echo_shot":
@@ -399,7 +406,7 @@ static func _miracle_cascade(ctx: BattleContext, source: BallBase) -> void:
 	var r4: Array = [["cleave", 4], ["chain_spark", 4], ["bomb_orb", 4],
 			["greater_heal", 4], ["mirror_shield", 4]]
 	var r5: Array = [["critical_edge", 5], ["poison_rain", 5], ["freeze_wave", 5],
-			["giant_orb", 5], ["time_drift", 5]]
+			["giant_orb", 5], ["time_drift", 5], ["contagion", 5]]
 	var p3: Array = r3[randi() % r3.size()]
 	var p4: Array = r4[randi() % r4.size()]
 	var p5: Array = r5[randi() % r5.size()]

@@ -1,0 +1,378 @@
+================================================================================
+ABILITIES REFERENCE — Current Implementation
+GameDesign-FinalProject
+Last updated: May 3, 2026
+================================================================================
+
+--------------------------------------------------------------------------------
+STATUS EFFECT RULES
+--------------------------------------------------------------------------------
+
+  POISON
+    - Triggers before each enemy attack.
+    - Deals damage equal to current stack count, then reduces stacks by 1.
+    - Example: 15 stacks → deals 15 before first attack, 14 before second, etc.
+    - Total damage (15 stacks): 15+14+13+...+1 = 120
+
+  BURN
+    - Triggers every real second.
+    - Deals damage equal to current stack count, then reduces stacks by 1.
+    - Example: 3 stacks → deals 3 at second 1, 2 at second 2, 1 at second 3.
+    - Total damage (3 stacks): 3+2+1 = 6
+
+  FREEZE
+    - Each stack = 1 second of frozen timer (additive, stacks are cumulative).
+    - Completely pauses the enemy's action/attack timer while active.
+    - No damage component.
+
+  CHARM
+    - Enemy's next attack is redirected at another enemy.
+    - Consumes 1 stack per attack resolved.
+
+  SHIELD
+    - Absorbs incoming damage before HP is reduced.
+    - Multiple shields stack additively.
+
+  NOTE: Burn and Poison DOT damage does NOT benefit from attack_bonus,
+  clone multipliers, or poison apple charges. Only direct damage does.
+
+--------------------------------------------------------------------------------
+RANK 1
+--------------------------------------------------------------------------------
+
+  Strike (DEFAULT)
+    Deal 5 damage to current enemy.
+
+  Mend
+    Heal 5 HP.
+
+  Venom
+    Apply Poison (10 stacks) to current enemy.
+
+  Ember
+    Apply Burn (3 stacks) to ALL enemies.
+
+  Guard
+    Gain 5 Shield.
+
+  Critical
+    50% chance: deal 5 damage to ALL enemies.
+    Otherwise: deal 5 damage to current enemy.
+
+  Refresh
+    Gain +1 mana pipe.
+
+  --- Dark ---
+
+  Poison Apple  [triggers on shot, rank 1]
+    Grant 3 poison apple charges.
+    While charges remain, each shot deals +10% bonus damage
+    but costs 2 self-HP per shot. Charges are consumed one at a time.
+    (UI note: next 3 mana-ball slots should appear black — not yet implemented.)
+
+  --- Gambler ---
+
+  Buy In  [triggers on merge, rank 1]
+    75% chance: heal 10 HP.
+    25% chance: take 10 damage.
+
+--------------------------------------------------------------------------------
+RANK 2
+--------------------------------------------------------------------------------
+
+  Heavy Strike (DEFAULT)
+    Deal 10 damage to one enemy.
+
+  Recovery
+    Heal 15% of missing HP.
+    Example: max HP 100, current HP 60 → missing 40 → heal 6.
+
+  Frost Touch
+    Freeze ALL enemies for 5 seconds.
+
+  Iron Guard
+    Gain 25 Shield.
+
+  Triple Shot
+    Hit 3 random enemies for 8 damage each (same enemy can be hit twice).
+
+  Scatter Drop
+    Spawn 2 random balls (rank 1–3) into the box.
+
+  Critical Strike
+    50% chance: deal 8 damage to ALL enemies.
+    Otherwise: deal 8 damage to one enemy.
+
+  Pollution
+    Double the current poison stack count on the current enemy.
+
+  FireBurn
+    Apply Burn (5 stacks) to ALL enemies.
+
+  --- Dark ---
+
+  Dark Brew  [rank 2]
+    NOT IMPLEMENTED.
+
+--------------------------------------------------------------------------------
+RANK 3
+--------------------------------------------------------------------------------
+
+  Power Slash (DEFAULT)
+    Deal 20 damage to one enemy.
+
+  Toxic Burst
+    Apply Poison (20 stacks) to ALL enemies.
+
+  Fireball
+    Hit 2 random enemies for 5 damage each.
+    Each hit also applies Burn (5 stacks) to that enemy.
+
+  Ice Shield
+    Gain 10 Shield.
+    Freeze current enemy for 5 seconds.
+
+  Reinforce
+    Gain +2 attack damage for this battle.
+    This bonus applies to all direct damage only (not DOT like burn/poison).
+    Stacks with multiple uses.
+
+  Convert
+    Upgrade 1 random ball in the box by +1 rank (capped at rank 7).
+
+  Echo Shot
+    Reapply the most recently resolved damage + effect.
+    Cannot echo another echo shot.
+
+  Charm
+    Apply 1 charm stack to ALL enemies.
+    Each enemy redirects their next attack at a random other enemy.
+
+  --- Dark ---
+
+  Slow Down  [rank 3]
+    NOT IMPLEMENTED.
+
+--------------------------------------------------------------------------------
+RANK 4
+--------------------------------------------------------------------------------
+
+  Cleave (DEFAULT)
+    Deal 20 damage to ALL enemies.
+
+  Greater Heal
+    Heal 30% of missing HP.
+
+  Bomb Orb
+    After 10 seconds (real time), deal 50 damage to ALL enemies.
+
+  Chain Spark
+    Hit up to 3 different enemies sequentially.
+    First hit: 10 damage. Second hit: 20 damage. Third hit: 40 damage.
+
+  Mirror Shield
+    Reflect the next 2 incoming damage instances back to the attacker.
+    Does not reflect status effects.
+
+  Corrupt Field
+    Apply Poison (20 stacks) to ALL enemies.
+
+  --- Dark ---
+
+  Care Drop  [triggers on merge, rank 4]
+    Spawn 5 rank 1–2 normal balls from the top of the box.
+
+--------------------------------------------------------------------------------
+RANK 5
+--------------------------------------------------------------------------------
+
+  Critical Edge (DEFAULT)
+    Deal random damage: either 30 or 50 to current enemy.
+
+  Freeze Wave
+    Freeze ALL enemies for 5 seconds.
+
+  Giant Orb
+    One random ball in the box gains:
+      - ×3 attack multiplier
+      - ×2 visual size
+    Does not trigger twice. Cannot be applied to a ball already giant.
+
+  Consume Core
+    Remove 1 random ball from the box (permanently for this battle).
+    Then deal 100 damage to current enemy.
+
+  Upgrade Pulse
+    Upgrade 1 random ball in the box by +1 rank (capped at rank 7).
+
+  Poison Rain
+    Apply Poison (20 stacks) to ALL enemies.
+
+  Time Drift
+    Slow game time to 40% speed for 10 seconds.
+    For the first 5 seconds: all damage you would take is stored instead.
+    For the final 5 seconds: stored damage is dealt back to all enemies
+    as continuous DOT (divided into 5 ticks, 1 per second).
+
+  Contagion
+    Copy poison, burn, and charm stacks plus remaining freeze duration from the
+    current enemy onto one random other enemy (adds to their existing debuffs).
+
+  --- Dark ---
+
+  Biggering  [rank 5]
+    Sets merge_growth to 8. INCOMPLETE — damage multiplier not yet wired.
+
+--------------------------------------------------------------------------------
+RANK 6
+--------------------------------------------------------------------------------
+
+  Meteor Crash (DEFAULT)
+    Deal 50 damage to ALL enemies.
+
+  Full Recovery
+    Restore HP equal to 30% of max HP.
+
+  Chaos Rain
+    If you have 1+ mana: spend 1 mana and spawn 6 random balls (rank 1–3).
+    Otherwise: spawn 3 random balls (rank 1–3) for free.
+
+  Overcharge
+    Gain +5 attack damage for this battle.
+    Applies to all direct damage (stacks with Reinforce).
+
+  Mass Morph
+    Upgrade ALL rank 1 and rank 2 balls currently in the box by +1 rank.
+
+  Reflect Wall
+    Reflect ALL incoming damage for 12 seconds.
+
+  Giant Core
+    One random rank 1–5 ball in the box gains:
+      - ×3 attack multiplier
+      - Triggers twice per shot
+      - ×2 visual size
+    Cannot be applied to a ball already giant.
+
+  Siphon
+    For the rest of this battle: heal for 20% of all DOT damage dealt to enemies
+    (_damage_enemy_dot paths).
+
+  --- Dark ---
+
+  An Eye For An Arm  [triggers on merge, rank 6]
+    Deal rank × 1.5 damage to current enemy.
+    Take rank ÷ 2 damage to self.
+
+--------------------------------------------------------------------------------
+RANK 7
+--------------------------------------------------------------------------------
+
+  Final Judgment (DEFAULT)
+    Deal 300 damage to one enemy.
+
+  Apocalypse
+    Deal 100 damage to ALL enemies.
+
+  Resurrection
+    Set a one-time revive: if you die this battle, revive once with low HP.
+    Cannot stack multiple resurrections.
+
+  Time Stop
+    Remove ALL balls currently in the box.
+    Freeze ALL enemies for 10 seconds.
+
+  Magic Flood
+    Launch all balls upward with an impulse.
+    Apply a random enchantment to each alive enemy:
+      - Poison: 8 stacks
+      - Burn: 3 stacks
+      - Freeze: 3 stacks (3 seconds)
+
+  Miracle Cascade
+    Trigger one random ability from rank 3 pool,
+    one random ability from rank 4 pool,
+    one random ability from rank 5 pool.
+    (Three abilities fire in sequence.)
+
+  Sacrifice Nova
+    Immediately lose 50% of current HP.
+    After 10 seconds (real time), deal 500 damage to ALL enemies.
+
+  1 Shower
+    Over 10 seconds, spawn 10 balls (rank 1–3), one per second.
+
+  Echo
+    For the rest of this battle: every DOT damage instance triggers twice.
+
+  --- Dark ---
+
+  Clone  [triggers on activation, rank 7]
+    Spawn a copy of this ball at rank 7.
+    Add 1 clone stack: each stack permanently doubles all direct damage.
+    Permanently reduce max HP by 5%.
+    Max 4 stacks (5 total activations).
+    Example with 3 stacks: direct damage is multiplied by ×8.
+
+  --- Gambler ---
+
+  Roll For Initiative  [triggers on activation, rank 7]
+    50% chance: all enemies execute all of their actions 3 times.
+    50% chance: deal 100 damage to current enemy AND trigger one random
+    rank-7 rank ability (Apocalypse / Time Stop / Magic Flood /
+    Miracle Cascade / Sacrifice Nova / 1 Shower / Echo).
+
+--------------------------------------------------------------------------------
+PASSIVES (always active, type-wide)
+--------------------------------------------------------------------------------
+
+  Darkness Consumes  [Dark passive, fires on every shot]
+    Deal rank × 4.5 damage to current enemy.
+    Take rank damage to self (bypasses Time Drift storage).
+
+  Gambling Fallacy  [Gambler passive, fires on every merge]
+    50% chance: take self-damage equal to ball rank.
+    50% chance: deal rank × 2 damage to current enemy.
+
+--------------------------------------------------------------------------------
+MODIFIER BALLS (BallCatalog — queue pool & mana special slots)
+--------------------------------------------------------------------------------
+  Listed by resource id. Symbols are HUD shortcuts where set.
+  bomb_ball exists under data/balls/ but is NOT registered in BallCatalog.
+
+  ball_normal — Normal Ball  [elemental / merge chain]
+    Basic merge ball; levels stack through merges.
+
+  ball_amplifier — Amplifier Ball  (symbol X)
+    On board: if your shot hits it, that shot’s damage is ×1.5.
+
+  ball_rock — Rock Ball  (R)
+    Immovable obstacle; cannot merge or be destroyed.
+
+  ball_duplication — Duplication Ball  (D)
+    When it touches enough normal balls, spawns copies of them.
+
+  ball_heal — Heal Ball  (H)
+    Board behavior: consumes touching normal balls and heals you by their
+    total rank value.
+
+  ball_magnet — Magnet Ball  (U)
+    Pulls nearby normal balls toward it while it remains on the field.
+
+  ball_multiplication — Multiplication Ball  (M)
+    Doubles the rank of touched normal balls.
+
+  ball_crumble — Crumble Ball  (C)
+    On shot: ball explodes into many smaller balls.
+
+  ball_heavy — Heavy Ball  (H)
+    Consumes touching normals and stores their damage; appearance reflects
+    stored damage.
+
+  ball_virus — Virus Ball  (V)
+    Touching behavior (partial / experimental): long contact halves ball
+    value and can destroy balls.
+
+================================================================================
+END OF ABILITIES REFERENCE
+================================================================================

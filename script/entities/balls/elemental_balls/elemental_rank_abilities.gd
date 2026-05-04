@@ -41,6 +41,7 @@ static var functions: Array[String] = [
 	"upgrade_pulse",
 	"poison_rain",
 	"time_drift",
+	"contagion",
 	"meteor_crash",
 	"full_recovery",
 	"chaos_rain",
@@ -48,6 +49,7 @@ static var functions: Array[String] = [
 	"mass_morph",
 	"reflect_wall",
 	"giant_core",
+	"dot_siphon",
 	"final_judgment",
 	"apocalypse",
 	"resurrection",
@@ -56,6 +58,7 @@ static var functions: Array[String] = [
 	"miracle_cascade",
 	"sacrifice_nova",
 	"one_shower",
+	"dot_echo",
 ]
 
 static var functions_by_id := {}
@@ -205,6 +208,10 @@ static var typing_by_id = {
 			"class": "gambler",
 			"ability": "misc"
 		},
+		"contagion": {
+			"class": "poison",
+			"ability": "misc"
+		},
 		"meteor_crash": {
 			"class": "gambler",
 			"ability": "crit"
@@ -233,6 +240,10 @@ static var typing_by_id = {
 			"class": "gambler",
 			"ability": "misc"
 		},
+		"dot_siphon": {
+			"class": "knight",
+			"ability": "heal"
+		},
 		"final_judgment": {
 			"class": "knight",
 			"ability": "crit"
@@ -260,6 +271,10 @@ static var typing_by_id = {
 		"one_shower": {
 			"class": "gambler",
 			"ability": "misc"
+		},
+		"dot_echo": {
+			"class": "fire",
+			"ability": "dot"
 		},
 	}
 

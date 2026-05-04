@@ -52,7 +52,7 @@ static func roll_for_initiative(_ctx: BattleContext, _source: BallBase):
 		_ctx.damage_enemy(100, _ctx.active_enemy())
 		# Trigger a random rank-7 rank ability as a bonus
 		var r7: Array = ["apocalypse", "time_stop", "magic_flood", "miracle_cascade",
-				"sacrifice_nova", "one_shower"]
+				"sacrifice_nova", "one_shower", "dot_echo"]
 		RankAbilityEffects.execute(_ctx, _source, r7[randi() % r7.size()], 7)
 
 ## Gambling Fallacy (passive on merge): randomly hurt player or hurt enemy.

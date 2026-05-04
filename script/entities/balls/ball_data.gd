@@ -9,6 +9,8 @@ const NO_COLOR_STEP := Color(0, 0, 0, 0)
 @export var tags: PackedStringArray = []
 @export var spawn_weight := 1
 @export var spawn_ranks := PackedInt32Array([1])
+## When > 0, mana special-slot drops use this rank instead of 1.
+@export var special_drop_rank := 0
 @export var symbol := ""
 @export var tint := Color(0.5, 0.5, 0.5)
 @export var outline_tint := NO_COLOR_STEP
