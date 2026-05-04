@@ -18,6 +18,13 @@ func setup(data: BallData, rank: int) -> void:
 	queue_redraw()
 
 
+func setup_raw(radius: float, ball_tint: Color, ball_outline: Color) -> void:
+	_ball_radius = radius
+	_ball_tint = ball_tint
+	_outline_color = ball_outline
+	queue_redraw()
+
+
 func launch(from: Vector2, to: Vector2) -> void:
 	global_position = from
 	var tween := create_tween()

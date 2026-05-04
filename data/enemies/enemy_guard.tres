@@ -16,5 +16,5 @@ display_name = "Guard"
 sprite_texture = ExtResource("4_tex")
 sprite_scale = Vector2(0.3, 0.3)
 max_health = 200
-attack_interval = 10.0
+max_shield = 50
 actions = Array[ExtResource("1_base")]([SubResource("Action_1")])

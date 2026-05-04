@@ -7,9 +7,11 @@ const DOGICA_FONT := preload("res://assets/dogica/TTF/dogicabold.ttf")
 const DAMAGE_RISE_PX := 60.0
 const DAMAGE_DURATION := 0.8
 const DAMAGE_FONT_PX := 46
+const SHIELD_FONT_PX := 28
 const DAMAGE_JITTER_X := 42.0
 const DAMAGE_JITTER_Y := 28.0
 const DAMAGE_RISE_JITTER_X := 26.0
+const SHIELD_COLOR := Color(0.62, 0.72, 0.68, 1.0)
 
 var _slot: Node2D
 var _spawn: Marker2D
@@ -19,6 +21,10 @@ var _bar: Control
 var _background: ColorRect
 var _fill: ColorRect
 var _hp_label: Label
+var _shield_bar: Control
+var _shield_background: ColorRect
+var _shield_fill: ColorRect
+var _shield_label: Label
 var _cooldown_ring: Node2D
 var _selection_box: Control
 var _damage_floaters: Node2D
@@ -69,6 +75,10 @@ func spawn_enemy() -> EnemyBase:
 	enemy.position = _spawn.position
 	_slot.add_child(enemy)
 	enemy.setup()
+	enemy.shield_restored.connect(func(amount: int) -> void:
+		show_shield_gain(amount)
+		sync_shield(enemy.shield(), enemy.max_shield())
+	)
 	return enemy
 
 
@@ -103,6 +113,32 @@ func show_damage(amount: int, color: Color) -> void:
 	tween.tween_callback(floater.queue_free)
 
 
+func show_shield_gain(amount: int) -> void:
+	if amount <= 0:
+		return
+	var floater := Label.new()
+	_damage_floaters.add_child(floater)
+	var jitter := Vector2(
+		randf_range(-DAMAGE_JITTER_X, DAMAGE_JITTER_X),
+		randf_range(-DAMAGE_JITTER_Y, DAMAGE_JITTER_Y)
+	)
+	floater.position = _damage_anchor.position + jitter
+	floater.text = "+%d" % amount
+	floater.modulate = SHIELD_COLOR
+	floater.modulate.a = 1.0
+	floater.scale = Vector2.ONE
+	floater.add_theme_font_override("font", DOGICA_FONT)
+	floater.add_theme_font_size_override("font_size", SHIELD_FONT_PX)
+	var rise_target := floater.position + Vector2(randf_range(-DAMAGE_RISE_JITTER_X, DAMAGE_RISE_JITTER_X), -DAMAGE_RISE_PX)
+	var tween := _slot.create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(floater, "position", rise_target, DAMAGE_DURATION).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "scale", Vector2(1.2, 1.2), DAMAGE_DURATION * 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	tween.tween_property(floater, "modulate:a", 0.0, DAMAGE_DURATION).set_delay(DAMAGE_DURATION * 0.15)
+	tween.set_parallel(false)
+	tween.tween_callback(floater.queue_free)
+
+
 func sync_view() -> void:
 	sync_realtime_view()
 
@@ -117,6 +153,9 @@ func sync_realtime_view() -> void:
 	if alive:
 		_fill.size.x = _background.size.x * float(enemy.health()) / float(enemy.max_health())
 		_hp_label.text = "%d/%d" % [enemy.health(), enemy.max_health()]
+		sync_shield(enemy.shield(), enemy.max_shield())
+	elif _shield_bar != null:
+		_shield_bar.visible = false
 	if alive and cooldown_total > 0.0:
 		_cooldown_ring.call("sync", enemy.cooldown_left(), cooldown_total)
 		_sync_attack_tooltip()
@@ -126,12 +165,29 @@ func is_alive() -> bool:
 	return enemy != null and enemy.is_alive()
 
 
+func sync_shield(shield: int, max_shield: int) -> void:
+	if _shield_bar == null:
+		return
+	if shield <= 0 or max_shield <= 0:
+		_shield_bar.visible = false
+		return
+	_shield_bar.visible = true
+	_shield_fill.size.x = _shield_background.size.x * float(mini(shield, max_shield)) / float(max_shield)
+	if _shield_label != null:
+		_shield_label.text = "%d/%d" % [shield, max_shield]
+
+
 func _bind_ui() -> void:
 	_ui_root = _slot.get_node("EnemyUi") as Node2D
 	_bar = _ui_root.get_node("EnemyHealthBar") as Control
 	_background = _ui_root.get_node("EnemyHealthBar/Background") as ColorRect
 	_fill = _ui_root.get_node("EnemyHealthBar/Fill") as ColorRect
 	_hp_label = _ui_root.get_node("EnemyHealthBar/Label") as Label
+	_shield_bar = _ui_root.get_node_or_null("EnemyShieldBar") as Control
+	if _shield_bar != null:
+		_shield_background = _shield_bar.get_node("Background") as ColorRect
+		_shield_fill = _shield_bar.get_node("Fill") as ColorRect
+		_shield_label = _shield_bar.get_node("Label") as Label
 	_cooldown_ring = _ui_root.get_node("CooldownRing") as Node2D
 	_selection_box = _ui_root.get_node("SelectionBox") as Control
 	_damage_floaters = _ui_root.get_node("DamageFloaters") as Node2D
@@ -146,6 +202,12 @@ func _style_ui() -> void:
 	_bar.size = Vector2(112, 16)
 	_background.color = Color(0.02, 0.02, 0.05, 1.0)
 	_fill.color = Color(0.83, 0.06, 0.0, 1.0)
+	if _shield_bar != null:
+		_shield_bar.position = Vector2(-52, 80)
+		_shield_bar.size = Vector2(112, 12)
+		_shield_background.color = Color(0.02, 0.02, 0.05, 1.0)
+		_shield_fill.color = Color(0.46, 0.54, 0.51, 1.0)
+		_shield_bar.visible = false
 	_hp_label.add_theme_font_override("font", DOGICA_FONT)
 	_hp_label.add_theme_font_size_override("font_size", 9)
 	_selection_box.position = Vector2(-56, -68)

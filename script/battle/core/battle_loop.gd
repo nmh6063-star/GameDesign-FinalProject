@@ -229,6 +229,7 @@ func resolve_enemy_turn(enemy: EnemyBase = null) -> void:
 	acting_enemy.on_turn(_context)
 	_context.clear_charm_redirect()
 	_context.on_enemy_attack_resolved(acting_enemy)
+	_sync_status_tags()
 
 
 func active_balls() -> Array:
@@ -441,6 +442,7 @@ func _on_ball_dropped() -> void:
 	var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
 	if freeze > 0:
 		_context.player_statuses["freeze_stacks"] = freeze - 1
+	_sync_status_tags()
 	_complete_turn_after_drop()
 
 
@@ -725,6 +727,9 @@ func _should_skip_reward_selection() -> bool:
 
 func _sync_status_tags() -> void:
 	_sync_player_bar()
+	var burn := int(_context.player_statuses.get("burn_stacks", 0))
+	var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
+	_hud.sync_player_statuses(burn, freeze)
 	for slot in _enemy_slots:
 		if slot != null and slot.has_method("sync_status_tag"):
 			slot.sync_status_tag(_context)

@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
+[ext_resource type="FontFile" uid="uid://bklbxoa3yjocr" path="res://assets/dogica/OTF/dogica.otf" id="9_jbj1t"]
 [ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_jkv2x"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
@@ -581,7 +582,22 @@ offset_right = 320.0
 offset_bottom = 46.0
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 8
-text = ""
+
+[node name="SpecialEffectBox" type="Panel" parent="UI/PlayerHealthBar" unique_id=1917910068]
+layout_mode = 0
+offset_left = -4.0
+offset_top = -90.0
+offset_right = 352.0
+offset_bottom = -2.0
+
+[node name="SpecialEffect" type="Label" parent="UI/PlayerHealthBar/SpecialEffectBox" unique_id=703330092]
+layout_mode = 0
+offset_left = 11.0
+offset_top = 5.0
+offset_right = 345.0
+offset_bottom = 124.0
+theme_override_fonts/font = ExtResource("9_jbj1t")
+uppercase = true
 
 [node name="SpecialBar" type="Panel" parent="UI" unique_id=1800000019]
 offset_left = 624.0
@@ -993,8 +1009,6 @@ position = Vector2(344, -227)
 [node name="EnemyUi" type="Node2D" parent="EnemySlot/EnemyHolder1" unique_id=1810001001]
 z_index = 10
 
-[node name="DamageFloaters" type="Node2D" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=970867613]
-
 [node name="EnemyHealthBar" type="Control" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=1419468956]
 layout_mode = 3
 anchors_preset = 0
@@ -1048,6 +1062,40 @@ offset_top = -8.0
 offset_right = 12.0
 offset_bottom = 8.0
 theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyShieldBar" type="Control" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=1759222679]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 72.0
+offset_right = 64.0
+offset_bottom = 87.0
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyUi/EnemyShieldBar" unique_id=888727891]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyUi/EnemyShieldBar" unique_id=66360246]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(0.46445185, 0.5395908, 0.51266927, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi/EnemyShieldBar" unique_id=32523332]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 vertical_alignment = 1
 
@@ -1121,6 +1169,40 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="EnemyShieldBar" type="Control" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=1759222680]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 72.0
+offset_right = 64.0
+offset_bottom = 87.0
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyUi/EnemyShieldBar" unique_id=888727892]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyUi/EnemyShieldBar" unique_id=66360247]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(0.46445185, 0.5395908, 0.51266927, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi/EnemyShieldBar" unique_id=32523333]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1307839188]
 position = Vector2(40, -32)
 
@@ -1188,6 +1270,40 @@ offset_top = -8.0
 offset_right = 12.0
 offset_bottom = 8.0
 theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EnemyShieldBar" type="Control" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=1759222681]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 72.0
+offset_right = 64.0
+offset_bottom = 87.0
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyUi/EnemyShieldBar" unique_id=888727893]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyUi/EnemyShieldBar" unique_id=66360248]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(0.46445185, 0.5395908, 0.51266927, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi/EnemyShieldBar" unique_id=32523334]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
 horizontal_alignment = 1
 vertical_alignment = 1
 

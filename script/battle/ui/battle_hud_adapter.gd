@@ -38,6 +38,7 @@ var _attack_key: Label
 var _attack_style_base: StyleBoxFlat
 var _game_over: Control
 var _stage_clear: Control
+var _status_label: Label
 
 
 func _init(root: CanvasLayer) -> void:
@@ -133,6 +134,18 @@ func show_damage(amount: int, anchor: Marker2D, color: Color) -> void:
 	tween.tween_callback(floater.queue_free)
 
 
+func sync_player_statuses(burn: int, freeze: int) -> void:
+	if _status_label == null:
+		return
+	var parts: Array[String] = []
+	if burn > 0:
+		parts.append("Burn: %d" % burn)
+	if freeze > 0:
+		parts.append("Freeze: %d" % freeze)
+	_status_label.text = "  |  ".join(parts)
+	_status_label.visible = not parts.is_empty()
+
+
 func clear_result() -> void:
 	_game_over.visible = false
 	_stage_clear.visible = false
@@ -184,6 +197,7 @@ func _bind_nodes() -> void:
 
 	_game_over = _root.get_node("GameOver") as Control
 	_stage_clear = _root.get_node("StageClear") as Control
+	_status_label = _root.get_node_or_null("PlayerHealthBar/SpecialEffectBox/SpecialEffect") as Label
 
 
 func _render_preview(root: Node2D, item: Dictionary, scale: float) -> void:

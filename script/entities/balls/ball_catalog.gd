@@ -15,7 +15,8 @@ const IDS: Array[String] = [
 	NORMAL_BALL_ID,
 	"ball_crumble",
 	"ball_heavy",
-	"ball_virus"
+	"ball_virus",
+	"ball_spider_egg"
 ]
 const DATA_BY_ID := {
 	IDS[0]: preload("res://data/balls/amplifier_ball.tres"),
@@ -27,7 +28,8 @@ const DATA_BY_ID := {
 	IDS[6]: preload("res://data/balls/normal_ball.tres"),
 	IDS[7]: preload("res://data/balls/crumble_ball.tres"),
 	IDS[8]: preload("res://data/balls/heavy_ball.tres"),
-	IDS[9]: preload("res://data/balls/virus_ball.tres")
+	IDS[9]: preload("res://data/balls/virus_ball.tres"),
+	IDS[10]: preload("res://data/balls/spider_egg.tres")
 }
 
 const ELEMENT_IDS: Array[String] = [

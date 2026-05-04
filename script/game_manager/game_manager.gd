@@ -185,7 +185,7 @@ func get_stage_enemy_ids(row: int) -> Array:
 		return ["enemy_small_spider", "enemy_spider_queen", "enemy_small_spider"]
 	if row >= 4:
 		return ["enemy_fire", "enemy_fire", "enemy_ice"]
-	return ["enemy1", "enemy2", ""]
+	return ["enemy_guard", "enemy_knight", "enemy_guard"]
 
 
 func consume_pre_map_reward_pending() -> bool:
