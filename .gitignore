@@ -1,0 +1,9 @@
+# Godot editor cache
+.godot/
+
+# Import cache
+*.import
+
+# OS files
+.DS_Store
+Thumbs.db
