@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="BallData" format=3 uid="uid://dcymjouvdfumk"]
+
+[ext_resource type="Script" uid="uid://sjkceukupggs" path="res://script/entities/balls/ball_data.gd" id="1_ball_data"]
+[ext_resource type="Script" uid="uid://e1gvu2cskubx" path="res://script/entities/balls/effects/ball_effect_base.gd" id="1_eff_base"]
+[ext_resource type="Script" uid="uid://lldxi1vs477e" path="res://script/entities/balls/effects/spider_egg_hatch_effect.gd" id="3_egg_effect"]
+
+[sub_resource type="Resource" id="SpiderEggHatchEffect_1"]
+script = ExtResource("3_egg_effect")
+
+[resource]
+script = ExtResource("1_ball_data")
+id = "ball_spider_egg"
+display_name = "Spider Egg"
+description = "When destroyed, hatches spiders into any empty slots, but only while the Spider Queen lives."
+spawn_weight = 0
+spawn_ranks = null
+symbol = "Egg"
+tint = Color(0.82, 0.78, 0.55, 1)
+outline_tint = Color(0.45, 0.38, 0.18, 1)
+base_radius = 28.0
+effects = Array[ExtResource("1_eff_base")]([SubResource("SpiderEggHatchEffect_1")])
+metadata/_custom_type_script = "uid://sjkceukupggs"

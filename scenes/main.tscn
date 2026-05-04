@@ -816,6 +816,40 @@ theme_override_colors/font_color = Color(0.88, 0.45, 1, 1)
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 7
 
+[node name="EnemyShieldBar" type="Control" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=1759222679]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 72.0
+offset_right = 64.0
+offset_bottom = 87.0
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyUi/EnemyShieldBar" unique_id=888727891]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder1/EnemyUi/EnemyShieldBar" unique_id=66360246]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(0.46445185, 0.5395908, 0.51266927, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi/EnemyShieldBar" unique_id=32523332]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder1" unique_id=181201766]
 position = Vector2(40, -32)
 
@@ -930,6 +964,40 @@ theme_override_colors/font_color = Color(0.88, 0.45, 1, 1)
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 7
 
+[node name="EnemyShieldBar" type="Control" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=1759222680]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 72.0
+offset_right = 64.0
+offset_bottom = 87.0
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyUi/EnemyShieldBar" unique_id=888727892]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder2/EnemyUi/EnemyShieldBar" unique_id=66360247]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(0.46445185, 0.5395908, 0.51266927, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi/EnemyShieldBar" unique_id=32523333]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder2" unique_id=1307839188]
 position = Vector2(40, -32)
 
@@ -1043,6 +1111,40 @@ offset_bottom = 115.0
 theme_override_colors/font_color = Color(0.88, 0.45, 1, 1)
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 7
+
+[node name="EnemyShieldBar" type="Control" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=1759222681]
+layout_mode = 3
+anchors_preset = 0
+offset_left = -40.0
+offset_top = 72.0
+offset_right = 64.0
+offset_bottom = 87.0
+
+[node name="Background" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyUi/EnemyShieldBar" unique_id=888727893]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Fill" type="ColorRect" parent="EnemySlot/EnemyHolder3/EnemyUi/EnemyShieldBar" unique_id=66360248]
+layout_mode = 0
+offset_right = 104.0
+offset_bottom = 15.0
+color = Color(0.46445185, 0.5395908, 0.51266927, 1)
+
+[node name="Label" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi/EnemyShieldBar" unique_id=32523334]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_choun")
+theme_override_font_sizes/font_size = 9
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="DamageAnchorEnemy" type="Marker2D" parent="EnemySlot/EnemyHolder3" unique_id=1800000043]
 position = Vector2(40, -32)

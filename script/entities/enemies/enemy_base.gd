@@ -4,12 +4,15 @@ class_name EnemyBase
 const EnemyData := preload("res://script/entities/enemies/enemy_data.gd")
 
 signal damaged(amount: int)
+signal shield_restored(amount: int)
 signal defeated
 signal action_requested
 
 @export var data: EnemyData
 
 var current_health := 0
+var current_shield := 0
+var _action_index := 0
 
 @onready var _sprite := $Sprite2D as Sprite2D
 @onready var _base_modulate: Color = _sprite.modulate
@@ -28,6 +31,8 @@ func setup() -> void:
 
 func reset() -> void:
 	current_health = max_health()
+	current_shield = max_shield()
+	_action_index = 0
 	visible = true
 	process_mode = Node.PROCESS_MODE_INHERIT
 	_apply_visuals()
@@ -43,6 +48,24 @@ func max_health() -> int:
 	return data.max_health if data != null else 0
 
 
+func shield() -> int:
+	return current_shield
+
+
+func max_shield() -> int:
+	return data.max_shield if data != null else 0
+
+
+func restore_shield(amount: int) -> void:
+	if amount <= 0 or max_shield() <= 0:
+		return
+	var gained := mini(amount, max_shield() - current_shield)
+	if gained <= 0:
+		return
+	current_shield += gained
+	shield_restored.emit(gained)
+
+
 func is_alive() -> bool:
 	return current_health > 0
 
@@ -54,6 +77,12 @@ func take_damage(amount: int) -> int:
 func take_damage_with_context(amount: int, ctx: BattleContext = null) -> int:
 	if amount <= 0 or not is_alive():
 		return 0
+	if current_shield > 0:
+		var absorbed := mini(current_shield, amount)
+		current_shield -= absorbed
+		amount -= absorbed
+		if amount <= 0:
+			return 0
 	var applied := mini(amount, current_health)
 	damaged.emit(applied)
 	current_health -= applied
@@ -71,12 +100,18 @@ func take_damage_with_context(amount: int, ctx: BattleContext = null) -> int:
 
 
 func on_turn(ctx: BattleContext) -> void:
-	if not is_alive() or data == null:
+	if not is_alive() or data == null or data.actions.is_empty():
 		return
 	for effect in _effects():
 		effect.on_turn_start(ctx, self)
-	for action in data.actions:
+	var count := data.actions.size()
+	for i in range(count):
+		var idx := (_action_index + i) % count
+		var action = data.actions[idx]
+		if action == null:
+			continue
 		if action.can_use(ctx, self):
+			_action_index = (idx + 1) % count
 			for effect in _effects():
 				effect.on_before_act(ctx, self, action)
 			action.execute(ctx, self)

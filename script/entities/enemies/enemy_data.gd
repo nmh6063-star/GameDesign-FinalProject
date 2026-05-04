@@ -7,6 +7,7 @@ class_name EnemyData
 @export var sprite_region := Rect2()
 @export var sprite_scale := Vector2.ONE
 @export var max_health := 50
+@export var max_shield := 0
 @export var attack_damage := 10
 @export var attack_interval := 5.0
 @export var actions: Array[EnemyActionBase] = []

@@ -4,18 +4,24 @@
 [ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/entities/enemies/enemy_data.gd" id="2_data"]
 [ext_resource type="Script" uid="uid://c0ybrm3kkd1uy" path="res://script/entities/enemies/actions/heavy_strike_action.gd" id="3_action"]
 [ext_resource type="Script" uid="uid://yo4105wmtbek" path="res://script/entities/enemies/effects/enemy_effect_base.gd" id="3_eff"]
-[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="4_tex"]
+[ext_resource type="Script" uid="uid://bwbdkyxsdyiuq" path="res://script/entities/enemies/actions/knight_guard_action.gd" id="4_action"]
+[ext_resource type="Texture2D" uid="uid://cjyxyqu5qx6k" path="res://assets/enemies/knightnoback.png" id="6_3ci0a"]
 
 [sub_resource type="Resource" id="Action_1"]
 script = ExtResource("3_action")
+
+[sub_resource type="Resource" id="Resource_3ci0a"]
+script = ExtResource("4_action")
+metadata/_custom_type_script = "uid://bwbdkyxsdyiuq"
 
 [resource]
 script = ExtResource("2_data")
 id = "enemy_knight"
 display_name = "Knight"
-sprite_texture = ExtResource("4_tex")
+sprite_texture = ExtResource("6_3ci0a")
 sprite_scale = Vector2(0.3, 0.3)
 max_health = 150
+max_shield = 100
 attack_damage = 20
 attack_interval = 8.0
-actions = Array[ExtResource("1_base")]([SubResource("Action_1")])
+actions = Array[ExtResource("1_base")]([SubResource("Action_1"), SubResource("Resource_3ci0a")])
