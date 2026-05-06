@@ -185,10 +185,11 @@ func get_stage_enemy_ids(row: int) -> Array:
 	if is_playground_mode:
 		return ["enemy_playground", "", ""]
 	if row >= 7:
-		return ["enemy_small_spider", "enemy_spider_queen", "enemy_small_spider"]
+		return ["enemy_guard", "enemy_knight", "enemy_guard"]
 	if row >= 4:
-		return ["enemy_fire", "enemy_fire", "enemy_ice"]
-	return ["enemy_guard", "enemy_knight", "enemy_guard"]
+		return ["enemy_fire", "enemy_ice", "enemy_fire"]
+	#return ["enemy1", "enemy2", "enemy1"]
+	return ["enemy_small_spider", "enemy_spider_queen", "enemy_small_spider"] # for testing
 
 
 func consume_pre_map_reward_pending() -> bool:

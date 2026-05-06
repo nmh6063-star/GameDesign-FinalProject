@@ -120,6 +120,12 @@ func on_turn(ctx: BattleContext) -> void:
 			return
 
 
+func next_action() -> EnemyActionBase:
+	if data == null or data.actions.is_empty():
+		return null
+	return data.actions[_action_index]
+
+
 func cooldown_left() -> float:
 	return _attack_cooldown.time_left
 
