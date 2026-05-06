@@ -52,7 +52,8 @@ var _ability_hover_vbox: VBoxContainer
 var _ability_hover_title: Label
 var _ability_hover_body: Label
 var _ability_hover_stat: Label
-var _ability_hover_rank: int = -1
+## Tracks hover content so we only reflow the tip when the target changes ("rank:3", "reward:1", …).
+var _hover_tip_key: String = ""
 
 
 func _ready() -> void:
@@ -77,7 +78,7 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	_update_ability_hover_tip()
+	_update_hover_tip()
 
 
 func _cache_ability_hover_tip() -> void:
@@ -105,6 +106,36 @@ func _rank_under_mouse() -> int:
 	return -1
 
 
+func _reward_card_under_mouse() -> int:
+	if _rewards_row() == null or not _rewards_row().visible:
+		return -1
+	var mp := get_viewport().get_mouse_position()
+	for i in range(REWARD_SLOT_COUNT):
+		if i >= _ability_entries.size():
+			continue
+		var card := _reward_card(i)
+		if card == null or not card.visible or not is_instance_valid(card):
+			continue
+		if card.disabled:
+			continue
+		if card.get_global_rect().has_point(mp):
+			return i
+	return -1
+
+
+## Same layout as `current_ability.gd` `_show_rank_details`, using a reward pool entry.
+func _fill_reward_pick_hover_tip(entry_index: int) -> void:
+	if _ability_hover_title == null or _ability_hover_body == null or _ability_hover_stat == null:
+		return
+	if entry_index < 0 or entry_index >= _ability_entries.size():
+		return
+	var ability: Dictionary = _ability_entries[entry_index]
+	var slot_rank := clampi(int(ability.get("rank", 1)), 1, 7)
+	_ability_hover_title.text = "Rank %d" % slot_rank
+	_ability_hover_body.text = "%s\n%s" % [str(ability.get("name", "")), str(ability.get("description", ""))]
+	_ability_hover_stat.text = "id: %s" % str(ability.get("function", ""))
+
+
 ## Same text layout as `current_ability.gd` `_show_rank_details`.
 func _fill_ability_hover_tip(rank: int) -> void:
 	if _ability_hover_title == null or _ability_hover_body == null or _ability_hover_stat == null:
@@ -130,18 +161,27 @@ func _apply_hover_tip_size() -> void:
 	_ability_hover_tip.size = _ability_hover_tip.custom_minimum_size
 
 
-func _update_ability_hover_tip() -> void:
+func _update_hover_tip() -> void:
 	if _ability_hover_tip == null:
 		return
+	var reward_i := _reward_card_under_mouse()
 	var rank := _rank_under_mouse()
-	if rank < 0:
+	var next_key := ""
+	if reward_i >= 0:
+		next_key = "reward:%d" % reward_i
+	elif rank >= 0:
+		next_key = "rank:%d" % rank
+	if next_key.is_empty():
 		if _ability_hover_tip.visible:
 			_ability_hover_tip.visible = false
-		_ability_hover_rank = -1
+		_hover_tip_key = ""
 		return
-	if rank != _ability_hover_rank:
-		_ability_hover_rank = rank
-		_fill_ability_hover_tip(rank)
+	if next_key != _hover_tip_key:
+		_hover_tip_key = next_key
+		if reward_i >= 0:
+			_fill_reward_pick_hover_tip(reward_i)
+		else:
+			_fill_ability_hover_tip(rank)
 		_apply_hover_tip_size()
 	_ability_hover_tip.visible = true
 	var mp := get_viewport().get_mouse_position()
