@@ -161,6 +161,8 @@ func sync_realtime_view() -> void:
 		_shield_bar.visible = false
 	if alive and cooldown_total > 0.0:
 		_cooldown_ring.call("sync", enemy.cooldown_left(), cooldown_total)
+		var next_act := enemy.next_action()
+		_cooldown_ring.call("set_icon", next_act.icon_texture() if next_act != null else null)
 		_sync_attack_tooltip()
 
 
@@ -234,7 +236,7 @@ func _ensure_tooltip_panel() -> Panel:
 		_ui_root.add_child(tooltip)
 	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip.position = Vector2(122, -22)
-	tooltip.size = Vector2(154, 88)
+	tooltip.size = Vector2(154, 104)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.88, 0.88, 0.88, 0.96)
 	style.set_corner_radius_all(18)
@@ -248,7 +250,7 @@ func _ensure_tooltip_panel() -> Panel:
 		tooltip.add_child(summary)
 	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary.position = Vector2(10, 10)
-	summary.size = Vector2(134, 46)
+	summary.size = Vector2(134, 52)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	summary.add_theme_font_override("font", DOGICA_FONT)
 	summary.add_theme_font_size_override("font_size", 8)
@@ -259,7 +261,7 @@ func _ensure_tooltip_panel() -> Panel:
 		damage.name = "Damage"
 		tooltip.add_child(damage)
 	damage.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	damage.position = Vector2(10, 58)
+	damage.position = Vector2(10, 66)
 	damage.size = Vector2(134, 16)
 	damage.add_theme_font_override("font", DOGICA_FONT)
 	damage.add_theme_font_size_override("font_size", 8)
@@ -270,8 +272,14 @@ func _sync_attack_tooltip() -> void:
 	if enemy == null or enemy.data == null:
 		_attack_tooltip.visible = false
 		return
-	_attack_summary_label.text = _action_summary()
-	_attack_damage_label.text = "Damage: %d" % enemy.data.attack_damage
+	var next_act := enemy.next_action()
+	if next_act == null:
+		_attack_tooltip.visible = false
+		return
+	_attack_summary_label.text = "Next Attack: %s\nSpecial: %s" % [
+		next_act.action_name(), next_act.special_effect()
+	]
+	_attack_damage_label.text = "Damage: %d" % next_act.damage_amount(enemy)
 	_attack_tooltip.visible = _is_hovering_cooldown()
 
 
@@ -312,17 +320,6 @@ func _is_hovering_cooldown() -> bool:
 	var radius := float(_cooldown_ring.get("radius")) + 8.0
 	return _slot.get_global_mouse_position().distance_to(_cooldown_ring.global_position) <= radius
 
-
-func _action_summary() -> String:
-	if enemy == null or enemy.data == null or enemy.data.actions.is_empty():
-		return "Enemy attack."
-	var action = enemy.data.actions[0]
-	var script_path := ""
-	if action != null and action.get_script() != null:
-		script_path = String(action.get_script().resource_path)
-	if script_path.ends_with("rock_drop_action.gd"):
-		return "Drops a rock onto\nthe board."
-	return "Direct player\nattack."
 
 
 func _ensure_status_labels() -> void:

@@ -446,6 +446,10 @@ offset_right = 1.0
 offset_bottom = 13.0
 color = Color(0.33, 0.66, 1, 1)
 
+[node name="current_player_stats" type="Label" parent="UI/StatsHUD/Row" unique_id=377638296]
+layout_mode = 2
+text = "Status: "
+
 [node name="CursorManaPipes" type="Control" parent="UI" unique_id=901000099]
 layout_mode = 3
 anchors_preset = 15
@@ -772,6 +776,8 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="icon" type="Sprite2D" parent="EnemySlot/EnemyHolder1/EnemyUi/CooldownRing" unique_id=2088234121]
+
 [node name="StatusPoison" type="Label" parent="EnemySlot/EnemyHolder1/EnemyUi" unique_id=-193967295]
 visible = false
 z_index = 2
@@ -920,6 +926,8 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="icon" type="Sprite2D" parent="EnemySlot/EnemyHolder2/EnemyUi/CooldownRing" unique_id=1920680955]
+
 [node name="StatusPoison" type="Label" parent="EnemySlot/EnemyHolder2/EnemyUi" unique_id=-192967295]
 visible = false
 z_index = 2
@@ -1067,6 +1075,8 @@ offset_bottom = 8.0
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="icon" type="Sprite2D" parent="EnemySlot/EnemyHolder3/EnemyUi/CooldownRing" unique_id=1586382758]
 
 [node name="StatusPoison" type="Label" parent="EnemySlot/EnemyHolder3/EnemyUi" unique_id=-191967295]
 visible = false
