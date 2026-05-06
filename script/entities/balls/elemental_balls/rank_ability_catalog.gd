@@ -7,22 +7,9 @@ const ELEMENT_TYPE := "Rank"
 
 
 static func default_element_for_rank(rank: int) -> Dictionary:
-	match rank:
-		1:
-			return _ability("strike", rank, "Strike", "Deal 5 damage to current enemy.")
-		2:
-			return _ability("heavy_strike", rank, "Heavy Strike", "Deal 10 damage to one enemy.")
-		3:
-			return _ability("power_slash", rank, "Power Slash", "Deal 30 damage to one target.")
-		4:
-			return _ability("cleave", rank, "Cleave", "Deal 15 damage to all enemies.")
-		5:
-			return _ability("critical_edge", rank, "Critical Edge", "Deal 25 or 30 damage to one enemy (random).")
-		6:
-			return _ability("meteor_crash", rank, "Meteor Crash", "Deal 30 damage to all enemies.")
-		7:
-			return _ability("final_judgment", rank, "Final Judgment", "Deal 12 damage to current enemy 4 times (48 total).")
-	return _ability("strike", rank, "Strike", "Deal 5 damage to current enemy.")
+	var r := clampi(rank, 1, 7)
+	var dmg := 5 * r
+	return _ability("strike", r, "Strike", "Deal %d damage to current enemy." % dmg)
 
 
 ## Combined reward pools for reward tiers: 0 → ranks 1–3, 1 → 4–6, 2 → rank 7 only.

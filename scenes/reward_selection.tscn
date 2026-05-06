@@ -613,10 +613,9 @@ text = "Next"
 [node name="HoverTip" type="Panel" parent="Overlay" unique_id=1511428514]
 visible = false
 z_index = 50
-custom_minimum_size = Vector2(300, 200)
 layout_mode = 0
-offset_right = 300.0
-offset_bottom = 200.0
+offset_right = 1.0
+offset_bottom = 1.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hover_tip")
 
@@ -625,13 +624,20 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
-offset_top = 14.0
-offset_right = -16.0
-offset_bottom = -14.0
+offset_left = 18.0
+offset_top = 16.0
+offset_right = -18.0
+offset_bottom = -16.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
+
+[node name="TipTitle" type="Label" parent="Overlay/HoverTip/VBox" unique_id=800868246]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
+theme_override_fonts/font = ExtResource("3_font")
+theme_override_font_sizes/font_size = 16
+text = "Rank 1"
 
 [node name="TipBody" type="Label" parent="Overlay/HoverTip/VBox" unique_id=800868247]
 layout_mode = 2
@@ -639,7 +645,7 @@ size_flags_vertical = 3
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 12
-text = "Description"
+text = "Ability info"
 autowrap_mode = 3
 
 [node name="TipStat" type="Label" parent="Overlay/HoverTip/VBox" unique_id=2137696531]
@@ -647,5 +653,5 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 12
-text = "Stat"
+text = "id"
 autowrap_mode = 2
