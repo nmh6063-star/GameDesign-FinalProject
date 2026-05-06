@@ -70,8 +70,8 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				if enemies.is_empty():
 					break
 				var target := enemies[randi() % enemies.size()] as EnemyBase
-				ctx.damage_enemy(5, target)
-				ctx.add_enemy_status(target, "burn", 5)
+				ctx.damage_enemy(8, target)
+				ctx.add_enemy_status(target, "burn", 8)
 			ctx.battle_flags["last_damage"] = 5
 		"ice_shield":
 			ctx.add_player_shield(10)
@@ -203,11 +203,24 @@ static func _deal_random_enemy(ctx: BattleContext, amount: int) -> void:
 
 # ── Ball spawning ──────────────────────────────────────────────────────────────
 
+## Returns a sensible world origin for spawning balls.
+## Prefers the source ball's position, then the controller's drop-zone centre,
+## then a safe hard-coded fallback.
+static func _safe_origin(ctx: BattleContext, source: BallBase) -> Vector2:
+	if is_instance_valid(source):
+		return source.global_position
+	if ctx.controller != null and ctx.controller.has_method("drop_zone_global"):
+		var dz: Vector2 = ctx.controller.drop_zone_global()
+		if dz != Vector2.ZERO:
+			return dz
+	return Vector2(200.0, 100.0)
+
+
 static func _spawn_random_ball_rank_1_to_3(ctx: BattleContext, source: BallBase) -> void:
 	var ids := ["ball_normal", "ball_heavy", "ball_bomb"]
 	var id: String = ids[randi() % ids.size()]
 	var ball_rank := randi_range(1, 3)
-	var origin: Vector2 = source.global_position if is_instance_valid(source) else Vector2(200.0, 100.0)
+	var origin: Vector2 = _safe_origin(ctx, source)
 	ctx.spawn_ball(id, origin + Vector2(randf_range(-30.0, 30.0), -20.0),
 			Vector2(randf_range(-30.0, 30.0), 0.0), ball_rank)
 
@@ -431,7 +444,7 @@ static func _one_shower(ctx: BattleContext, source: BallBase) -> void:
 	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
 	if tree == null:
 		return
-	var origin: Vector2 = source.global_position if is_instance_valid(source) else Vector2(200.0, 100.0)
+	var origin: Vector2 = _safe_origin(ctx, source)
 	for i in range(10):
 		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
 		t.timeout.connect(func():

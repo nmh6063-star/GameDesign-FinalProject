@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" format=3 uid="uid://pg_enemy_data_001"]
+
+[ext_resource type="Script" uid="uid://bcjr8w352653g" path="res://script/entities/enemies/actions/enemy_action_base.gd" id="1_enemy_action_base"]
+[ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/entities/enemies/enemy_data.gd" id="2_enemy_data"]
+[ext_resource type="Texture2D" uid="uid://bp3xn8rupyljd" path="res://assets/enemy2.png" id="4_texture"]
+
+[resource]
+script = ExtResource("2_enemy_data")
+id = "enemy_playground"
+display_name = "Playground Dummy"
+sprite_texture = ExtResource("4_texture")
+sprite_region = Rect2(990, 440, 640, 640)
+sprite_scale = Vector2(0.23, 0.23)
+max_health = 99999
+attack_damage = 0
+attack_interval = 0.0
+actions = Array[ExtResource("1_enemy_action_base")]([])

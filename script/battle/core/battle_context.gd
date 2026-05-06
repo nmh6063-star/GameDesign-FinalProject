@@ -35,6 +35,7 @@ var battle_flags := {
 	"last_effect_id": "",
 	"time_slow_until_ms": 0,
 	"sacrifice_pending": false,
+	"max_combo_reached": 0,
 }
 var ball_statuses := {}
 
@@ -76,6 +77,7 @@ func reset_for_battle() -> void:
 		"last_effect_id": "",
 		"time_slow_until_ms": 0,
 		"sacrifice_pending": false,
+		"max_combo_reached": 0,
 	}
 	_charm_redirect_source = null
 
@@ -145,6 +147,8 @@ func register_merge() -> void:
 	combo += 1
 	COMBO_TIMEOUT -= clampf(0.1 / (combo/2.0), 0.25, 5.0)
 	combo_timer = COMBO_TIMEOUT
+	if combo > int(battle_flags.get("max_combo_reached", 0)):
+		battle_flags["max_combo_reached"] = combo
 	if mana_pipes < MAX_MANA_PIPES:
 		var progress_gain := maxi(1, int(combo_multiplier()))
 		merge_progress += progress_gain

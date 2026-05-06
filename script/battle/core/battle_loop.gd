@@ -13,6 +13,7 @@ const BattleHudAdapter := preload("res://script/battle/ui/battle_hud_adapter.gd"
 const REWARD_SELECTION_SCENE := preload("res://scenes/reward_selection.tscn")
 const CURRENT_ABILITY_SCENE := preload("res://scenes/current_ability.tscn")
 const Effects := preload("res://script/battle/core/general_effects.gd")
+const PlaygroundOverlayScript := preload("res://script/map/playground_overlay.gd")
 
 const BURST_AREA_RADIUS := 320.0
 const BURST_STRENGTH := 35.0
@@ -42,6 +43,7 @@ var _enemy_slots: Array = []
 var _reward_overlay: RewardSelectionController
 var _current_ability_overlay: CanvasLayer
 var _paused_for_ability_overlay := false
+var _playground_overlay: CanvasLayer
 
 @onready var _root := get_tree().current_scene as Node2D
 @onready var _ball_placeholder := _root.get_node("BallHolder/BallPlaceholder") as BallBase
@@ -71,8 +73,24 @@ func _ready() -> void:
 	call_deferred("_initialize")
 
 
+func get_context() -> BattleContext:
+	return _context
+
+
 func _initialize() -> void:
+	_inject_playground_overlay_if_needed()
 	_begin_battle()
+
+
+func _inject_playground_overlay_if_needed() -> void:
+	var gm := _game_manager()
+	if gm == null or not bool(gm.get("is_playground_mode")):
+		return
+	if _playground_overlay != null and is_instance_valid(_playground_overlay):
+		return
+	_playground_overlay = PlaygroundOverlayScript.new()
+	_playground_overlay.set("_battle_loop", self)
+	_root.add_child(_playground_overlay)
 
 
 func _begin_battle() -> void:
@@ -613,6 +631,13 @@ func _finish_battle(text: String) -> void:
 	if text == "Game Over":
 		game_manager.call("restart_run")
 		return
+	# Playground mode: respawn the enemy and keep testing
+	if text == "Stage Clear" and bool(game_manager.get("is_playground_mode")):
+		respawn_playground_enemies()
+		return
+	# Award currency on victory
+	if text == "Stage Clear":
+		PlayerState.add_gold(_compute_battle_gold_reward())
 	if _should_show_post_battle_reward():
 		_show_post_battle_reward_selection()
 		return
@@ -621,6 +646,28 @@ func _finish_battle(text: String) -> void:
 
 func _should_show_post_battle_reward() -> bool:
 	return true
+
+
+## Base 50 gold + 15 per 3 combo tier reached this battle.
+func _compute_battle_gold_reward() -> int:
+	var max_combo := int(_context.battle_flags.get("max_combo_reached", 0))
+	var combo_bonus := (max_combo / 3) * 15
+	return 50 + combo_bonus
+
+
+## Called in playground mode when the dummy enemy is defeated — respawn it.
+func respawn_playground_enemies() -> void:
+	_context.reset_for_battle()
+	_hud.clear_result()
+	# spawn_enemy() frees the old enemy internally before spawning a new one
+	_override_enemy_ids_from_stage()
+	_spawn_enemies()
+	sync_enemy_views()
+	_sync_player_bar()
+	sync_mana_hud()
+	_sync_special_bar()
+	set_physics_process(true)
+	_begin_turn()
 
 
 ## Dev / hotkey: jump to the same flow as Stage Clear (result → timer → rank reward → map).

@@ -1,3 +1,7 @@
+res://script/battle/core/battle_context.gd
+res://script/battle/core/battle_loop.gd
+res://script/game_manager/game_manager.gd
+res://script/map/plinko_room.gd
 res://scenes/ball.tscn
 res://data/balls/amplifier_ball.tres
 res://data/balls/duplication_ball.tres
@@ -22,14 +26,8 @@ res://data/enemies/enemy_guard.tres
 res://data/enemies/enemy_small_soldier.tres
 res://data/enemies/enemy_mage.tres
 res://data/enemies/enemy_machine_core.tres
-res://script/battle/controllers/enemy_slot_controller.gd
-res://script/battle/core/battle_loop.gd
-res://script/game_manager/game_manager.gd
-res://script/map/map_selection.gd
+res://script/map/playground_controller.gd
+res://script/map/playground.gd
+res://script/entities/enemies/enemy_catalog.gd
 res://script/entities/balls/elemental_balls/rank_ability_effects.gd
-res://script/battle/core/battle_context.gd
-res://script/entities/balls/ball_catalog.gd
-res://script/entities/balls/ball_data.gd
-res://data/balls/contagion_ball.tres
-res://data/balls/dot_leech_ball.tres
-res://data/balls/dot_echo_ball.tres
+res://script/ui/combo_hud.gd

@@ -10,6 +10,9 @@ func _ready() -> void:
 	var ability_btn := get_node_or_null("MenuScreen/AbilityCollection") as Button
 	if ability_btn != null:
 		ability_btn.pressed.connect(_on_ability_collection_pressed)
+	var playground_btn := get_node_or_null("MenuScreen/Playground") as Button
+	if playground_btn != null:
+		playground_btn.pressed.connect(_on_playground_pressed)
 
 
 func _on_start_game_pressed() -> void:
@@ -24,3 +27,8 @@ func _on_tutorial_pressed() -> void:
 func _on_ability_collection_pressed() -> void:
 	var inst := ABILITY_COLLECTION_SCENE.instantiate() as Node
 	get_tree().current_scene.add_child(inst)
+
+
+func _on_playground_pressed() -> void:
+	GameManager.generate_new_run()
+	GameManager.open_playground()
