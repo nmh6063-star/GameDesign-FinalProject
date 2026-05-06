@@ -262,7 +262,7 @@ static func get_sprite_files(function: String):
 	var base = sprite_map[get_function_info(function)["class"]]
 	var overlay = null
 	var parsed = _parse(function)["kind"]
-	if FileAccess.file_exists("res://assets/ball_sprites/%s.png" % parsed):
+	if ResourceLoader.exists("res://assets/ball_sprites/%s.png" % parsed):
 		overlay = load("res://assets/ball_sprites/%s.png" % parsed)
 	else:
 		overlay = load("res://assets/ball_sprites/oops.png")
