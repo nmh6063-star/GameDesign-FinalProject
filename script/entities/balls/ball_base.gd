@@ -221,6 +221,7 @@ func die():
 	else:
 		$CollisionShape2D.disabled = true
 	dying = true
+	queue_redraw()
 	timer.start()
 
 func _on_timer_timeout():
@@ -240,7 +241,10 @@ func has_tag(tag: String) -> bool:
 
 
 func get_radius() -> float:
-	var base := 20.0 if data == null else data.radius_for_rank(rank)
+	var plus = 0
+	if typing && !ui_preview:
+		plus = 25.0
+	var base = 20.0 if data == null else data.radius_for_rank(rank) + plus
 	if battle_context != null:
 		var mult := float(battle_context.ball_status_for(self).get("size_mult", 1.0))
 		if mult != 1.0:
@@ -413,7 +417,8 @@ func _draw() -> void:
 		return
 	var radius := get_radius()
 	var color := data.display_color(rank)
-	#draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(rank), OUTLINE_WIDTH, true)
+	if dying:
+		draw_arc(Vector2(0, 25.0), radius*0.5, 0.0, TAU, OUTLINE_POINTS, $base.modulate, radius, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale

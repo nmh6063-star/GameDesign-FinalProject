@@ -122,16 +122,13 @@ static var typing_by_id = {
 			"class": "fire",
 		},
 	"ice_shield": {
-		"class": "ice",
-		"ability": "block"
+		"class": "alchemist",
 	},
 	"convert": {
-		"class": "gambler",
-		"ability": "misc"
+		"class": "alchemist",
 	},
 	"reinforce": {
-			"class": "knight",
-			"ability": "block_plus"
+			"class": "fire",
 		},
 		"echo_shot": {
 			"class": "alchemist",
@@ -228,9 +225,6 @@ static var typing_by_id = {
 		},
 		"dot_echo": {
 			"class": "alchemist",
-		},
-		"convert": {
-			"class": "alchemist"
 		}
 	}
 
