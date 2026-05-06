@@ -65,80 +65,61 @@ static var functions_by_id := {}
 
 static var typing_by_id = {
 		"strike": {
-			"class": "knight",
-			"ability": "hit"
+			"class": "fire",
 		},
 		"mend": {
-			"class": "knight",
-			"ability": "heal"
+			"class": "fire",
 		},
 		"venom": {
-			"class": "poison",
-			"ability": "dot"
+			"class": "alchemist",
 		},
 		"ember": {
-			"class": "fire",
-			"ability": "dot"
+			"class": "alchemist",
 		},
 		"guard": {
-			"class": "knight",
-			"ability": "block"
+			"class": "fire",
 		},
 		"critical": {
-			"class": "knight",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"refresh": {
-			"class": "knight",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"heavy_strike": {
-			"class": "knight",
-			"ability": "hit"
+			"class": "fire",
 		},
 		"recovery": {
-			"class": "knight",
-			"ability": "heal"
+			"class": "alchemist",
 		},
 		"frost_touch": {
-			"class": "ice",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"iron_guard": {
-			"class": "knight",
-			"ability": "block_plus"
+			"class": "fire",
 		},
 		"triple_shot": {
-			"class": "gambler",
-			"ability": "hit"
+			"class": "fire",
 		},
 		"scatter_drop": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"critical_strike": {
-			"class": "gambler",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"pollution": {
-			"class": "poison",
-			"ability": "crit"
+			"class": "alchemist",
 		},
 		"fireburn": {
 			"class": "fire",
-			"ability": "dot"
 		},
 		"power_slash": {
-			"class": "knight",
-			"ability": "hit"
+			"class": "fire",
 		},
 		"toxic_burst": {
-			"class": "poison",
-			"ability": "bomb"
+			"class": "alchemist",
 		},
 		"fireball": {
 			"class": "fire",
-			"ability": "dot"
 		},
 	"ice_shield": {
 		"class": "ice",
@@ -153,149 +134,125 @@ static var typing_by_id = {
 			"ability": "block_plus"
 		},
 		"echo_shot": {
-			"class": "knight",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"charm": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"cleave": {
-			"class": "knight",
-			"ability": "hit"
+			"class": "fire",
 		},
 		"greater_heal": {
-			"class": "knight",
-			"ability": "heal"
+			"class": "alchemist",
 		},
 		"bomb_orb": {
-			"class": "knight",
-			"ability": "bomb"
+			"class": "fire",
 		},
 		"chain_spark": {
-			"class": "gambler",
-			"ability": "hit"
+			"class": "fire",
 		},
 		"mirror_shield": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"corrupt_field": {
-			"class": "poison",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"critical_edge": {
-			"class": "gambler",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"freeze_wave": {
-			"class": "ice",
-			"ability": "block"
+			"class": "alchemist",
 		},
 		"giant_orb": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "fire",
 		},
 		"consume_core": {
-			"class": "gambler",
-			"ability": "crit"
+			"class": "alchemist",
 		},
 		"upgrade_pulse": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "fire",
 		},
 		"poison_rain": {
-			"class": "poison",
-			"ability": "dot"
+			"class": "alchemist",
 		},
 		"time_drift": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"contagion": {
-			"class": "poison",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"meteor_crash": {
-			"class": "gambler",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"full_recovery": {
-			"class": "knight",
-			"ability": "heal"
+			"class": "fire",
 		},
 		"chaos_rain": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "fire",
 		},
 		"overcharge": {
-			"class": "knight",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"mass_morph": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"reflect_wall": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"giant_core": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "fire",
 		},
 		"dot_siphon": {
-			"class": "knight",
-			"ability": "heal"
+			"class": "alchemist",
 		},
 		"final_judgment": {
-			"class": "knight",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"apocalypse": {
-			"class": "knight",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"time_stop": {
-			"class": "ice",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"magic_flood": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"miracle_cascade": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "alchemist",
 		},
 		"sacrifice_nova": {
-			"class": "poison",
-			"ability": "crit"
+			"class": "fire",
 		},
 		"one_shower": {
-			"class": "gambler",
-			"ability": "misc"
+			"class": "fire",
 		},
 		"dot_echo": {
-			"class": "fire",
-			"ability": "dot"
+			"class": "alchemist",
 		},
+		"convert": {
+			"class": "alchemist"
+		}
 	}
 
 static var sprite_map = {
-	"block": preload("res://assets/ball_sprites/block.png"),
-	"block_plus": preload("res://assets/ball_sprites/block_plus.png"),
-	"bomb": preload("res://assets/ball_sprites/bomb.png"),
-	"crit": preload("res://assets/ball_sprites/crit.png"),
-	"dot": preload("res://assets/ball_sprites/dot.png"),
-	"fire": preload("res://assets/ball_sprites/fire.png"),
-	"gambler": preload("res://assets/ball_sprites/gambler.png"),
-	"heal": preload("res://assets/ball_sprites/heal.png"),
-	"hit": preload("res://assets/ball_sprites/hit.png"),
-	"ice": preload("res://assets/ball_sprites/ice.png"),
-	"knight": preload("res://assets/ball_sprites/knight.png"),
-	"misc": preload("res://assets/ball_sprites/misc.png"),
-	"poison": preload("res://assets/ball_sprites/skull.png")
+	"alchemist": [
+		preload("res://assets/ball_sprites/flask1.png"),
+		preload("res://assets/ball_sprites/flask2.png"),
+		preload("res://assets/ball_sprites/flask3.png"),
+		preload("res://assets/ball_sprites/flask4.png"),
+		preload("res://assets/ball_sprites/flask5.png"),
+		preload("res://assets/ball_sprites/flask6.png"),
+		preload("res://assets/ball_sprites/flask7.png"),
+		],
+	"fire": [
+		preload("res://assets/ball_sprites/flame1.png"),
+		preload("res://assets/ball_sprites/flame2.png"),
+		preload("res://assets/ball_sprites/flame3.png"),
+		preload("res://assets/ball_sprites/flame4.png"),
+		preload("res://assets/ball_sprites/flame5.png"),
+		preload("res://assets/ball_sprites/flame6.png"),
+		preload("res://assets/ball_sprites/flame7.png"),
+		]
 }
 static func _init_registry() -> void:
 	if not functions_by_id.is_empty():
@@ -309,7 +266,12 @@ static func get_function_info(function: String):
 
 static func get_sprite_files(function: String):
 	var base = sprite_map[get_function_info(function)["class"]]
-	var overlay = sprite_map[get_function_info(function)["ability"]]
+	var overlay = null
+	var parsed = _parse(function)["kind"]
+	if FileAccess.file_exists("res://assets/ball_sprites/%s.png" % parsed):
+		overlay = load("res://assets/ball_sprites/%s.png" % parsed)
+	else:
+		overlay = load("res://assets/ball_sprites/oops.png")
 	return {
 		"base": base,
 		"overlay": overlay

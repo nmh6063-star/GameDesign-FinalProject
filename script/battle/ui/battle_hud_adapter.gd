@@ -172,6 +172,7 @@ func _render_preview(root: Node2D, item: Dictionary, scale: float) -> void:
 		return
 	var ball: BallBase = (item["scene"] as PackedScene).instantiate() as BallBase
 	ball.ui_preview = true
+	print(item["scene"])
 	root.add_child(ball)
 	ball.set_preview(item["data"], int(item.get("rank", 1)))
 	ball.position = Vector2.ZERO
