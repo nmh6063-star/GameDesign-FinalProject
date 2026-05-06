@@ -245,21 +245,18 @@ z_index = 1
 layout_mode = 0
 offset_right = 120.0
 offset_bottom = 120.0
-mouse_filter = 0
 
 [node name="RangeTier1" type="Panel" parent="Overlay/Card/TopBar" unique_id=40291002]
 z_index = 1
 layout_mode = 0
 offset_right = 120.0
 offset_bottom = 120.0
-mouse_filter = 0
 
 [node name="RangeTier2" type="Panel" parent="Overlay/Card/TopBar" unique_id=40291003]
 z_index = 1
 layout_mode = 0
 offset_right = 120.0
 offset_bottom = 120.0
-mouse_filter = 0
 
 [node name="SelectionPanel" type="Panel" parent="Overlay/Card" unique_id=2137676088]
 layout_mode = 0
@@ -352,7 +349,6 @@ theme_override_font_sizes/font_size = 16
 text = "7"
 
 [node name="RewardsRow" type="HBoxContainer" parent="Overlay/Card/SelectionPanel" unique_id=428217110]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -412,6 +408,22 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
+[node name="overlay" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard0/Margin/VBox/Orb" unique_id=1226442329]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -19.0
+offset_top = -19.0
+offset_right = 19.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+pivot_offset = Vector2(19, 19)
+
 [node name="RewardCard1" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=829177488]
 custom_minimum_size = Vector2(180, 220)
 layout_mode = 2
@@ -458,6 +470,22 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
+[node name="overlay" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard1/Margin/VBox/Orb" unique_id=1817707692]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -19.0
+offset_top = -19.0
+offset_right = 19.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+pivot_offset = Vector2(19, 19)
+
 [node name="RewardCard2" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=1556927840]
 custom_minimum_size = Vector2(180, 220)
 layout_mode = 2
@@ -503,6 +531,22 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_orb")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
+
+[node name="overlay" type="TextureRect" parent="Overlay/Card/SelectionPanel/RewardsRow/RewardCard2/Margin/VBox/Orb" unique_id=373600641]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -19.0
+offset_top = -19.0
+offset_right = 19.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(2, 2)
+pivot_offset = Vector2(19, 19)
 
 [node name="RewardCard3" type="Button" parent="Overlay/Card/SelectionPanel/RewardsRow" unique_id=165029589]
 visible = false
@@ -569,8 +613,8 @@ text = "Next"
 [node name="HoverTip" type="Panel" parent="Overlay" unique_id=1511428514]
 visible = false
 z_index = 50
-layout_mode = 0
 custom_minimum_size = Vector2(300, 200)
+layout_mode = 0
 offset_right = 300.0
 offset_bottom = 200.0
 mouse_filter = 2

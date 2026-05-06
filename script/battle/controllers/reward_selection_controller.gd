@@ -3,6 +3,7 @@ class_name RewardSelectionController
 
 const RankAbilityCatalog := preload("res://script/entities/balls/elemental_balls/rank_ability_catalog.gd")
 const COLLECTION_SCENE := preload("res://scenes/ability_collection.tscn")
+const Abilities := preload("res://script/entities/balls/elemental_balls/elemental_rank_abilities.gd")
 
 signal selection_completed
 
@@ -61,7 +62,6 @@ func _ready() -> void:
 			orb.pressed.connect(_on_reward_card_pressed.bind(i))
 		card.disabled = true
 	_begin_rank_pick_phase()
-
 
 func _build_style_templates() -> void:
 	_reward_style_idle = _make_reward_card_style(false)
@@ -430,6 +430,8 @@ func _refresh_reward_cards() -> void:
 			var ab_rank := clampi(int(e.get("rank", 1)), 1, 7)
 			if lbl != null:
 				lbl.text = str(e.get("name", ""))
+				var data = Abilities.get_sprite_files(e.get("function", ""))
+				orb.get_node("overlay").texture = data["overlay"]
 			card.disabled = false
 			if orb != null:
 				orb.disabled = false

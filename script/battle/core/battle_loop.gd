@@ -12,6 +12,7 @@ const BattleHudAdapter := preload("res://script/battle/ui/battle_hud_adapter.gd"
 const REWARD_SELECTION_SCENE := preload("res://scenes/reward_selection.tscn")
 const CURRENT_ABILITY_SCENE := preload("res://scenes/current_ability.tscn")
 const Effects := preload("res://script/battle/core/general_effects.gd")
+const sound := preload("res://script/game_manager/sound_manager.gd")
 
 const BURST_AREA_RADIUS := 320.0
 const BURST_STRENGTH := 35.0
@@ -170,7 +171,8 @@ func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	var hit_balls := _targeted_balls(target_area)
 	for ball in hit_balls:
 		ball.on_shot(_context)
-	burst_knock_on_balls(burst_origin, SHOOT_BURST_STRENGTH_MULT)
+	sound.play_sound_from_string("shotgun")
+	burst_knock_on_balls(burst_origin, SHOOT_BURST_STRENGTH_MULT * 5.0)
 
 
 func _complete_turn_after_drop() -> void:
@@ -359,11 +361,13 @@ func sync_enemy_views() -> void:
 func _enter_slow_mo() -> void:
 	_context.slow_mo_active = true
 	Engine.time_scale = SLOW_MO_SCALE
+	sound.play_sound_from_string("slow")
 
 
 func _exit_slow_mo() -> void:
 	_context.slow_mo_active = false
 	Engine.time_scale = 1.0
+	sound.play_sound_from_string("speed")
 
 
 func _show_reward_selection() -> void:

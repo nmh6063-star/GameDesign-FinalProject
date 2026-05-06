@@ -8,6 +8,7 @@ const BallData := preload("res://script/entities/balls/ball_data.gd")
 const GRAVITY_SCALE := 2.0
 const OUTLINE_WIDTH := 2.0
 const OUTLINE_POINTS := 64
+const sound := preload("res://script/game_manager/sound_manager.gd")
 
 signal dropped
 
@@ -28,6 +29,7 @@ var _playfield_right_x: float = -1.0
 var type = []
 var element_list = []
 var _status_tag_label: Label
+var previous_velocity: Vector2
 
 
 func _ready() -> void:
@@ -66,9 +68,78 @@ func set_preview(ball_data: BallData, ball_rank: int) -> void:
 	ui_preview = true
 	data = ball_data
 	rank = clampi(ball_rank, 1, 7)
+	#come back to 
+	for elements in element_list:
+		if elements["element"].matching_function(self, elements["effect"]):
+			$Sprite2D.texture = elements["element"].get_sprite_files(elements["effect"])["overlay"]
 	set_collision_enabled(false)
 	refresh()
 
+func soften_alpha(img: Image):
+	var w = img.get_width()
+	var h = img.get_height()
+
+	var temp = Image.create(w, h, false, Image.FORMAT_RGBA8)
+
+	# number of blur passes (increase for stronger smoothing)
+	var passes = 3
+
+	for p in range(passes):
+		for y in range(h):
+			for x in range(w):
+				var sum = 0.0
+				var count = 0
+
+				# 5x5 kernel (stronger than before)
+				for oy in range(-2, 3):
+					for ox in range(-2, 3):
+						var nx = x + ox
+						var ny = y + oy
+
+						if nx >= 0 and nx < w and ny >= 0 and ny < h:
+							var c = img.get_pixel(nx, ny)
+							sum += c.a
+							count += 1
+
+				var avg = sum / max(count, 1)
+
+				var c = img.get_pixel(x, y)
+				c.a = avg
+				temp.set_pixel(x, y, c)
+
+		# copy back for next pass
+		img.copy_from(temp)
+
+func center(poly: PackedVector2Array, size: Vector2) -> PackedVector2Array:
+	var half = size * 0.5
+	var result = PackedVector2Array()
+
+	for p in poly:
+		result.append((p - half) * get_radius() * 0.05)
+
+	return result
+
+func get_texture_center_global(sprite: Sprite2D) -> Vector2:
+	if sprite.texture == null:
+		return sprite.global_position
+
+	var tex_size = sprite.texture.get_size()
+	var local_center = tex_size / 2
+
+	if sprite.centered:
+		local_center = Vector2.ZERO
+	else:
+		local_center -= sprite.offset
+
+	return sprite.to_global(local_center)
+
+func percent_to_7(n: float) -> float:
+	var min_val = 1.0
+	var max_val = 7.0
+	n = clamp(n, min_val, max_val)
+	
+	var percent = (n - min_val) / (max_val - min_val) * 100.0
+	return percent/100.0
 
 func refresh() -> void:
 	if data == null:
@@ -81,15 +152,42 @@ func refresh() -> void:
 	capsule.visible = true
 	for elements in element_list:
 		if elements["element"].matching_function(self, elements["effect"]):
-			var sprites = elements["element"].get_sprite_files(elements["effect"])
-			element_base.texture = sprites["base"]
-			element_overlay.texture = sprites["overlay"]
-			element_base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
-			element_overlay.scale = element_base.scale
+			var polygon = get_node_or_null("Polygon2D")
+			if polygon:
+				polygon.queue_free()
+			var base = get_node_or_null("Sprite2D")
+			var overlay = get_node_or_null("overlay")
+			var collision = get_node_or_null("collision")
+			if get_node_or_null("collision") == null:
+				overlay = Sprite2D.new()
+				overlay.name = "overlay"
+				collision = CollisionPolygon2D.new()
+				collision.name = "collision"
+				self.add_child(overlay)
+				self.add_child(collision)
+				get_node("CollisionShape2D").queue_free()
+			base.texture = elements["element"].get_sprite_files(elements["effect"])["base"][rank-1]
+			overlay.texture = elements["element"].get_sprite_files(elements["effect"])["overlay"]
+			overlay.modulate = Color(0.68, 0.85, 0.9)
+			base.modulate = Color(percent_to_7(rank), percent_to_7(rank), percent_to_7(rank))
+			#base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			overlay.scale = Vector2(get_radius()/25.0, get_radius()/25.0)
+			overlay.position.y = 25.0
 			typing = elements["element"].get_function_info(elements["effect"])["class"]
-			capsule.visible = false
-			element_base.visible = true
-			element_overlay.visible = true
+			var image = base.texture.get_image()
+			image.convert(Image.FORMAT_RGBA8)
+			soften_alpha(image)
+			var bitmap = BitMap.new()
+			bitmap.create_from_image_alpha(image)
+			var polys = bitmap.opaque_to_polygons(
+				Rect2(Vector2.ZERO, image.get_size()),
+				0.5
+			)
+
+			var poly = center(polys[0], image.get_size())
+
+			collision.polygon = poly
+			collision.position = base.position + Vector2(0, 1.0)
 			break
 	_sync_rank()
 	_update_collision()
@@ -118,7 +216,10 @@ func die():
 	timer.one_shot = true
 	timer.timeout.connect(_on_timer_timeout)
 	self.freeze = true
-	$CollisionShape2D.disabled = true
+	if $collision:
+		$collision.disabled = true
+	else:
+		$CollisionShape2D.disabled = true
 	dying = true
 	timer.start()
 
@@ -139,7 +240,10 @@ func has_tag(tag: String) -> bool:
 
 
 func get_radius() -> float:
-	return 20.0 if data == null else data.radius_for_rank(rank)
+	var plus = 0
+	if typing && !ui_preview:
+		plus = 25.0
+	return 20.0 if data == null else data.radius_for_rank(rank) + plus #temp solution
 
 
 func is_setup_ball() -> bool:
@@ -219,6 +323,7 @@ func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
 	for elements in element_list:
 		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
 			elements["element"].on_merge(ctx, self, elements["effect"])
+	sound.play_sound_from_string("merge")
 	refresh()
 
 
@@ -240,14 +345,14 @@ func _physics_process(_delta: float) -> void:
 			base_color.x += ElementCatalog.get_color(i).r
 			base_color.y += ElementCatalog.get_color(i).g
 			base_color.z += ElementCatalog.get_color(i).b
-		self_modulate = Color(base_color.x, base_color.y, base_color.z)
+		#self_modulate = Color(base_color.x, base_color.y, base_color.z)
 	if dying:
-		self_modulate.a -= 5.0 * _delta
+		self_modulate.a -= 2.5 * _delta
 		self_modulate.a = max(self_modulate.a, 0)
-		scale += Vector2(2.5 * _delta, 2.5 * _delta)
+		scale += Vector2(5.0 * _delta, 5.0 * _delta)
 		for child in get_children():
 			if "self_modulate" in child:
-				child.self_modulate.a -= 5.0 * _delta
+				child.self_modulate.a -= 2.5 * _delta
 				child.self_modulate.a = max(child.self_modulate.a, 0)
 	if not visible:
 		gravity_scale = 0.0
@@ -286,17 +391,31 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		if w > 0.001:
 			var mid_x := (_playfield_left_x + _playfield_right_x) * 0.5
 			touchingDir = "right" if position.x > mid_x else "left"
+	var current_velocity = state.linear_velocity
+	if state.get_contact_count() > 0:
+		for i in range(state.get_contact_count()):
+			var normal = state.get_contact_local_normal(i)
+
+			var dot_before = previous_velocity.dot(normal)
+			var dot_after = current_velocity.dot(normal)
+
+			var impact_speed = -dot_before  # positive if moving into the surface
+
+			if dot_before < 0 and dot_after > 0 and impact_speed > 200.0:
+				sound.play_sound_from_string("bounce", abs(impact_speed)/1000.0)
+
+	previous_velocity = current_velocity
 
 func _draw() -> void:
 	if data == null:
 		return
 	var radius := get_radius()
 	var color := data.display_color(rank)
-	draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(rank), OUTLINE_WIDTH, true)
+	#draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, data.display_outline_color(rank), OUTLINE_WIDTH, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale
-	sprite.modulate = color
+	#sprite.modulate = color
 	($RichTextLabel as RichTextLabel).text = "[b]%s[/b]" % data.display_label(rank)
 
 
