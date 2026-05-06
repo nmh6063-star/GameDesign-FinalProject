@@ -5,13 +5,13 @@ const X_DIST := 30.0
 const Y_DIST := 25.0
 const PLACEMENT_RANDOMNESS := 5.0
 
-const FLOORS := 9        ## rows 0-8; boss appended as the 10th layer
+const FLOORS := 10        ## rows 0-8; boss appended as the 10th layer
 const MAP_WIDTH := 7
 const PATHS := 6
 const MAX_OUTGOING := 3
 
 ## Row indices that are always MONSTER.
-const MONSTER_ROWS := [1, 4, 7]
+const MONSTER_ROWS := [1, 4, 7, 9]
 ## Row indices that are always non-battle (SHOP / CAMPFIRE / EVENT).
 const NON_BATTLE_ROWS := [2, 3, 5, 6]
 ## Last row before boss — always CAMPFIRE.

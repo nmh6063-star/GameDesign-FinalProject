@@ -5,7 +5,6 @@ const ThrowEffect := preload("res://scenes/visual_effects/throw_effect.tscn")
 const SpiderWeb := preload("res://scenes/visual_effects/SpiderWeb.tscn")
 const _ICON := preload("res://assets/enemies/attack_icon/spider web icon no back.png")
 
-const WEB_CENTER := Vector2(572.0, 384.0)
 const WEB_TINT := Color(0.75, 0.82, 0.72)
 const WEB_OUTLINE := Color(0.25, 0.55, 0.22)
 const WEB_RADIUS := 38.0
@@ -18,9 +17,8 @@ func execute(ctx: BattleContext, enemy: EnemyBase) -> void:
 	fx.landed.connect(func() -> void:
 		var web := SpiderWeb.instantiate()
 		enemy.add_sibling(web)
-		web.global_position = WEB_CENTER
 	)
-	fx.launch(enemy.global_position, WEB_CENTER)
+	fx.launch(enemy.global_position, ctx.drop_zone_global())
 
 
 func action_name() -> String:

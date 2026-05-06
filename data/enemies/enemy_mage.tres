@@ -4,10 +4,15 @@
 [ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/entities/enemies/enemy_data.gd" id="2_data"]
 [ext_resource type="Script" uid="uid://dnu77ff3ufbjb" path="res://script/entities/enemies/actions/mana_drain_action.gd" id="3_action"]
 [ext_resource type="Script" uid="uid://yo4105wmtbek" path="res://script/entities/enemies/effects/enemy_effect_base.gd" id="3_eff"]
+[ext_resource type="Script" uid="uid://buniuu8uh8tif" path="res://script/entities/enemies/actions/fog_board_action.gd" id="3_ehwko"]
 [ext_resource type="Texture2D" uid="uid://cmauy0ytsy0rn" path="res://assets/enemies/mage no back.png" id="5_chb2f"]
 
 [sub_resource type="Resource" id="Action_1"]
 script = ExtResource("3_action")
+
+[sub_resource type="Resource" id="Resource_a4as2"]
+script = ExtResource("3_ehwko")
+metadata/_custom_type_script = "uid://buniuu8uh8tif"
 
 [resource]
 script = ExtResource("2_data")
@@ -17,5 +22,5 @@ sprite_texture = ExtResource("5_chb2f")
 sprite_scale = Vector2(0.3, 0.3)
 max_health = 100
 attack_damage = 18
-attack_interval = 10.0
-actions = Array[ExtResource("1_base")]([SubResource("Action_1")])
+attack_interval = 8.0
+actions = Array[ExtResource("1_base")]([SubResource("Action_1"), SubResource("Resource_a4as2")])

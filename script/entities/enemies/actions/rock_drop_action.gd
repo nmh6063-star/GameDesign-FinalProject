@@ -4,7 +4,7 @@ class_name RockDropAction
 const ROCK_BALL_ID := "ball_rock"
 const ROCK_RANK := 4
 const ThrowEffect := preload("res://scenes/visual_effects/throw_effect.tscn")
-const _ICON := preload("res://assets/enemies/attack_icon/normal attack no back.png")
+const _ICON := preload("res://assets/enemies/attack_icon/stone icon no back.png")
 
 
 func execute(ctx: BattleContext, enemy: EnemyBase) -> void:
