@@ -65,10 +65,10 @@ static var functions_by_id := {}
 
 static var typing_by_id = {
 		"strike": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"mend": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"venom": {
 			"class": "alchemist",
@@ -77,16 +77,16 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"guard": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"critical": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"refresh": {
 			"class": "alchemist",
 		},
 		"heavy_strike": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"recovery": {
 			"class": "alchemist",
@@ -95,31 +95,31 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"iron_guard": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"triple_shot": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"scatter_drop": {
 			"class": "alchemist",
 		},
 		"critical_strike": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"pollution": {
 			"class": "alchemist",
 		},
 		"fireburn": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"power_slash": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"toxic_burst": {
 			"class": "alchemist",
 		},
 		"fireball": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 	"ice_shield": {
 		"class": "alchemist",
@@ -128,7 +128,7 @@ static var typing_by_id = {
 		"class": "alchemist",
 	},
 	"reinforce": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"echo_shot": {
 			"class": "alchemist",
@@ -137,16 +137,16 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"cleave": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"greater_heal": {
 			"class": "alchemist",
 		},
 		"bomb_orb": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"chain_spark": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"mirror_shield": {
 			"class": "alchemist",
@@ -155,19 +155,19 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"critical_edge": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"freeze_wave": {
 			"class": "alchemist",
 		},
 		"giant_orb": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"consume_core": {
 			"class": "alchemist",
 		},
 		"upgrade_pulse": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"poison_rain": {
 			"class": "alchemist",
@@ -179,16 +179,16 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"meteor_crash": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"full_recovery": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"chaos_rain": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"overcharge": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"mass_morph": {
 			"class": "alchemist",
@@ -197,16 +197,16 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"giant_core": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"dot_siphon": {
 			"class": "alchemist",
 		},
 		"final_judgment": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"apocalypse": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"time_stop": {
 			"class": "alchemist",
@@ -218,10 +218,10 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"sacrifice_nova": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"one_shower": {
-			"class": "fire",
+			"class": "alchemist",
 		},
 		"dot_echo": {
 			"class": "alchemist",

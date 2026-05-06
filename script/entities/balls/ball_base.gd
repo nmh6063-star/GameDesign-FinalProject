@@ -417,8 +417,8 @@ func _draw() -> void:
 		return
 	var radius := get_radius()
 	var color := data.display_color(rank)
-	if dying:
-		draw_arc(Vector2(0, 25.0), radius*0.5, 0.0, TAU, OUTLINE_POINTS, $base.modulate, radius, true)
+	#if dying:
+		#draw_arc(Vector2(0, 25.0), radius*0.5, 0.0, TAU, OUTLINE_POINTS, $base.modulate, radius, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale
