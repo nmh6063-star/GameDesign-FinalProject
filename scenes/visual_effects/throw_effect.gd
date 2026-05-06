@@ -12,6 +12,9 @@ var _outline_color: Color = Color(0.3, 0.3, 0.3)
 
 
 func setup(data: BallData, rank: int) -> void:
+	if data == null:
+		queue_redraw()
+		return
 	_ball_radius = data.radius_for_rank(rank)
 	_ball_tint = data.tint
 	_outline_color = data.display_outline_color(rank)

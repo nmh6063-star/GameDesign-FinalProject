@@ -117,6 +117,52 @@ func drop_ball_at_x(ball_id: String, rank: int = 1, x: float = INF) -> BallBase:
 	return spawned
 
 
+## Like drop_ball_at_x, but also copies the player's equipped element_list onto the
+## ball so it displays with the correct class texture (same as the queued setup balls).
+func drop_element_ball_at_x(rank: int, x: float = INF) -> BallBase:
+	var ball_id := BallCatalog.NORMAL_BALL_ID
+	var data := BallCatalog.data_for_id(ball_id)
+	if data == null:
+		return null
+	var scene := BallCatalog.scene_for_id(ball_id)
+	var ball := scene.instantiate() as BallBase
+	if ball == null:
+		return null
+	# Mirror the element setup from spawn_setup_ball so visuals match queued balls.
+	if PlayerState.elements.get(rank) != null:
+		var type_str := String(PlayerState.elements[rank].get("type", ""))
+		if not type_str.is_empty():
+			ball.type.append(type_str)
+	var new_data := []
+	for element in PlayerState.elements:
+		if element == 0:
+			for i in PlayerState.elements[0]:
+				new_data.append({
+					"element": BallCatalog.data_for_element(String(i.get("type", "")).to_lower()),
+					"effect":  i.get("function", ""),
+					"rank":    i.get("rank", 1),
+				})
+		elif PlayerState.elements[element] != null:
+			var el: Dictionary = PlayerState.elements[element]
+			new_data.append({
+				"element": BallCatalog.data_for_element(String(el.get("type", "")).to_lower()),
+				"effect":  el.get("function", ""),
+				"rank":    el.get("rank", 1),
+			})
+	ball.element_list = new_data
+	var radius: float = data.radius_for_rank(rank)
+	# When no X is given, pick a truly random local X across the full box width
+	# (same as drop_ball does) rather than following the cursor.
+	var drop_x: float
+	if is_inf(x):
+		drop_x = randf_range(_drop_left_x + radius, _drop_right_x - radius)
+	else:
+		drop_x = _clamp_drop_x(x, radius)
+	var spawned := _spawn_instance(ball, data, rank, Vector2(drop_x, _drop_y), false)
+	spawned.sleeping = false
+	return spawned
+
+
 func spawn_setup_ball() -> BallBase:
 	var entry := _take_queue_entry()
 	var base = entry["scene"].instantiate() as BallBase

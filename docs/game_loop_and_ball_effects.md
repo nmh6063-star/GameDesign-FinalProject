@@ -150,6 +150,37 @@ The default `EnemyBase` flow:
 
 Enemy turns are driven only by each enemy's real-time attack cooldown timer.
 
+## Recent API Additions (May 6, 2026)
+
+### Element-aware ball drops
+
+`BattleBallManager.drop_element_ball_at_x(rank, x)` — like `drop_ball_at_x` but
+mirrors the full `element_list` / `type` setup from `spawn_setup_ball` before
+`configure()` is called. Use this when spawning balls that should display the
+player's current rank-class texture (e.g. the 1 Shower ability).
+
+Exposed up the chain via:
+- `BattleLoop.drop_element_ball_in_box(rank, x)` → `_box.drop_element_ball_at_x`
+- `BattleContext.drop_element_ball_in_box(rank, x)` → `controller.drop_element_ball_in_box`
+
+### New enemy status keys (BattleContext.enemy_statuses)
+
+| Key | Type | Set by | Effect |
+|-----|------|--------|--------|
+| `time_stop_until_ms` | int (epoch ms) | Time Stop ability | Blocks attack timer; target takes ×1.5 direct damage |
+| (existing) `freeze_until_ms` | int | Freeze/Ice abilities | Blocks attack timer only |
+
+### New battle_flags keys (BattleContext.battle_flags)
+
+| Key | Type | Set by | Effect |
+|-----|------|--------|--------|
+| `poison_rain_shoots` | int (0–3) | Poison Rain | Poison stacks grow instead of shrink; hits add +2 stacks |
+| `corrupt_field_active` | bool | Corrupt Field | Poisoned enemies deal −20% damage for 1 shoot |
+| `bomb_orb_ticks` | int | Bomb Orb | Bomb countdown displayed on enemies; 0 = inactive |
+
+Both `poison_rain_shoots` and `corrupt_field_active` are decremented/cleared in
+`BattleLoop._on_ball_dropped()` so duration is measured in ball drops (shoots).
+
 ## Composition Model
 
 ### Balls

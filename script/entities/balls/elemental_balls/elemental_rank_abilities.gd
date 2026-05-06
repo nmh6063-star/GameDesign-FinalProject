@@ -121,11 +121,17 @@ static var typing_by_id = {
 		"fireball": {
 			"class": "fire",
 		},
-		"ice_shield": {
-			"class": "alchemist",
-		},
-		"reinforce": {
-			"class": "fire",
+	"ice_shield": {
+		"class": "ice",
+		"ability": "block"
+	},
+	"convert": {
+		"class": "gambler",
+		"ability": "misc"
+	},
+	"reinforce": {
+			"class": "knight",
+			"ability": "block_plus"
 		},
 		"echo_shot": {
 			"class": "alchemist",

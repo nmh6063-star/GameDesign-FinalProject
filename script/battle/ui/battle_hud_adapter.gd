@@ -25,6 +25,7 @@ var _combo_hud: Control
 var _game_over: Control
 var _stage_clear: Control
 var _status_label: Label
+var _player_stats_label: Label
 
 
 func _init(root: CanvasLayer) -> void:
@@ -103,15 +104,26 @@ func show_damage(amount: int, anchor: Marker2D, color: Color) -> void:
 
 
 func sync_player_statuses(burn: int, freeze: int) -> void:
-	if _status_label == null:
+	if _status_label != null:
+		var parts: Array[String] = []
+		if burn > 0:
+			parts.append("Burn: %d" % burn)
+		if freeze > 0:
+			parts.append("Freeze: %d" % freeze)
+		_status_label.text = "  |  ".join(parts)
+		_status_label.visible = not parts.is_empty()
+
+	if _player_stats_label == null:
 		return
-	var parts: Array[String] = []
+	var lines: Array[String] = []
 	if burn > 0:
-		parts.append("Burn: %d" % burn)
+		lines.append("Burn: %d" % burn)
 	if freeze > 0:
-		parts.append("Freeze: %d" % freeze)
-	_status_label.text = "  |  ".join(parts)
-	_status_label.visible = not parts.is_empty()
+		lines.append("Freeze: %d" % freeze)
+	if lines.is_empty():
+		_player_stats_label.text = ""
+	else:
+		_player_stats_label.text = "\n".join(lines)
 
 
 func clear_result() -> void:
@@ -146,6 +158,11 @@ func _bind_nodes() -> void:
 	_game_over = _root.get_node("GameOver") as Control
 	_stage_clear = _root.get_node("StageClear") as Control
 	_status_label = _root.get_node_or_null("PlayerHealthBar/SpecialEffectBox/SpecialEffect") as Label
+	_player_stats_label = _root.get_node_or_null("StatsHUD/Row/current_player_stats") as Label
+	if _player_stats_label != null:
+		_player_stats_label.add_theme_font_override("font", DOGICA_FONT)
+		_player_stats_label.add_theme_font_size_override("font_size", 8)
+		_player_stats_label.text = ""
 
 
 func _render_preview(root: Node2D, item: Dictionary, scale: float) -> void:

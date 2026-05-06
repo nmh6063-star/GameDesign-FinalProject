@@ -1,7 +1,7 @@
 extends Node2D
 
-const HALF_W := 164.0
-const HALF_H := 84.0
+const HALF_W := 356.0
+const HALF_H := 64.0
 const LIFETIME := 10.0
 const MAX_SPEED := 120.0
 const DRAG_PER_FRAME := 0.05

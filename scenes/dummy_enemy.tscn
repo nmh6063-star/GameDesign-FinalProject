@@ -1,0 +1,12 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://script/entities/enemies/dummy_enemy.gd" id="1_dummy"]
+
+[node name="DummyEnemy" type="Node2D"]
+script = ExtResource("1_dummy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="Timer" type="Timer" parent="."]
+
+[node name="AttackCooldown" type="Timer" parent="."]

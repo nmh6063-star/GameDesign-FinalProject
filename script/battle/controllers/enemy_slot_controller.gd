@@ -36,6 +36,10 @@ var _poison_label:  Label
 var _burn_label:    Label
 var _freeze_label:  Label
 var _charm_label:   Label
+var _bomb_label:    Label
+var _rain_label:      Label
+var _corrupt_label:   Label
+var _time_stop_label: Label
 
 var enemy: EnemyBase
 var _selected := false
@@ -161,6 +165,8 @@ func sync_realtime_view() -> void:
 		_shield_bar.visible = false
 	if alive and cooldown_total > 0.0:
 		_cooldown_ring.call("sync", enemy.cooldown_left(), cooldown_total)
+		var next_act := enemy.next_action()
+		_cooldown_ring.call("set_icon", next_act.icon_texture() if next_act != null else null)
 		_sync_attack_tooltip()
 
 
@@ -234,7 +240,7 @@ func _ensure_tooltip_panel() -> Panel:
 		_ui_root.add_child(tooltip)
 	tooltip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	tooltip.position = Vector2(122, -22)
-	tooltip.size = Vector2(154, 88)
+	tooltip.size = Vector2(154, 104)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.88, 0.88, 0.88, 0.96)
 	style.set_corner_radius_all(18)
@@ -248,7 +254,7 @@ func _ensure_tooltip_panel() -> Panel:
 		tooltip.add_child(summary)
 	summary.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	summary.position = Vector2(10, 10)
-	summary.size = Vector2(134, 46)
+	summary.size = Vector2(134, 52)
 	summary.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	summary.add_theme_font_override("font", DOGICA_FONT)
 	summary.add_theme_font_size_override("font_size", 8)
@@ -259,7 +265,7 @@ func _ensure_tooltip_panel() -> Panel:
 		damage.name = "Damage"
 		tooltip.add_child(damage)
 	damage.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	damage.position = Vector2(10, 58)
+	damage.position = Vector2(10, 66)
 	damage.size = Vector2(134, 16)
 	damage.add_theme_font_override("font", DOGICA_FONT)
 	damage.add_theme_font_size_override("font_size", 8)
@@ -270,18 +276,28 @@ func _sync_attack_tooltip() -> void:
 	if enemy == null or enemy.data == null:
 		_attack_tooltip.visible = false
 		return
-	_attack_summary_label.text = _action_summary()
-	_attack_damage_label.text = "Damage: %d" % enemy.data.attack_damage
+	var next_act := enemy.next_action()
+	if next_act == null:
+		_attack_tooltip.visible = false
+		return
+	_attack_summary_label.text = "Next Attack: %s\nSpecial: %s" % [
+		next_act.action_name(), next_act.special_effect()
+	]
+	_attack_damage_label.text = "Damage: %d" % next_act.damage_amount(enemy)
 	_attack_tooltip.visible = _is_hovering_cooldown()
 
 
 func sync_status_tag(ctx: BattleContext) -> void:
 	var alive := enemy != null and enemy.is_alive()
 	if not alive:
-		if _poison_label != null: _poison_label.visible = false
-		if _burn_label   != null: _burn_label.visible   = false
-		if _freeze_label != null: _freeze_label.visible = false
-		if _charm_label  != null: _charm_label.visible  = false
+		if _poison_label  != null: _poison_label.visible  = false
+		if _burn_label    != null: _burn_label.visible    = false
+		if _freeze_label  != null: _freeze_label.visible  = false
+		if _charm_label   != null: _charm_label.visible   = false
+		if _bomb_label    != null: _bomb_label.visible    = false
+		if _rain_label      != null: _rain_label.visible      = false
+		if _corrupt_label   != null: _corrupt_label.visible   = false
+		if _time_stop_label != null: _time_stop_label.visible = false
 		return
 	var st := ctx.status_for_enemy(enemy)
 
@@ -307,27 +323,56 @@ func sync_status_tag(ctx: BattleContext) -> void:
 		_charm_label.visible = charm > 0
 		_charm_label.text = "💫 Chm %d" % charm
 
+	var bomb_ticks := int(ctx.battle_flags.get("bomb_orb_ticks", 0))
+	if _bomb_label != null:
+		_bomb_label.visible = bomb_ticks > 0
+		_bomb_label.text = "💣 Bomb %ds" % bomb_ticks
+
+	var rain_shoots := int(ctx.battle_flags.get("poison_rain_shoots", 0))
+	if _rain_label != null:
+		_rain_label.visible = rain_shoots > 0
+		_rain_label.text = "☣ Rain ×%d" % rain_shoots
+
+	var corrupt_active := bool(ctx.battle_flags.get("corrupt_field_active", false))
+	if _corrupt_label != null:
+		_corrupt_label.visible = corrupt_active and poison > 0
+		_corrupt_label.text = "⚗ Wkn 1"
+
+	var ts_until := int(st.get("time_stop_until_ms", 0))
+	var ts_secs  := int(ceil(maxi(0, ts_until - ctx.now_ms()) / 1000.0))
+	if _time_stop_label != null:
+		_time_stop_label.visible = ts_secs > 0
+		_time_stop_label.text = "⏱ Stop %ds (+50%%)" % ts_secs
+
 
 func _is_hovering_cooldown() -> bool:
 	var radius := float(_cooldown_ring.get("radius")) + 8.0
 	return _slot.get_global_mouse_position().distance_to(_cooldown_ring.global_position) <= radius
 
 
-func _action_summary() -> String:
-	if enemy == null or enemy.data == null or enemy.data.actions.is_empty():
-		return "Enemy attack."
-	var action = enemy.data.actions[0]
-	var script_path := ""
-	if action != null and action.get_script() != null:
-		script_path = String(action.get_script().resource_path)
-	if script_path.ends_with("rock_drop_action.gd"):
-		return "Drops a rock onto\nthe board."
-	return "Direct player\nattack."
-
 
 func _ensure_status_labels() -> void:
-	# Nodes are defined in the .tscn; just look them up.
-	_poison_label = _ui_root.get_node_or_null("StatusPoison") as Label
-	_burn_label   = _ui_root.get_node_or_null("StatusBurn")   as Label
-	_freeze_label = _ui_root.get_node_or_null("StatusFreeze") as Label
-	_charm_label  = _ui_root.get_node_or_null("StatusCharm")  as Label
+	_poison_label  = _get_or_create_status_label("StatusPoison",  Vector2(-52,  98), Color(0.55, 0.9,  0.25))
+	_burn_label    = _get_or_create_status_label("StatusBurn",    Vector2(-52, 111), Color(1.0,  0.45, 0.1))
+	_freeze_label  = _get_or_create_status_label("StatusFreeze",  Vector2(-52, 124), Color(0.45, 0.85, 1.0))
+	_charm_label   = _get_or_create_status_label("StatusCharm",   Vector2(-52, 137), Color(1.0,  0.75, 0.95))
+	_bomb_label    = _get_or_create_status_label("StatusBomb",    Vector2(-52, 150), Color(1.0,  0.85, 0.2))
+	_rain_label      = _get_or_create_status_label("StatusRain",     Vector2(-52, 163), Color(0.4,  0.9,  0.55))
+	_corrupt_label   = _get_or_create_status_label("StatusCorrupt",  Vector2(-52, 176), Color(0.8,  0.35, 1.0))
+	_time_stop_label = _get_or_create_status_label("StatusTimeStop", Vector2(-52, 189), Color(0.6,  0.85, 1.0))
+
+
+func _get_or_create_status_label(node_name: String, pos: Vector2, color: Color) -> Label:
+	var existing := _ui_root.get_node_or_null(node_name) as Label
+	if existing != null:
+		return existing
+	var lbl := Label.new()
+	lbl.name = node_name
+	lbl.position = pos
+	lbl.size = Vector2(116, 12)
+	lbl.add_theme_font_override("font", DOGICA_FONT)
+	lbl.add_theme_font_size_override("font_size", 8)
+	lbl.modulate = color
+	lbl.visible = false
+	_ui_root.add_child(lbl)
+	return lbl

@@ -240,10 +240,12 @@ func has_tag(tag: String) -> bool:
 
 
 func get_radius() -> float:
-	var plus = 0
-	if typing && !ui_preview:
-		plus = 25.0
-	return 20.0 if data == null else data.radius_for_rank(rank) + plus #temp solution
+	var base := 20.0 if data == null else data.radius_for_rank(rank)
+	if battle_context != null:
+		var mult := float(battle_context.ball_status_for(self).get("size_mult", 1.0))
+		if mult != 1.0:
+			return base * mult
+	return base
 
 
 func is_setup_ball() -> bool:
