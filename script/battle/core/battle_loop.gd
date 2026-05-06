@@ -190,6 +190,9 @@ func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	for ball in hit_balls:
 		ball.on_shot(_context)
 	sound.play_sound_from_string("shotgun")
+	var effects = Effects.new()
+	_root.add_child(effects)
+	effects.shake(SHOOT_BURST_STRENGTH_MULT)
 	burst_knock_on_balls(burst_origin, SHOOT_BURST_STRENGTH_MULT * 5.0)
 
 
