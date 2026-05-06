@@ -48,6 +48,7 @@ var _range_frame_selected: StyleBoxFlat
 var _range_frame_not_chosen_dim: StyleBoxFlat
 
 var _ability_hover_tip: Panel
+var _ability_hover_margin: MarginContainer
 var _ability_hover_vbox: VBoxContainer
 var _ability_hover_title: Label
 var _ability_hover_body: Label
@@ -82,14 +83,16 @@ func _process(_delta: float) -> void:
 
 
 func _cache_ability_hover_tip() -> void:
-	_ability_hover_tip = get_node("Overlay/HoverTip") as Panel
-	_ability_hover_vbox = get_node("Overlay/HoverTip/VBox") as VBoxContainer
-	_ability_hover_title = get_node("Overlay/HoverTip/VBox/TipTitle") as Label
-	_ability_hover_body = get_node("Overlay/HoverTip/VBox/TipBody") as Label
-	_ability_hover_stat = get_node("Overlay/HoverTip/VBox/TipStat") as Label
+	_ability_hover_tip = get_node("HoverTip") as Panel
+	_ability_hover_margin = get_node("HoverTip/MarginContainer") as MarginContainer
+	_ability_hover_vbox = get_node("HoverTip/MarginContainer/VBox") as VBoxContainer
+	_ability_hover_title = get_node("HoverTip/MarginContainer/VBox/TipTitle") as Label
+	_ability_hover_body = get_node("HoverTip/MarginContainer/VBox/TipBody") as Label
+	_ability_hover_stat = get_node("HoverTip/MarginContainer/VBox/TipStat") as Label
 	if _ability_hover_tip != null:
 		_ability_hover_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_ability_hover_tip.visible = false
+		_ability_hover_tip.top_level = true
 	for lbl in [_ability_hover_title, _ability_hover_body, _ability_hover_stat]:
 		if lbl != null:
 			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -123,7 +126,6 @@ func _reward_card_under_mouse() -> int:
 	return -1
 
 
-## Same layout as `current_ability.gd` `_show_rank_details`, using a reward pool entry.
 func _fill_reward_pick_hover_tip(entry_index: int) -> void:
 	if _ability_hover_title == null or _ability_hover_body == null or _ability_hover_stat == null:
 		return
@@ -131,34 +133,65 @@ func _fill_reward_pick_hover_tip(entry_index: int) -> void:
 		return
 	var ability: Dictionary = _ability_entries[entry_index]
 	var slot_rank := clampi(int(ability.get("rank", 1)), 1, 7)
-	_ability_hover_title.text = "Rank %d" % slot_rank
-	_ability_hover_body.text = "%s\n%s" % [str(ability.get("name", "")), str(ability.get("description", ""))]
-	_ability_hover_stat.text = "id: %s" % str(ability.get("function", ""))
+	_ability_hover_title.text = str(ability.get("name", "?"))
+	var desc_r := str(ability.get("description", ""))
+	_ability_hover_body.text = desc_r if not desc_r.is_empty() else "—"
+	_ability_hover_stat.text = "Rank %d  ·  id: %s" % [slot_rank, str(ability.get("function", ""))]
 
 
-## Same text layout as `current_ability.gd` `_show_rank_details`.
 func _fill_ability_hover_tip(rank: int) -> void:
 	if _ability_hover_title == null or _ability_hover_body == null or _ability_hover_stat == null:
 		return
-	_ability_hover_title.text = "Rank %d" % rank
 	var ability = PlayerState.elements.get(rank)
 	if ability == null or not (ability is Dictionary):
+		_ability_hover_title.text = "Rank %d" % rank
 		_ability_hover_body.text = "No ability equipped."
 		_ability_hover_stat.text = ""
 		return
-	_ability_hover_body.text = "%s\n%s" % [str(ability.get("name", "")), str(ability.get("description", ""))]
+	_ability_hover_title.text = "Rank %d — %s" % [rank, str(ability.get("name", "?"))]
+	var desc_a := str(ability.get("description", ""))
+	_ability_hover_body.text = desc_a if not desc_a.is_empty() else "—"
 	_ability_hover_stat.text = "id: %s" % str(ability.get("function", ""))
 
 
 func _apply_hover_tip_size() -> void:
-	if _ability_hover_tip == null or _ability_hover_vbox == null or _ability_hover_body == null:
+	if (
+			_ability_hover_tip == null
+			or _ability_hover_margin == null
+			or _ability_hover_vbox == null
+			or _ability_hover_body == null
+	):
 		return
-	_ability_hover_body.custom_minimum_size = Vector2(_HOVER_TIP_BODY_WIDTH, 0)
-	var inner := _ability_hover_vbox.get_combined_minimum_size()
-	const MARGIN_X := 36.0
-	const MARGIN_Y := 32.0
-	_ability_hover_tip.custom_minimum_size = inner + Vector2(MARGIN_X, MARGIN_Y)
-	_ability_hover_tip.size = _ability_hover_tip.custom_minimum_size
+	const ML := 18.0
+	const MT := 16.0
+	const MR := 18.0
+	const MB := 16.0
+	var tw := _HOVER_TIP_BODY_WIDTH
+	var wrap := Vector2(tw, 0)
+	_ability_hover_body.custom_minimum_size = wrap
+	if _ability_hover_title != null:
+		_ability_hover_title.custom_minimum_size = wrap
+	if _ability_hover_stat != null:
+		_ability_hover_stat.custom_minimum_size = wrap
+
+	var sep := float(_ability_hover_vbox.get_theme_constant("separation", "VBoxContainer"))
+	var sum_y := 0.0
+	var parts := 0
+	for lbl in [_ability_hover_title, _ability_hover_body, _ability_hover_stat]:
+		if lbl == null:
+			continue
+		if lbl == _ability_hover_stat and lbl.text.is_empty():
+			continue
+		sum_y += lbl.get_minimum_size().y
+		parts += 1
+	if parts > 1:
+		sum_y += sep * float(parts - 1)
+
+	var outer := Vector2(tw + ML + MR, sum_y + MT + MB)
+	outer.x = maxf(outer.x, tw + ML + MR)
+	outer.y = maxf(outer.y, 56.0)
+	_ability_hover_tip.custom_minimum_size = outer
+	_ability_hover_tip.size = outer
 
 
 func _update_hover_tip() -> void:
@@ -176,14 +209,32 @@ func _update_hover_tip() -> void:
 			_ability_hover_tip.visible = false
 		_hover_tip_key = ""
 		return
-	if next_key != _hover_tip_key:
+
+	var content_changed := next_key != _hover_tip_key
+	if content_changed:
 		_hover_tip_key = next_key
 		if reward_i >= 0:
 			_fill_reward_pick_hover_tip(reward_i)
 		else:
 			_fill_ability_hover_tip(rank)
-		_apply_hover_tip_size()
+
 	_ability_hover_tip.visible = true
+	if content_changed:
+		_apply_hover_tip_size()
+		call_deferred("_deferred_finalize_reward_hover_tip")
+	_reward_hover_tip_position()
+
+
+func _deferred_finalize_reward_hover_tip() -> void:
+	if _ability_hover_tip == null or not _ability_hover_tip.visible:
+		return
+	_apply_hover_tip_size()
+	_reward_hover_tip_position()
+
+
+func _reward_hover_tip_position() -> void:
+	if _ability_hover_tip == null or not _ability_hover_tip.visible:
+		return
 	var mp := get_viewport().get_mouse_position()
 	_ability_hover_tip.global_position = mp + _ABILITY_HOVER_MOUSE_OFFSET
 	_clamp_control_to_viewport(_ability_hover_tip)

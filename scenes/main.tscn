@@ -184,10 +184,10 @@ script = ExtResource("2_gm")
 [node name="BallQueue" type="Control" parent="UI" unique_id=1041509987]
 layout_mode = 3
 anchors_preset = 0
-offset_left = 40.0
-offset_top = 208.0
-offset_right = 528.0
-offset_bottom = 612.0
+offset_left = 41.0
+offset_top = 266.0
+offset_right = 529.0
+offset_bottom = 670.0
 mouse_filter = 2
 
 [node name="NextBox" type="Panel" parent="UI/BallQueue" unique_id=1041509988]

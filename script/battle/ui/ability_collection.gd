@@ -40,7 +40,9 @@ func _build_rank_page(rank: int) -> Control:
 
 func _ability_card(row: Dictionary) -> Control:
 	var outer := PanelContainer.new()
-	outer.custom_minimum_size = Vector2(260, 148)
+	const CARD_MIN_W := 260.0
+	const INNER_TEXT_W := 236.0
+	outer.custom_minimum_size = Vector2(CARD_MIN_W, 0)
 	outer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.16, 0.12, 0.24, 1)
@@ -66,6 +68,7 @@ func _ability_card(row: Dictionary) -> Control:
 	title.add_theme_font_override("font", FONT)
 	title.add_theme_font_size_override("font_size", 15)
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.custom_minimum_size = Vector2(INNER_TEXT_W, 0)
 	vb.add_child(title)
 	var body := Label.new()
 	body.text = str(row.get("description", ""))
@@ -73,12 +76,14 @@ func _ability_card(row: Dictionary) -> Control:
 	body.add_theme_font_size_override("font_size", 11)
 	body.add_theme_color_override("font_color", Color(0.88, 0.88, 0.94))
 	body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.custom_minimum_size = Vector2(INNER_TEXT_W, 0)
 	vb.add_child(body)
 	var fn := Label.new()
 	fn.text = "id: %s" % str(row.get("function", ""))
 	fn.add_theme_font_override("font", FONT)
 	fn.add_theme_font_size_override("font_size", 9)
 	fn.add_theme_color_override("font_color", Color(0.55, 0.52, 0.62))
+	fn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	fn.custom_minimum_size = Vector2(INNER_TEXT_W, 0)
 	vb.add_child(fn)
 	return outer
