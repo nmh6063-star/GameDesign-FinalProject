@@ -12,4 +12,4 @@ spawn_ranks = null
 symbol = "R"
 tint = Color(0.55, 0.55, 0.55, 1)
 outline_tint = Color(0.3, 0.3, 0.3, 1)
-base_radius = 40.0
+base_radius = 80.0

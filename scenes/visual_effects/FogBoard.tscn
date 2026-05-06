@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://oqkq6aq3rn6g"]
+
+[ext_resource type="Script" uid="uid://do6vhhftx4437" path="res://scenes/visual_effects/fog_board.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://c8sm5mga0y1qs" path="res://assets/fog rectangle no back.png" id="2_48dqp"]
+
+[node name="FogBoard" type="Node2D" unique_id=1901791418]
+script = ExtResource("1_script")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1178458926]
+texture = ExtResource("2_48dqp")

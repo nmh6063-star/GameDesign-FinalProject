@@ -1,11 +1,10 @@
 [gd_scene format=3 uid="uid://da2rod53ll4oq"]
 
 [ext_resource type="Script" uid="uid://fpe1gxeflgoc" path="res://scenes/visual_effects/spider_web.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://gcnghjluxjr6" path="res://assets/enemies/spiderweb.png" id="2_texture"]
+[ext_resource type="Texture2D" uid="uid://cxn3qf715mbh" path="res://assets/enemies/spiderweb no back.png" id="2_cbiyc"]
 
-[node name="SpiderWeb" type="Node2D"]
+[node name="SpiderWeb" type="Node2D" unique_id=2095627120]
 script = ExtResource("1_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.716, 0.251)
-texture = ExtResource("2_texture")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=764352572]
+texture = ExtResource("2_cbiyc")
