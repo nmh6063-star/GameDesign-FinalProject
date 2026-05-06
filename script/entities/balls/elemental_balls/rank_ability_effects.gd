@@ -6,7 +6,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
-			_deal_single(ctx, 7, source)
+			_deal_single(ctx, 5 * clampi(rank, 1, 7), source)
 		"mend":
 			ctx.heal_player(10)
 		"venom":

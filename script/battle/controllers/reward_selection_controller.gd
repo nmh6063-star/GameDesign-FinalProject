@@ -21,6 +21,9 @@ const _RANK_BAR_ORB_SIZES: Array[Vector2] = [
 ]
 const _RANK_BAR_ORB_FONT_SIZES: Array[int] = [11, 12, 13, 14, 15, 16, 17]
 const DEFAULT_REWARD_ORB_SIZE := Vector2(72, 72)
+## Matches Current Ability overlay InfoPanel body width for wrapped text.
+const _HOVER_TIP_BODY_WIDTH := 420.0
+const _ABILITY_HOVER_MOUSE_OFFSET := Vector2(18, 18)
 
 ## Reward tier: 0 = ranks 1–3, 1 = ranks 4–6, 2 = rank 7. -1 = none chosen yet.
 var _selected_reward_range: int = -1
@@ -44,6 +47,13 @@ var _range_frame_hover: StyleBoxFlat
 var _range_frame_selected: StyleBoxFlat
 var _range_frame_not_chosen_dim: StyleBoxFlat
 
+var _ability_hover_tip: Panel
+var _ability_hover_vbox: VBoxContainer
+var _ability_hover_title: Label
+var _ability_hover_body: Label
+var _ability_hover_stat: Label
+var _ability_hover_rank: int = -1
+
 
 func _ready() -> void:
 	_build_style_templates()
@@ -52,6 +62,8 @@ func _ready() -> void:
 	_cache_tip_labels()
 	_connect_range_panels()
 	_disable_rank_ball_pointer_events()
+	_cache_ability_hover_tip()
+	set_process(true)
 	_collection_button().pressed.connect(_on_collection_pressed)
 	_next_button().pressed.connect(_on_next_pressed)
 	for i in range(REWARD_SLOT_COUNT):
@@ -62,6 +74,95 @@ func _ready() -> void:
 			orb.pressed.connect(_on_reward_card_pressed.bind(i))
 		card.disabled = true
 	_begin_rank_pick_phase()
+
+
+func _process(_delta: float) -> void:
+	_update_ability_hover_tip()
+
+
+func _cache_ability_hover_tip() -> void:
+	_ability_hover_tip = get_node("Overlay/HoverTip") as Panel
+	_ability_hover_vbox = get_node("Overlay/HoverTip/VBox") as VBoxContainer
+	_ability_hover_title = get_node("Overlay/HoverTip/VBox/TipTitle") as Label
+	_ability_hover_body = get_node("Overlay/HoverTip/VBox/TipBody") as Label
+	_ability_hover_stat = get_node("Overlay/HoverTip/VBox/TipStat") as Label
+	if _ability_hover_tip != null:
+		_ability_hover_tip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_ability_hover_tip.visible = false
+	for lbl in [_ability_hover_title, _ability_hover_body, _ability_hover_stat]:
+		if lbl != null:
+			lbl.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func _rank_under_mouse() -> int:
+	var mp := get_viewport().get_mouse_position()
+	for rank in range(1, 8):
+		var b := _top_rank_button(rank)
+		if b == null or not b.visible or not is_instance_valid(b):
+			continue
+		if b.get_global_rect().has_point(mp):
+			return rank
+	return -1
+
+
+## Same text layout as `current_ability.gd` `_show_rank_details`.
+func _fill_ability_hover_tip(rank: int) -> void:
+	if _ability_hover_title == null or _ability_hover_body == null or _ability_hover_stat == null:
+		return
+	_ability_hover_title.text = "Rank %d" % rank
+	var ability = PlayerState.elements.get(rank)
+	if ability == null or not (ability is Dictionary):
+		_ability_hover_body.text = "No ability equipped."
+		_ability_hover_stat.text = ""
+		return
+	_ability_hover_body.text = "%s\n%s" % [str(ability.get("name", "")), str(ability.get("description", ""))]
+	_ability_hover_stat.text = "id: %s" % str(ability.get("function", ""))
+
+
+func _apply_hover_tip_size() -> void:
+	if _ability_hover_tip == null or _ability_hover_vbox == null or _ability_hover_body == null:
+		return
+	_ability_hover_body.custom_minimum_size = Vector2(_HOVER_TIP_BODY_WIDTH, 0)
+	var inner := _ability_hover_vbox.get_combined_minimum_size()
+	const MARGIN_X := 36.0
+	const MARGIN_Y := 32.0
+	_ability_hover_tip.custom_minimum_size = inner + Vector2(MARGIN_X, MARGIN_Y)
+	_ability_hover_tip.size = _ability_hover_tip.custom_minimum_size
+
+
+func _update_ability_hover_tip() -> void:
+	if _ability_hover_tip == null:
+		return
+	var rank := _rank_under_mouse()
+	if rank < 0:
+		if _ability_hover_tip.visible:
+			_ability_hover_tip.visible = false
+		_ability_hover_rank = -1
+		return
+	if rank != _ability_hover_rank:
+		_ability_hover_rank = rank
+		_fill_ability_hover_tip(rank)
+		_apply_hover_tip_size()
+	_ability_hover_tip.visible = true
+	var mp := get_viewport().get_mouse_position()
+	_ability_hover_tip.global_position = mp + _ABILITY_HOVER_MOUSE_OFFSET
+	_clamp_control_to_viewport(_ability_hover_tip)
+
+
+func _clamp_control_to_viewport(ctrl: Control) -> void:
+	var vr := get_viewport().get_visible_rect()
+	var gr := ctrl.get_global_rect()
+	var p := ctrl.global_position
+	if gr.position.x < vr.position.x:
+		p.x = vr.position.x
+	if gr.position.y < vr.position.y:
+		p.y = vr.position.y
+	if gr.end.x > vr.end.x:
+		p.x = vr.end.x - gr.size.x
+	if gr.end.y > vr.end.y:
+		p.y = vr.end.y - gr.size.y
+	ctrl.global_position = p
+
 
 func _build_style_templates() -> void:
 	_reward_style_idle = _make_reward_card_style(false)

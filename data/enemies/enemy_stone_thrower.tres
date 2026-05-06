@@ -17,5 +17,5 @@ sprite_texture = ExtResource("5_q0t6r")
 sprite_scale = Vector2(0.3, 0.3)
 max_health = 40
 attack_damage = 8
-attack_interval = 7.0
+attack_interval = 40.0
 actions = Array[ExtResource("1_base")]([SubResource("Action_1")])
