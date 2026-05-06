@@ -24,8 +24,18 @@ func start_new_run(seed: int = -1) -> void:
 	_completed_room_ids = []
 	_available_choice_ids = _initial_choice_ids()
 	_selected_choice_index = 0
+	_visit_all_start_rooms()
 	run_started.emit(_run)
 	state_changed.emit()
+
+
+func _visit_all_start_rooms() -> void:
+	if _run == null:
+		return
+	for sid in _run.start_room_ids:
+		var s := int(sid)
+		if s not in _visited_room_ids:
+			_visited_room_ids.append(s)
 
 
 func run_data() -> MapGenerator.Run:
@@ -100,13 +110,6 @@ func selected_path_target_id() -> int:
 	return -1 if room == null else int(room.id)
 
 
-func move_selection(step: int) -> void:
-	if _available_choice_ids.size() <= 1:
-		return
-	_selected_choice_index = wrapi(_selected_choice_index + step, 0, _available_choice_ids.size())
-	state_changed.emit()
-
-
 func select_choice_index(index: int) -> void:
 	if _available_choice_ids.is_empty():
 		return
@@ -117,21 +120,53 @@ func select_choice_index(index: int) -> void:
 	state_changed.emit()
 
 
+func select_choice_room_id(room_id: int) -> bool:
+	var idx := _available_choice_ids.find(room_id)
+	if idx < 0:
+		return false
+	if idx == _selected_choice_index:
+		return true
+	_selected_choice_index = idx
+	state_changed.emit()
+	return true
+
+
 func confirm_selection() -> MapGenerator.Room:
-	print("WHAT THE HELL")
 	var room := selected_choice()
 	if room == null:
 		return null
-	_current_room_id = room.id
+	_current_room_id = int(room.id)
 	room.selected = true
-	if room.id not in _visited_room_ids:
-		_visited_room_ids.append(room.id)
+	var dest_id := int(room.id)
+	if dest_id not in _visited_room_ids:
+		_visited_room_ids.append(dest_id)
 	_refresh_choices()
 	room_entered.emit(room)
 	if is_complete():
 		run_completed.emit(room)
 	state_changed.emit()
 	return room
+
+
+## Edges and room tint use visited ids; edges go red only when both ends are visited.
+## Any step off the START layer must record all start_room_ids (MapGraph calls this each refresh).
+func reconcile_visit_data_for_display() -> void:
+	if _run == null:
+		return
+	if _current_room_id >= 0 and _current_room_id not in _visited_room_ids:
+		_visited_room_ids.append(_current_room_id)
+	if _run.start_room_ids.is_empty():
+		return
+	var start_set := {}
+	for sid in _run.start_room_ids:
+		start_set[int(sid)] = true
+	for vid in _visited_room_ids.duplicate():
+		if not start_set.has(int(vid)):
+			for sid in _run.start_room_ids:
+				var s := int(sid)
+				if s not in _visited_room_ids:
+					_visited_room_ids.append(s)
+			return
 
 
 func mark_current_room_complete() -> void:

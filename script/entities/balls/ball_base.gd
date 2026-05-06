@@ -22,6 +22,9 @@ var ui_preview := false
 var touchingDir = ""
 var last = 0
 var dying = false
+## Horizontal playfield extent in BallHolder space (set by BattleBallManager from Background/Box/Interior).
+var _playfield_left_x: float = 0.0
+var _playfield_right_x: float = -1.0
 var type = []
 var element_list = []
 var _status_tag_label: Label
@@ -47,6 +50,11 @@ func set_runtime(ctx: BattleContext, target: Node2D) -> void:
 	aim_target = target
 
 
+func set_playfield_x_bounds(left_x: float, right_x: float) -> void:
+	_playfield_left_x = left_x
+	_playfield_right_x = right_x
+
+
 func configure(ball_data: BallData, ball_rank: int, ctx: BattleContext, target: Node2D) -> void:
 	data = ball_data
 	rank = clampi(ball_rank, 1, 7)
@@ -65,23 +73,23 @@ func set_preview(ball_data: BallData, ball_rank: int) -> void:
 func refresh() -> void:
 	if data == null:
 		return
+	var capsule := $Sprite2D as Sprite2D
+	var element_base := $base as Sprite2D
+	var element_overlay := $overlay as Sprite2D
+	element_base.visible = false
+	element_overlay.visible = false
+	capsule.visible = true
 	for elements in element_list:
 		if elements["element"].matching_function(self, elements["effect"]):
 			var sprites = elements["element"].get_sprite_files(elements["effect"])
-			var base = get_node_or_null("base")
-			var overlay = get_node_or_null("overlay")
-			if get_node_or_null("base") == null:
-				base = Sprite2D.new()
-				overlay = Sprite2D.new()
-				base.name = "base"
-				overlay.name = "overlay"
-				self.add_child(base)
-				self.add_child(overlay)
-			base.texture = sprites["base"]
-			overlay.texture = sprites["overlay"]
-			base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
-			overlay.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			element_base.texture = sprites["base"]
+			element_overlay.texture = sprites["overlay"]
+			element_base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
+			element_overlay.scale = element_base.scale
 			typing = elements["element"].get_function_info(elements["effect"])["class"]
+			capsule.visible = false
+			element_base.visible = true
+			element_overlay.visible = true
 			break
 	_sync_rank()
 	_update_collision()
@@ -273,12 +281,11 @@ func _physics_process(_delta: float) -> void:
 		
 				
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	if(state.get_contact_count() > 0):
-		if(set_up):
-			if global_position.x > 400:
-				touchingDir = 'right'
-			else:
-				touchingDir = 'left'
+	if state.get_contact_count() > 0 and set_up:
+		var w := _playfield_right_x - _playfield_left_x
+		if w > 0.001:
+			var mid_x := (_playfield_left_x + _playfield_right_x) * 0.5
+			touchingDir = "right" if position.x > mid_x else "left"
 
 func _draw() -> void:
 	if data == null:

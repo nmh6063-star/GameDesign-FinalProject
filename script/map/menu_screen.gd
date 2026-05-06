@@ -17,7 +17,7 @@ func _ready() -> void:
 
 func _on_start_game_pressed() -> void:
 	GameManager.generate_new_run()
-	GameManager.open_map_selection()
+	GameManager.open_map()
 
 
 func _on_tutorial_pressed() -> void:

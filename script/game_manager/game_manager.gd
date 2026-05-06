@@ -3,7 +3,7 @@ extends Node
 const MapController := preload("res://script/map/map_controller.gd")
 const MapGenerator := preload("res://script/map/map_generator.gd")
 
-const MAP_SELECTION_SCENE_PATH := "res://scenes/map/map_selection.tscn"
+const MAP_SCENE_PATH := "res://scenes/map/map_graph.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
@@ -33,11 +33,8 @@ signal room_started(room_data)
 signal room_completed(room_data)
 signal run_reset
 signal map_state_changed
-signal augment_state_changed
 
 var current_map_data := {}
-var map_view_visible := false
-var augment_view_visible := false
 var is_playground_mode := false
 
 var _controller := MapController.new()
@@ -78,7 +75,6 @@ func generate_new_run(seed: int = -1) -> void:
 	BattleLoadout.reset_for_run()
 	PlayerState.reset_for_run()
 	_pre_map_reward_pending = true
-	map_view_visible = false
 	_controller.start_new_run(seed)
 
 
@@ -86,9 +82,9 @@ func start_new_run(seed: int = -1) -> void:
 	generate_new_run(seed)
 
 
-func open_map_selection() -> void:
+func open_map() -> void:
 	is_playground_mode = false
-	_change_scene(MAP_SELECTION_SCENE_PATH)
+	_change_scene(MAP_SCENE_PATH)
 
 
 func open_playground() -> void:
@@ -130,16 +126,8 @@ func is_map_complete() -> bool:
 	return _controller.is_complete()
 
 
-func shift_map_choice(step: int) -> void:
-	_controller.move_selection(step)
-
-
-func set_map_choice_index(index: int) -> void:
-	_controller.select_choice_index(index)
-
-
-func selected_map_choice_index() -> int:
-	return _controller.selected_choice_index()
+func select_map_room(room_id: int) -> bool:
+	return _controller.select_choice_room_id(room_id)
 
 
 func current_node_id() -> int:
@@ -180,13 +168,13 @@ func complete_current_room() -> void:
 		return
 	_controller.mark_current_room_complete()
 	room_completed.emit(_room_payload(room))
-	open_map_selection()
+	open_map()
 
 
 func restart_run(seed: int = -1) -> void:
 	generate_new_run(seed if seed >= 0 else current_seed())
 	run_reset.emit()
-	open_map_selection()
+	open_map()
 
 
 func should_skip_battle_rewards() -> bool:
@@ -200,7 +188,7 @@ func get_stage_enemy_ids(row: int) -> Array:
 		return ["enemy_small_spider", "enemy_spider_queen", "enemy_small_spider"]
 	if row >= 4:
 		return ["enemy_fire", "enemy_fire", "enemy_ice"]
-	return ["enemy1", "enemy2", ""]
+	return ["enemy_guard", "enemy_knight", "enemy_guard"]
 
 
 func consume_pre_map_reward_pending() -> bool:
@@ -224,17 +212,6 @@ func restart_current_room() -> void:
 func exit_to_menu() -> void:
 	_current_room_scene = ""
 	get_tree().change_scene_to_file(MENU_SCENE_PATH)
-
-
-func toggle_map_view() -> bool:
-	map_view_visible = not map_view_visible
-	map_state_changed.emit()
-	return map_view_visible
-
-func toggle_augment_view() -> bool:
-	augment_view_visible = not augment_view_visible
-	augment_state_changed.emit()
-	return augment_view_visible
 
 
 func _save_room_entry_state(scene_path: String) -> void:

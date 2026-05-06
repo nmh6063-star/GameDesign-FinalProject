@@ -33,6 +33,12 @@ texture_filter = 1
 scale = Vector2(1.25, 1.25)
 texture = ExtResource("2_4dx81")
 
+[node name="base" type="Sprite2D" parent="." unique_id=1714147893]
+visible = false
+
+[node name="overlay" type="Sprite2D" parent="." unique_id=1714147894]
+visible = false
+
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=738856116]
 shape = SubResource("CircleShape2D_o5qli")
 disabled = true

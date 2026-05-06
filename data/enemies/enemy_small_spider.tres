@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/entities/enemies/enemy_data.gd" id="2_data"]
 [ext_resource type="Script" uid="uid://cw4hlvxifwn8g" path="res://script/entities/enemies/actions/direct_attack_action.gd" id="3_action"]
 [ext_resource type="Script" uid="uid://yo4105wmtbek" path="res://script/entities/enemies/effects/enemy_effect_base.gd" id="3_eff"]
-[ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="4_tex"]
+[ext_resource type="Texture2D" uid="uid://c8fgidv6pav3o" path="res://assets/enemies/smallspider2noback.png" id="5_f4y2b"]
 
 [sub_resource type="Resource" id="Action_1"]
 script = ExtResource("3_action")
@@ -13,9 +13,9 @@ script = ExtResource("3_action")
 script = ExtResource("2_data")
 id = "enemy_small_spider"
 display_name = "Small Spider"
-sprite_texture = ExtResource("4_tex")
+sprite_texture = ExtResource("5_f4y2b")
 sprite_scale = Vector2(0.2, 0.2)
 max_health = 30
-attack_damage = 8
+attack_damage = 5
 attack_interval = 4.0
 actions = Array[ExtResource("1_base")]([SubResource("Action_1")])

@@ -49,9 +49,15 @@ script = ExtResource("1_script")
 
 [node name="Visuals" type="Node2D" parent="." unique_id=1942435740]
 
+[node name="Fill" type="Polygon2D" parent="Visuals" unique_id=1829986918]
+z_index = -1
+color = Color(1, 1, 1, 0)
+
 [node name="Border" type="Sprite2D" parent="Visuals" unique_id=1829986919]
+z_index = 0
 
 [node name="Sprite2D" type="Sprite2D" parent="Visuals" unique_id=447161206]
+z_index = 1
 scale = Vector2(0.02, 0.02)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=632711831]
