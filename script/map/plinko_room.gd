@@ -1,13 +1,14 @@
 extends Node2D
 
 const BALL_SCENE := preload("res://scenes/plinko/plinko_ball.tscn")
+const RankAbilityCatalog := preload("res://script/entities/balls/elemental_balls/rank_ability_catalog.gd")
 
-# ── Tweakable parameters (set in Inspector / stored in .tscn) ─────────────────
-@export var max_drops            := 4
+# ── Tweakable parameters ──────────────────────────────────────────────────────
+@export var max_drops            := 1       ## One drop per visit
 @export var ball_radius          := 9.0
 @export var ball_drop_impulse    := 10.0
-@export var indicator_speed      := 120.0   ## px/s, how fast the drop cursor moves
-@export var indicator_half_range := 140.0   ## fallback if markers are missing
+@export var indicator_speed      := 120.0
+@export var indicator_half_range := 140.0
 
 # ── Node references ───────────────────────────────────────────────────────────
 @onready var _earnings_label := $PlinkoUI/EarningsLabel   as Label
@@ -43,6 +44,9 @@ var _shake_strength       := 0.0
 var _shake_duration_total := 0.0
 var _camera_base_offset   := Vector2.ZERO
 
+# Ability slots: maps slot name → {ability: Dictionary, rank: int}
+var _slot_abilities: Dictionary = {}
+
 
 func _ready() -> void:
 	var gm := get_node_or_null("/root/GameManager")
@@ -52,7 +56,6 @@ func _ready() -> void:
 	_drops_remaining    = max_drops
 	_camera_base_offset = _camera.offset
 
-	# Derive indicator oscillation bounds from the Left/Right markers in the scene.
 	if is_instance_valid(_left_marker) and is_instance_valid(_right_marker):
 		_ind_min_x = _left_marker.position.x + ball_radius
 		_ind_max_x = _right_marker.position.x - ball_radius
@@ -64,15 +67,57 @@ func _ready() -> void:
 	_indicator_dir = 1.0
 	_drop_indicator.position.x = _indicator_x
 
-	# Connect every reward-slot Area2D defined in the scene.
 	var slots_root := get_node_or_null(
 			"Background/Box/PlatformsRoot/RewardSlotsRoot") as Node
 	if slots_root:
+		_assign_slot_abilities(slots_root)
 		for child in slots_root.get_children():
 			if child is Area2D:
 				child.body_entered.connect(_on_slot_body_entered.bind(child))
 
 	_refresh_drop_ui()
+
+
+# ── Assign a random rank ability to every slot ────────────────────────────────
+
+func _assign_slot_abilities(slots_root: Node) -> void:
+	var used_fns: Array[String] = []
+	for child in slots_root.get_children():
+		if not child is Area2D:
+			continue
+		var ability := _pick_random_ability(used_fns)
+		var rank := int(ability.get("rank", 1))
+		_slot_abilities[child.name] = {"ability": ability, "rank": rank}
+
+		# Update the ValueLabel so the player can read the ability name
+		var value_label := child.get_node_or_null("ValueLabel") as Label
+		if value_label != null:
+			var short_name := String(ability.get("name", "?"))
+			# Abbreviate to fit small slot
+			if short_name.length() > 9:
+				short_name = short_name.substr(0, 8) + "…"
+			value_label.text = short_name
+			value_label.add_theme_font_size_override("font_size", 7)
+			value_label.tooltip_text = (
+				"%s (R%d)\n%s" % [ability.get("name","?"), rank, ability.get("description","")]
+			)
+			# Tint the polygon by rank
+			var vis := child.get_node_or_null("SlotVis") as Polygon2D
+			if vis != null:
+				vis.color = _rank_color(rank)
+
+
+func _pick_random_ability(exclude_fns: Array[String]) -> Dictionary:
+	var rank := randi_range(1, 7)
+	var options: Array = RankAbilityCatalog.reward_options_for_rank(rank)
+	options.append(RankAbilityCatalog.default_element_for_rank(rank))
+	options.shuffle()
+	for opt in options:
+		var fn := String(opt.get("function", ""))
+		if not exclude_fns.has(fn):
+			exclude_fns.append(fn)
+			return opt
+	return options[0]  # fallback
 
 
 # ── Indicator oscillation ─────────────────────────────────────────────────────
@@ -115,13 +160,13 @@ func _physics_process(delta: float) -> void:
 	if spd < 7.0:
 		_stuck_elapsed += delta
 		if _stuck_elapsed >= 2.5:
-			_finalize_active_ball(0)
+			_finalize_active_ball(null)
 			return
 	else:
 		_stuck_elapsed = 0.0
 	_ball_alive_time += delta
 	if _ball_alive_time > 18.0:
-		_finalize_active_ball(0)
+		_finalize_active_ball(null)
 
 
 # ── Launch button ─────────────────────────────────────────────────────────────
@@ -158,37 +203,155 @@ func _on_slot_body_entered(body: Node, slot: Area2D) -> void:
 	if not is_instance_valid(body) or body != _active_ball:
 		return
 	_ball_resolved = true
-	var value := int(slot.get_meta("reward_value", 0))
-	_finalize_active_ball(value)
+	var slot_data: Dictionary = _slot_abilities.get(slot.name, {})
+	_finalize_active_ball(slot_data if not slot_data.is_empty() else null)
 
 
-func _finalize_active_ball(value: int) -> void:
+func _finalize_active_ball(slot_data) -> void:
 	_ball_resolved = false
 	if _active_ball != null and is_instance_valid(_active_ball):
 		_active_ball.queue_free()
 	_active_ball     = null
 	_ball_alive_time = 0.0
 	_stuck_elapsed   = 0.0
-	_round_scores.append(value)
-	if value > 0:
-		_show_win("+%d pts!" % value)
+
+	if slot_data != null and slot_data is Dictionary and not slot_data.is_empty():
+		var ability: Dictionary = slot_data.get("ability", {})
+		var name_str := String(ability.get("name", "?"))
+		_show_win("Got: %s!" % name_str)
 		_start_screen_shake(0.18, 5.5)
+		_refresh_drop_ui()
+		_show_swap_dialog(ability, int(slot_data.get("rank", 1)))
 	else:
-		_show_win("Miss!")
-	_refresh_drop_ui()
-	_check_end()
+		_show_win("Miss…")
+		_refresh_drop_ui()
+		_check_end()
+
+
+# ── Swap dialog ───────────────────────────────────────────────────────────────
+
+func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
+	var font: Font = load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
+
+	var overlay := CanvasLayer.new()
+	overlay.layer = 20
+	add_child(overlay)
+
+	var dim := ColorRect.new()
+	dim.color = Color(0, 0, 0, 0.65)
+	dim.anchors_preset = Control.PRESET_FULL_RECT
+	overlay.add_child(dim)
+
+	var card := PanelContainer.new()
+	card.set_anchors_preset(Control.PRESET_CENTER)
+	card.offset_left   = -260.0
+	card.offset_top    = -140.0
+	card.offset_right  =  260.0
+	card.offset_bottom =  140.0
+	var card_style := StyleBoxFlat.new()
+	card_style.bg_color = Color(0.10, 0.07, 0.18)
+	card_style.border_color = Color(0.85, 0.8, 1.0)
+	card_style.set_border_width_all(3)
+	for i in 4:
+		card_style.set_corner_radius(i, 14)
+	card.add_theme_stylebox_override("panel", card_style)
+	overlay.add_child(card)
+
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 12)
+	card.add_child(vbox)
+
+	var title := Label.new()
+	title.text = "Ability Found!"
+	title.add_theme_font_override("font", font)
+	title.add_theme_font_size_override("font_size", 14)
+	title.add_theme_color_override("font_color", Color(1.0, 0.9, 0.4))
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title)
+
+	# Current ability at this rank
+	var current_ability: Dictionary = PlayerState.elements.get(rank, {})
+	var current_name := String(current_ability.get("name", "(none)")) if current_ability != null else "(none)"
+	var current_desc := String(current_ability.get("description", "")) if current_ability != null else ""
+
+	var current_lbl := Label.new()
+	current_lbl.text = "Current (Rank %d):\n  %s" % [rank, current_name]
+	if current_desc.length() > 0:
+		current_lbl.text += "\n  " + current_desc.substr(0, 60) + ("…" if current_desc.length() > 60 else "")
+	current_lbl.add_theme_font_override("font", font)
+	current_lbl.add_theme_font_size_override("font_size", 9)
+	current_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.85))
+	current_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(current_lbl)
+
+	var arrow := Label.new()
+	arrow.text = "   ↕"
+	arrow.add_theme_font_override("font", font)
+	arrow.add_theme_font_size_override("font_size", 14)
+	arrow.add_theme_color_override("font_color", Color(0.6, 0.6, 0.8))
+	arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(arrow)
+
+	var new_name := String(new_ability.get("name", "?"))
+	var new_desc := String(new_ability.get("description", ""))
+	var new_lbl := Label.new()
+	new_lbl.text = "New (Rank %d):\n  %s" % [rank, new_name]
+	if new_desc.length() > 0:
+		new_lbl.text += "\n  " + new_desc.substr(0, 60) + ("…" if new_desc.length() > 60 else "")
+	new_lbl.add_theme_font_override("font", font)
+	new_lbl.add_theme_font_size_override("font_size", 9)
+	new_lbl.add_theme_color_override("font_color", Color(0.5, 1.0, 0.5))
+	new_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	vbox.add_child(new_lbl)
+
+	# Buttons
+	var btn_row := HBoxContainer.new()
+	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	btn_row.add_theme_constant_override("separation", 20)
+	vbox.add_child(btn_row)
+
+	var swap_btn  := _make_dialog_button("Swap", Color(0.2, 0.55, 0.2))
+	var skip_btn  := _make_dialog_button("Skip", Color(0.35, 0.2, 0.5))
+	btn_row.add_child(swap_btn)
+	btn_row.add_child(skip_btn)
+
+	swap_btn.pressed.connect(func():
+		PlayerState.equip_rank_ability(rank, new_ability)
+		overlay.queue_free()
+		_check_end())
+
+	skip_btn.pressed.connect(func():
+		overlay.queue_free()
+		_check_end())
+
+
+func _make_dialog_button(label_text: String, color: Color) -> Button:
+	var font: Font = load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
+	var btn := Button.new()
+	btn.text = label_text
+	btn.custom_minimum_size = Vector2(100, 36)
+	btn.add_theme_font_override("font", font)
+	btn.add_theme_font_size_override("font_size", 12)
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = color
+	sb.set_border_width_all(0)
+	for i in 4:
+		sb.set_corner_radius(i, 10)
+	btn.add_theme_stylebox_override("normal", sb)
+	var sb_h := sb.duplicate() as StyleBoxFlat
+	sb_h.bg_color = color.lightened(0.2)
+	btn.add_theme_stylebox_override("hover", sb_h)
+	btn.add_theme_stylebox_override("pressed", sb_h)
+	return btn
 
 
 func _check_end() -> void:
-	if _drops_remaining > 0 or _finishing:
+	if _finishing:
 		return
 	_finishing = true
-	var total := 0
-	for s in _round_scores:
-		total += s
 	if is_instance_valid(_earnings_label):
-		_earnings_label.text = "Done — score %d pts" % total
-	await get_tree().create_timer(1.4).timeout
+		_earnings_label.text = "Plinko done!"
+	await get_tree().create_timer(0.8).timeout
 	if is_inside_tree():
 		GameManager.complete_current_room()
 
@@ -203,10 +366,7 @@ func _on_leave() -> void:
 
 func _refresh_drop_ui() -> void:
 	_cost_label.text = "Drops left: %d / %d" % [_drops_remaining, max_drops]
-	var running_total := 0
-	for s in _round_scores:
-		running_total += s
-	_score_label.text = "Score: %d pts" % running_total
+	_score_label.text = ""
 	if is_instance_valid(_launch_button):
 		var ball_active := _active_ball != null and is_instance_valid(_active_ball)
 		_launch_button.disabled = _drops_remaining <= 0 or _finishing \
@@ -217,7 +377,19 @@ func _show_win(text: String) -> void:
 	_win_label.text     = text
 	_win_label.modulate = Color(1, 0.9, 0.2, 1)
 	var tw := create_tween()
-	tw.tween_property(_win_label, "modulate:a", 0.0, 1.8)
+	tw.tween_property(_win_label, "modulate:a", 0.0, 2.4)
+
+
+func _rank_color(rank: int) -> Color:
+	match rank:
+		1: return Color(0.65, 0.65, 0.65)
+		2: return Color(0.3, 0.75, 0.3)
+		3: return Color(0.3, 0.5, 0.9)
+		4: return Color(0.75, 0.3, 0.85)
+		5: return Color(0.9, 0.78, 0.15)
+		6: return Color(0.9, 0.45, 0.15)
+		7: return Color(0.9, 0.2, 0.2)
+	return Color.WHITE
 
 
 # ── Screen shake ──────────────────────────────────────────────────────────────

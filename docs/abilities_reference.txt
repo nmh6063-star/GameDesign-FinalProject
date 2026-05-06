@@ -1,7 +1,44 @@
 ================================================================================
 ABILITIES REFERENCE — Current Implementation
 GameDesign-FinalProject
-Last updated: May 3, 2026
+Last updated: May 6, 2026
+================================================================================
+
+CHANGELOG
+  May 6, 2026 — Session 1
+    - Bomb Orb: now shows live countdown on all enemies (💣 Bomb Xs); all status
+      labels (poison/burn/freeze/charm) now properly visible in-game.
+    - Giant Orb / Giant Core: fixed size (radius now doubles via size_mult) and
+      attack_mult now correctly multiplies all direct damage when the enlarged
+      ball fires.
+    - Power Slash: damage corrected to 30 (was 18 in code / 30 in old description).
+    - Scatter Drop: now always spawns normal balls only; spawn position randomised
+      across the full drop-zone width (±80 px) instead of anchoring to the source.
+    - Convert / Upgrade Pulse: now play a green expanding ring effect on the
+      upgraded ball.
+    - All descriptions below updated to match exact code values.
+    - Corrupt Field redesigned: 12 poison stacks + 20% attack debuff for 1 shoot.
+      (⚗ Wkn 1 indicator on poisoned enemies while active.)
+    - Poison Rain redesigned: 3-shoot "rain" mode — stacks grow instead of shrink,
+      every direct hit adds +2 stacks. (☣ Rain ×N indicator on enemies.)
+
+  May 6, 2026 — Session 2
+    - Pollution moved from Rank 2 → Rank 3.
+    - Toxic Burst moved from Rank 3 → Rank 2.
+    - Time Stop redesigned: clears the box then applies a new TIME STOP status
+      (not Freeze) to all enemies for 10 s. While stopped, enemies cannot attack
+      AND take 50% more damage from all direct hits. (⏱ Stop Xs indicator.)
+    - Magic Flood redesigned: now applies 10 random enchantments, each targeting
+      a random alive enemy (was one enchantment per enemy). Enchantment pool:
+      Poison 8 stacks / Burn 3 stacks / Freeze 3 stacks.
+    - Apocalypse redesigned: 6 hits × 8 damage to all enemies (was 48 flat).
+    - Final Judgment redesigned: 4 hits × 12 damage to current enemy (was 45 flat).
+    - 1 Shower: balls now spawn with the player's current element class texture
+      (matching queued setup balls). Position range shifted left so all 10 balls
+      reliably land inside the box.
+    - New API: BattleBallManager.drop_element_ball_at_x(rank, x) — element-aware
+      drop that mirrors spawn_setup_ball's element_list/type assignment before
+      configure() is called. Exposed via BattleLoop and BattleContext.
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -29,6 +66,15 @@ STATUS EFFECT RULES
     - Enemy's next attack is redirected at another enemy.
     - Consumes 1 stack per attack resolved.
 
+  TIME STOP  (special status — distinct from Freeze)
+    - Applied only by the Time Stop ability (rank 7).
+    - Duration: 10 seconds real time (stored as time_stop_until_ms).
+    - Blocks the enemy's attack timer while active (same effect as Freeze but
+      tracked separately — a frozen and time-stopped enemy respects both timers).
+    - Enemies under Time Stop take 50% more damage from all direct hits.
+    - Indicator: ⏱ Stop Xs shown on affected enemies, counting down each second.
+    - No damage component.
+
   SHIELD
     - Absorbs incoming damage before HP is reduced.
     - Multiple shields stack additively.
@@ -47,7 +93,7 @@ RANK 1
     Heal 5 HP.
 
   Venom
-    Apply Poison (10 stacks) to current enemy.
+    Apply Poison (8 stacks) to current enemy.
 
   Ember
     Apply Burn (3 stacks) to ALL enemies.
@@ -103,11 +149,11 @@ RANK 2
     50% chance: deal 8 damage to ALL enemies.
     Otherwise: deal 8 damage to one enemy.
 
-  Pollution
-    Double the current poison stack count on the current enemy.
-
   FireBurn
     Apply Burn (5 stacks) to ALL enemies.
+
+  Toxic Burst
+    Apply Poison (15 stacks) to ALL enemies.
 
   --- Dark ---
 
@@ -119,14 +165,14 @@ RANK 3
 --------------------------------------------------------------------------------
 
   Power Slash (DEFAULT)
-    Deal 20 damage to one enemy.
+    Deal 30 damage to one enemy.
 
-  Toxic Burst
-    Apply Poison (20 stacks) to ALL enemies.
+  Pollution
+    Double the current poison stack count on the current enemy.
 
   Fireball
-    Hit 2 random enemies for 5 damage each.
-    Each hit also applies Burn (5 stacks) to that enemy.
+    Hit 2 random enemies for 8 damage each.
+    Each hit also applies Burn (8 stacks) to that enemy.
 
   Ice Shield
     Gain 10 Shield.
@@ -158,13 +204,14 @@ RANK 4
 --------------------------------------------------------------------------------
 
   Cleave (DEFAULT)
-    Deal 20 damage to ALL enemies.
+    Deal 15 damage to ALL enemies.
 
   Greater Heal
     Heal 30% of missing HP.
 
   Bomb Orb
     After 10 seconds (real time), deal 50 damage to ALL enemies.
+    A live countdown (💣 Bomb Xs) is shown on all enemies while the fuse is active.
 
   Chain Spark
     Hit up to 3 different enemies sequentially.
@@ -175,7 +222,9 @@ RANK 4
     Does not reflect status effects.
 
   Corrupt Field
-    Apply Poison (20 stacks) to ALL enemies.
+    Apply Poison (12 stacks) to ALL enemies.
+    For this shoot only: all enemies that have poison stacks deal 20% less damage
+    to the player. (⚗ Wkn 1 indicator shown while active.)
 
   --- Dark ---
 
@@ -187,15 +236,15 @@ RANK 5
 --------------------------------------------------------------------------------
 
   Critical Edge (DEFAULT)
-    Deal random damage: either 30 or 50 to current enemy.
+    Deal 25 or 30 damage to one enemy (chosen randomly).
 
   Freeze Wave
-    Freeze ALL enemies for 5 seconds.
+    Freeze ALL enemies for 3 seconds (3 stacks).
 
   Giant Orb
     One random ball in the box gains:
-      - ×3 attack multiplier
-      - ×2 visual size
+      - ×3 attack damage multiplier
+      - ×2 size (radius doubles; collision and visuals both update)
     Does not trigger twice. Cannot be applied to a ball already giant.
 
   Consume Core
@@ -206,7 +255,10 @@ RANK 5
     Upgrade 1 random ball in the box by +1 rank (capped at rank 7).
 
   Poison Rain
-    Apply Poison (20 stacks) to ALL enemies.
+    Activate a 3-shoot Rain mode (☣ Rain ×N shown on enemies):
+    • Enemies no longer lose poison stacks — instead stacks INCREASE by 1 each tick.
+    • Every direct hit on an enemy adds +2 poison stacks to them.
+    The effect expires after 3 ball drops.
 
   Time Drift
     Slow game time to 40% speed for 10 seconds.
@@ -228,7 +280,7 @@ RANK 6
 --------------------------------------------------------------------------------
 
   Meteor Crash (DEFAULT)
-    Deal 50 damage to ALL enemies.
+    Deal 30 damage to ALL enemies.
 
   Full Recovery
     Restore HP equal to 30% of max HP.
@@ -249,9 +301,9 @@ RANK 6
 
   Giant Core
     One random rank 1–5 ball in the box gains:
-      - ×3 attack multiplier
+      - ×3 attack damage multiplier
       - Triggers twice per shot
-      - ×2 visual size
+      - ×2 size (radius doubles)
     Cannot be applied to a ball already giant.
 
   Siphon
@@ -269,10 +321,12 @@ RANK 7
 --------------------------------------------------------------------------------
 
   Final Judgment (DEFAULT)
-    Deal 300 damage to one enemy.
+    Deal 12 damage to current enemy 4 times (48 total).
+    Each hit benefits from Giant Orb / attack bonuses.
 
   Apocalypse
-    Deal 100 damage to ALL enemies.
+    Deal 8 damage to ALL enemies 6 times (48 total per enemy).
+    Each hit benefits from attack bonuses.
 
   Resurrection
     Set a one-time revive: if you die this battle, revive once with low HP.
@@ -280,11 +334,13 @@ RANK 7
 
   Time Stop
     Remove ALL balls currently in the box.
-    Freeze ALL enemies for 10 seconds.
+    All enemies enter a 10-second Time Stop state (⏱ Stop Xs indicator):
+    • They cannot attack while stopped.
+    • They take 50% more damage from all hits while stopped.
+    (Distinct from Freeze — stacks separately.)
 
   Magic Flood
-    Launch all balls upward with an impulse.
-    Apply a random enchantment to each alive enemy:
+    Apply 10 random enchantments total, each targeting a random alive enemy:
       - Poison: 8 stacks
       - Burn: 3 stacks
       - Freeze: 3 stacks (3 seconds)
@@ -300,7 +356,8 @@ RANK 7
     After 10 seconds (real time), deal 500 damage to ALL enemies.
 
   1 Shower
-    Over 10 seconds, spawn 10 balls (rank 1–3), one per second.
+    Over 10 seconds, spawn 10 balls (rank 1–3) one per second.
+    Each ball drops at a random X position spread across the full box width.
 
   Echo
     For the rest of this battle: every DOT damage instance triggers twice.

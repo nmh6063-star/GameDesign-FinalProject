@@ -338,7 +338,7 @@ func _assign_room_types(floors: Array, boss_room: Room) -> void:
 			elif row in MONSTER_ROWS:
 				room.type = Room.Type.MONSTER
 			elif row == CAMPFIRE_ROW:
-				room.type = Room.Type.CAMPFIRE
+				room.type = Room.Type.EVENT
 			elif row in NON_BATTLE_ROWS:
 				room.type = _random_non_battle()
 
@@ -346,7 +346,7 @@ func _assign_room_types(floors: Array, boss_room: Room) -> void:
 
 
 func _random_non_battle() -> int:
-	var pool := [Room.Type.SHOP, Room.Type.CAMPFIRE, Room.Type.EVENT]
+	var pool := [Room.Type.SHOP, Room.Type.EVENT]
 	return pool[_rng.randi_range(0, pool.size() - 1)]
 
 
@@ -359,8 +359,7 @@ func _deduplicate_sibling_types(floors: Array) -> void:
 			var seen_types := {}
 			for next_data in room.next_rooms:
 				var next_room := next_data as Room
-				if next_room.type in [Room.Type.BOSS, Room.Type.START,
-						Room.Type.MONSTER, Room.Type.CAMPFIRE]:
+				if next_room.type in [Room.Type.BOSS, Room.Type.START, Room.Type.MONSTER]:
 					continue
 				if seen_types.has(int(next_room.type)):
 					next_room.type = _alternative_non_battle(next_room, seen_types)
@@ -368,7 +367,7 @@ func _deduplicate_sibling_types(floors: Array) -> void:
 
 
 func _alternative_non_battle(room: Room, taken: Dictionary) -> int:
-	var candidates := [Room.Type.SHOP, Room.Type.CAMPFIRE, Room.Type.EVENT]
+	var candidates := [Room.Type.SHOP, Room.Type.EVENT]
 	candidates.shuffle()
 	for candidate in candidates:
 		if not taken.has(int(candidate)):

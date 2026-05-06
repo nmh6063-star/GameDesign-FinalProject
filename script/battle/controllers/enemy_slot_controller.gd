@@ -36,6 +36,10 @@ var _poison_label:  Label
 var _burn_label:    Label
 var _freeze_label:  Label
 var _charm_label:   Label
+var _bomb_label:    Label
+var _rain_label:      Label
+var _corrupt_label:   Label
+var _time_stop_label: Label
 
 var enemy: EnemyBase
 var _selected := false
@@ -286,10 +290,14 @@ func _sync_attack_tooltip() -> void:
 func sync_status_tag(ctx: BattleContext) -> void:
 	var alive := enemy != null and enemy.is_alive()
 	if not alive:
-		if _poison_label != null: _poison_label.visible = false
-		if _burn_label   != null: _burn_label.visible   = false
-		if _freeze_label != null: _freeze_label.visible = false
-		if _charm_label  != null: _charm_label.visible  = false
+		if _poison_label  != null: _poison_label.visible  = false
+		if _burn_label    != null: _burn_label.visible    = false
+		if _freeze_label  != null: _freeze_label.visible  = false
+		if _charm_label   != null: _charm_label.visible   = false
+		if _bomb_label    != null: _bomb_label.visible    = false
+		if _rain_label      != null: _rain_label.visible      = false
+		if _corrupt_label   != null: _corrupt_label.visible   = false
+		if _time_stop_label != null: _time_stop_label.visible = false
 		return
 	var st := ctx.status_for_enemy(enemy)
 
@@ -315,6 +323,27 @@ func sync_status_tag(ctx: BattleContext) -> void:
 		_charm_label.visible = charm > 0
 		_charm_label.text = "💫 Chm %d" % charm
 
+	var bomb_ticks := int(ctx.battle_flags.get("bomb_orb_ticks", 0))
+	if _bomb_label != null:
+		_bomb_label.visible = bomb_ticks > 0
+		_bomb_label.text = "💣 Bomb %ds" % bomb_ticks
+
+	var rain_shoots := int(ctx.battle_flags.get("poison_rain_shoots", 0))
+	if _rain_label != null:
+		_rain_label.visible = rain_shoots > 0
+		_rain_label.text = "☣ Rain ×%d" % rain_shoots
+
+	var corrupt_active := bool(ctx.battle_flags.get("corrupt_field_active", false))
+	if _corrupt_label != null:
+		_corrupt_label.visible = corrupt_active and poison > 0
+		_corrupt_label.text = "⚗ Wkn 1"
+
+	var ts_until := int(st.get("time_stop_until_ms", 0))
+	var ts_secs  := int(ceil(maxi(0, ts_until - ctx.now_ms()) / 1000.0))
+	if _time_stop_label != null:
+		_time_stop_label.visible = ts_secs > 0
+		_time_stop_label.text = "⏱ Stop %ds (+50%%)" % ts_secs
+
 
 func _is_hovering_cooldown() -> bool:
 	var radius := float(_cooldown_ring.get("radius")) + 8.0
@@ -323,8 +352,27 @@ func _is_hovering_cooldown() -> bool:
 
 
 func _ensure_status_labels() -> void:
-	# Nodes are defined in the .tscn; just look them up.
-	_poison_label = _ui_root.get_node_or_null("StatusPoison") as Label
-	_burn_label   = _ui_root.get_node_or_null("StatusBurn")   as Label
-	_freeze_label = _ui_root.get_node_or_null("StatusFreeze") as Label
-	_charm_label  = _ui_root.get_node_or_null("StatusCharm")  as Label
+	_poison_label  = _get_or_create_status_label("StatusPoison",  Vector2(-52,  98), Color(0.55, 0.9,  0.25))
+	_burn_label    = _get_or_create_status_label("StatusBurn",    Vector2(-52, 111), Color(1.0,  0.45, 0.1))
+	_freeze_label  = _get_or_create_status_label("StatusFreeze",  Vector2(-52, 124), Color(0.45, 0.85, 1.0))
+	_charm_label   = _get_or_create_status_label("StatusCharm",   Vector2(-52, 137), Color(1.0,  0.75, 0.95))
+	_bomb_label    = _get_or_create_status_label("StatusBomb",    Vector2(-52, 150), Color(1.0,  0.85, 0.2))
+	_rain_label      = _get_or_create_status_label("StatusRain",     Vector2(-52, 163), Color(0.4,  0.9,  0.55))
+	_corrupt_label   = _get_or_create_status_label("StatusCorrupt",  Vector2(-52, 176), Color(0.8,  0.35, 1.0))
+	_time_stop_label = _get_or_create_status_label("StatusTimeStop", Vector2(-52, 189), Color(0.6,  0.85, 1.0))
+
+
+func _get_or_create_status_label(node_name: String, pos: Vector2, color: Color) -> Label:
+	var existing := _ui_root.get_node_or_null(node_name) as Label
+	if existing != null:
+		return existing
+	var lbl := Label.new()
+	lbl.name = node_name
+	lbl.position = pos
+	lbl.size = Vector2(116, 12)
+	lbl.add_theme_font_override("font", DOGICA_FONT)
+	lbl.add_theme_font_size_override("font_size", 8)
+	lbl.modulate = color
+	lbl.visible = false
+	_ui_root.add_child(lbl)
+	return lbl

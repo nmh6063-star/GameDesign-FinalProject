@@ -35,6 +35,7 @@ var battle_flags := {
 	"last_effect_id": "",
 	"time_slow_until_ms": 0,
 	"sacrifice_pending": false,
+	"max_combo_reached": 0,
 }
 var ball_statuses := {}
 
@@ -76,6 +77,7 @@ func reset_for_battle() -> void:
 		"last_effect_id": "",
 		"time_slow_until_ms": 0,
 		"sacrifice_pending": false,
+		"max_combo_reached": 0,
 	}
 	_charm_redirect_source = null
 
@@ -145,6 +147,8 @@ func register_merge() -> void:
 	combo += 1
 	COMBO_TIMEOUT -= clampf(0.1 / (combo/2.0), 0.25, 5.0)
 	combo_timer = COMBO_TIMEOUT
+	if combo > int(battle_flags.get("max_combo_reached", 0)):
+		battle_flags["max_combo_reached"] = combo
 	if mana_pipes < MAX_MANA_PIPES:
 		var progress_gain := maxi(1, int(combo_multiplier()))
 		merge_progress += progress_gain
@@ -228,6 +232,13 @@ func drop_ball_in_box(ball_id: String, rank: int = 1) -> BallBase:
 	return controller.drop_ball_in_box(ball_id, rank) if controller != null else null
 
 
+## Drop a ball with the player's current element textures at a specific X inside the box.
+func drop_element_ball_in_box(rank: int, x: float = INF) -> BallBase:
+	if controller == null or not controller.has_method("drop_element_ball_in_box"):
+		return null
+	return controller.drop_element_ball_in_box(rank, x)
+
+
 func heal_player(amount: int) -> void:
 	if controller != null:
 		controller.heal_player(amount)
@@ -238,6 +249,12 @@ func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
 	if controller == null:
 		return
 	var base := amount + int(player_statuses.get("attack_bonus", 0))
+	# Time Stop: struck enemies take 50% more damage.
+	var target_for_check := enemy if enemy != null else active_enemy()
+	if target_for_check != null:
+		var ts_st := status_for_enemy(target_for_check)
+		if now_ms() <= int(ts_st.get("time_stop_until_ms", 0)):
+			base = int(round(float(base) * 1.5))
 	# Poison Apple: +10% per charge, consumes charge, costs a bit of self-HP
 	var pa := int(player_statuses.get("poison_apple_charges", 0))
 	if pa > 0:
@@ -250,6 +267,11 @@ func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
 		base *= 2
 	controller.damage_enemy(base, enemy, self)
 	battle_flags["last_damage"] = amount
+	# Poison Rain: each direct hit adds 2 poison stacks to the struck enemy.
+	if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
+		var target := enemy if enemy != null else active_enemy()
+		if target != null and is_instance_valid(target) and target.is_alive():
+			add_enemy_status(target, "poison", 2)
 
 
 ## Player takes damage. During Time Drift, incoming damage is stored
@@ -336,6 +358,7 @@ func status_for_enemy(enemy: EnemyBase) -> Dictionary:
 			"burn_accum": 0.0,
 			"freeze_until_ms": 0,
 			"charm_stack": 0,
+			"time_stop_until_ms": 0,
 		}
 	return enemy_statuses[key]
 
@@ -373,15 +396,21 @@ func tick_enemy_burn(delta: float) -> void:
 
 
 ## Poison fires before each enemy attack (1 dmg, 1 stack consumed).
+## During Poison Rain the stack GROWS instead of shrinking.
 ## Returns false if enemy is frozen (attack blocked).
 func on_enemy_attack_started(enemy: EnemyBase) -> bool:
 	var st := status_for_enemy(enemy)
 	if now_ms() <= int(st.get("freeze_until_ms", 0)):
 		return false
+	if now_ms() <= int(st.get("time_stop_until_ms", 0)):
+		return false
 	var poison_stacks := int(st.get("poison_stack", 0))
 	if poison_stacks > 0:
 		_damage_enemy_dot(poison_stacks, enemy)
-		st["poison_stack"] = poison_stacks - 1
+		if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
+			st["poison_stack"] = poison_stacks + 1  # Rain: stacks bloom
+		else:
+			st["poison_stack"] = poison_stacks - 1
 	return true
 
 

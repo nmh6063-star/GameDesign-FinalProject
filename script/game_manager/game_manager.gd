@@ -7,7 +7,9 @@ const MAP_SCENE_PATH := "res://scenes/map/map_graph.tscn"
 const BATTLE_SCENE_PATH := "res://scenes/main.tscn"
 const CAMPFIRE_SCENE_PATH := "res://scenes/camp_fire.tscn"
 const SHOP_SCENE_PATH := "res://scenes/shop.tscn"
-const EVENT_SCENE_PATH := "res://scenes/plinko_room.tscn"
+const EVENT_SCENE_PATH := "res://scenes/event_room.tscn"
+const PLINKO_SCENE_PATH := "res://scenes/plinko_room.tscn"
+const PLAYGROUND_SCENE_PATH := "res://scenes/playground.tscn"
 const MENU_SCENE_PATH := "res://scenes/menu_screen.tscn"
 const PAUSE_MENU_SCENE := preload("res://scenes/pause_menu.tscn")
 
@@ -15,6 +17,7 @@ const _NON_GAME_SCENES := [
 	"res://scenes/menu_screen.tscn",
 	"res://scenes/tutorial.tscn",
 	"res://scenes/tutorial_complete.tscn",
+	PLAYGROUND_SCENE_PATH,
 ]
 
 const _ROOM_SCENES := [
@@ -22,6 +25,7 @@ const _ROOM_SCENES := [
 	CAMPFIRE_SCENE_PATH,
 	SHOP_SCENE_PATH,
 	EVENT_SCENE_PATH,
+	PLINKO_SCENE_PATH,
 ]
 
 signal run_started(run_data)
@@ -31,6 +35,7 @@ signal run_reset
 signal map_state_changed
 
 var current_map_data := {}
+var is_playground_mode := false
 
 var _controller := MapController.new()
 var _pause_menu: CanvasLayer
@@ -78,7 +83,15 @@ func start_new_run(seed: int = -1) -> void:
 
 
 func open_map() -> void:
+	is_playground_mode = false
 	_change_scene(MAP_SCENE_PATH)
+
+
+func open_playground() -> void:
+	is_playground_mode = true
+	# Give the player full health for testing
+	PlayerState.player_health = PlayerState.player_max_health
+	_change_scene(BATTLE_SCENE_PATH)
 
 
 func current_map_node():
@@ -169,10 +182,8 @@ func should_skip_battle_rewards() -> bool:
 
 
 func get_stage_enemy_ids(row: int) -> Array:
-	#if row >= 9:
-		#return ["enemy_small_spider", "enemy_spider_queen", "enemy_small_spider"]
-	if row >= 9:
-		return ["", "enemy_mage", ""]
+	if is_playground_mode:
+		return ["enemy_playground", "", ""]
 	if row >= 7:
 		return ["enemy_guard", "enemy_knight", "enemy_guard"]
 	if row >= 4:

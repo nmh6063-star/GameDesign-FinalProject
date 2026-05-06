@@ -23,7 +23,7 @@ static var functions: Array[String] = [
 	"power_slash",
 	"toxic_burst",
 	"fireball",
-	"ice_lance",
+	"ice_shield",
 	"reinforce",
 	"convert",
 	"echo_shot",
@@ -140,11 +140,15 @@ static var typing_by_id = {
 			"class": "fire",
 			"ability": "dot"
 		},
-		"ice_lance": {
-			"class": "ice",
-			"ability": "dot"
-		},
-		"reinforce": {
+	"ice_shield": {
+		"class": "ice",
+		"ability": "block"
+	},
+	"convert": {
+		"class": "gambler",
+		"ability": "misc"
+	},
+	"reinforce": {
 			"class": "knight",
 			"ability": "block_plus"
 		},
