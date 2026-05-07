@@ -605,7 +605,6 @@ func respawn_playground_enemies() -> void:
 	sync_enemy_views()
 	_sync_player_bar()
 	sync_mana_hud()
-	_sync_special_bar()
 	set_physics_process(true)
 	_begin_turn()
 
