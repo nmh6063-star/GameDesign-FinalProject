@@ -6,11 +6,11 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
-			_deal_single(ctx, 5)
+			_deal_single(ctx, 7, source)
 		"mend":
-			ctx.heal_player(5)
+			ctx.heal_player(10)
 		"venom":
-			ctx.add_enemy_status(ctx.active_enemy(), "poison", 8)
+			ctx.add_enemy_status(ctx.active_enemy(), "poison", 6)
 		"ember":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "burn", 3)
@@ -19,15 +19,15 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"critical":
 			# 50%: deal 5 to all enemies; else: deal 5 to current target
 			if randi_range(1, 2) == 1:
-				_deal_all(ctx, 5)
+				_deal_all(ctx, 10, source)
 			else:
-				_deal_single(ctx, 5)
+				_deal_single(ctx, 15, source)
 		"refresh":
 			ctx.mana_pipes = min(ctx.MAX_MANA_PIPES, ctx.mana_pipes + 1)
 
 		# ── Rank 2 ────────────────────────────────────────────────────────────
 		"heavy_strike":
-			_deal_single(ctx, 10)
+			_deal_single(ctx, 10, source)
 		"recovery":
 			var lost: int = maxi(0, PlayerState.player_max_health - PlayerState.player_health)
 			ctx.heal_player(int(round(lost * 0.15)))
@@ -35,51 +35,56 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			# Flat 5-second freeze on all enemies (5 stacks × 1 s each)
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "freeze", 5)
+				_deal_single(ctx, 10, source)
 		"iron_guard":
 			ctx.add_player_shield(25)
 		"triple_shot":
 			for _i in range(3):
-				_deal_random_enemy(ctx, 8)
+				_deal_random_enemy(ctx, 10, source)
 		"scatter_drop":
 			for _i in range(2):
 				_spawn_random_ball_rank_1_to_3(ctx, source)
 		"critical_strike":
 			if randi_range(1, 2) == 1:
-				_deal_all(ctx, 8)
+				_deal_all(ctx, 12, source)
 			else:
-				_deal_single(ctx, 8)
-		"pollution":
-			# Doubles poison stacks on current target
-			var st := ctx.status_for_enemy(ctx.active_enemy())
-			if not st.is_empty():
-				st["poison_stack"] = int(st.get("poison_stack", 0)) * 2
+				_deal_all(ctx, 6, source)
 		"fireburn":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "burn", 5)
-
-		# ── Rank 3 ────────────────────────────────────────────────────────────
-		"power_slash":
-			_deal_single(ctx, 18)
 		"toxic_burst":
-			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "poison", 15)
-		"fireball":
-			# Two hits on random enemies, each also applies 5 burn stacks
 			for _i in range(2):
 				var enemies := _alive_enemies(ctx)
 				if enemies.is_empty():
 					break
 				var target := enemies[randi() % enemies.size()] as EnemyBase
-				ctx.damage_enemy(8, target)
+				ctx.add_enemy_status(target, "poison", 8)
+
+		# ── Rank 3 ────────────────────────────────────────────────────────────
+		"power_slash":
+			_deal_single(ctx, 18, source)
+		"pollution":
+			# Doubles poison stacks on current target
+			var st := ctx.status_for_enemy(ctx.active_enemy())
+			if not st.is_empty():
+				st["poison_stack"] = int(st.get("poison_stack", 0)) * 2
+		"fireball":
+			# Two hits on random enemies, each also applies 8 burn stacks
+			for _i in range(2):
+				var enemies := _alive_enemies(ctx)
+				if enemies.is_empty():
+					break
+				var target := enemies[randi() % enemies.size()] as EnemyBase
+				ctx.damage_enemy(12, target)
 				ctx.add_enemy_status(target, "burn", 8)
-			ctx.battle_flags["last_damage"] = 5
+			ctx.battle_flags["last_damage"] = 8
 		"ice_shield":
-			ctx.add_player_shield(10)
+			ctx.add_player_shield(20)
 			ctx.add_enemy_status(ctx.active_enemy(), "freeze", 5)
 		"reinforce":
-			ctx.add_player_attack_bonus(2)
+			ctx.add_player_attack_bonus(3)
 		"convert":
-			_upgrade_random_ball(ctx, 1)
+			_upgrade_random_ball_with_fx(ctx, 1)
 		"echo_shot":
 			_reapply_last(ctx, source)
 		"charm":
@@ -89,24 +94,25 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 4 ────────────────────────────────────────────────────────────
 		"cleave":
-			_deal_all(ctx, 15)
+			_deal_all(ctx, 20, source)
 		"greater_heal":
 			var lost_g: int = maxi(0, PlayerState.player_max_health - PlayerState.player_health)
 			ctx.heal_player(int(round(lost_g * 0.30)))
 		"bomb_orb":
-			_schedule_damage_all(ctx, 10.0, 50)
+			_schedule_bomb_orb(ctx)
 		"chain_spark":
 			_chain_spark(ctx)
 		"mirror_shield":
-			ctx.set_player_reflect_hits(2)
+			ctx.set_player_reflect_hits(3)
 		"corrupt_field":
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "poison", 20)
+				ctx.add_enemy_status(e, "poison", 12)
+			ctx.battle_flags["corrupt_field_active"] = true
 
 		# ── Rank 5 ────────────────────────────────────────────────────────────
 		"critical_edge":
 			var pool := [25, 30]
-			_deal_single(ctx, int(pool[randi() % pool.size()]))
+			_deal_single(ctx, int(pool[randi() % pool.size()]), source)
 		"freeze_wave":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "freeze", 3)
@@ -116,10 +122,11 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"consume_core":
 			_consume_random_ball_and_deal(ctx, 100, source)
 		"upgrade_pulse":
-			_upgrade_random_ball(ctx, 1)
+			_upgrade_random_ball_with_fx(ctx, 1)
 		"poison_rain":
-			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "poison", 25)
+			# Activate the Rain effect: stacks grow instead of shrink for 3 shoots,
+			# and every direct hit adds 2 more stacks.
+			ctx.battle_flags["poison_rain_shoots"] = 3
 		"time_drift":
 			_time_drift(ctx)
 		"contagion":
@@ -127,7 +134,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 6 ────────────────────────────────────────────────────────────
 		"meteor_crash":
-			_deal_all(ctx, 30)
+			_deal_all(ctx, 30, source)
 		"full_recovery":
 			ctx.heal_player(int(PlayerState.player_max_health * 0.30))
 		"chaos_rain":
@@ -153,15 +160,22 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 7 ────────────────────────────────────────────────────────────
 		"final_judgment":
-			_deal_single(ctx, 45)
+			# 4 hits of 12 damage on current enemy.
+			for _i in range(4):
+				_deal_single(ctx, 12, source)
 		"apocalypse":
-			_deal_all(ctx, 48)
+			# 6 hits of 8 damage to all enemies.
+			for _i in range(6):
+				_deal_all(ctx, 8, source)
 		"resurrection":
 			ctx.set_resurrection_ready()
 		"time_stop":
 			_clear_all_balls(ctx)
+			var stop_secs := 10
+			var stop_until := ctx.now_ms() + stop_secs * 1000
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "freeze", 6)
+				var ts_st := ctx.status_for_enemy(e)
+				ts_st["time_stop_until_ms"] = stop_until
 		"magic_flood":
 			_magic_flood(ctx)
 		"miracle_cascade":
@@ -180,25 +194,37 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 # ── Single / All / Random helpers ─────────────────────────────────────────────
 
-static func _deal_single(ctx: BattleContext, amount: int) -> void:
+static func _deal_single(ctx: BattleContext, amount: int, source: BallBase = null) -> void:
 	var ae := ctx.active_enemy()
 	if ae != null:
-		ctx.damage_enemy(amount, ae)
-		ctx.battle_flags["last_damage"] = amount
+		var final := _apply_attack_mult(ctx, source, amount)
+		ctx.damage_enemy(final, ae)
+		ctx.battle_flags["last_damage"] = final
 
 
-static func _deal_all(ctx: BattleContext, amount: int) -> void:
+static func _deal_all(ctx: BattleContext, amount: int, source: BallBase = null) -> void:
 	if ctx.controller != null and ctx.controller.has_method("damage_all_enemies"):
-		ctx.controller.damage_all_enemies(amount, ctx)
-		ctx.battle_flags["last_damage"] = amount
+		var final := _apply_attack_mult(ctx, source, amount)
+		ctx.controller.damage_all_enemies(final, ctx)
+		ctx.battle_flags["last_damage"] = final
 
 
-static func _deal_random_enemy(ctx: BattleContext, amount: int) -> void:
+static func _deal_random_enemy(ctx: BattleContext, amount: int, source: BallBase = null) -> void:
 	var enemies := _alive_enemies(ctx)
 	if enemies.is_empty():
 		return
-	ctx.damage_enemy(amount, enemies[randi() % enemies.size()])
-	ctx.battle_flags["last_damage"] = amount
+	var final := _apply_attack_mult(ctx, source, amount)
+	ctx.damage_enemy(final, enemies[randi() % enemies.size()])
+	ctx.battle_flags["last_damage"] = final
+
+
+static func _apply_attack_mult(ctx: BattleContext, source: BallBase, amount: int) -> int:
+	if source == null or not is_instance_valid(source):
+		return amount
+	var mult := float(ctx.ball_status_for(source).get("attack_mult", 1.0))
+	if mult == 1.0:
+		return amount
+	return int(round(float(amount) * mult))
 
 
 # ── Ball spawning ──────────────────────────────────────────────────────────────
@@ -217,12 +243,18 @@ static func _safe_origin(ctx: BattleContext, source: BallBase) -> Vector2:
 
 
 static func _spawn_random_ball_rank_1_to_3(ctx: BattleContext, source: BallBase) -> void:
-	var ids := ["ball_normal", "ball_heavy", "ball_bomb"]
-	var id: String = ids[randi() % ids.size()]
 	var ball_rank := randi_range(1, 3)
-	var origin: Vector2 = _safe_origin(ctx, source)
-	ctx.spawn_ball(id, origin + Vector2(randf_range(-30.0, 30.0), -20.0),
-			Vector2(randf_range(-30.0, 30.0), 0.0), ball_rank)
+	# Always spread from the drop-zone centre so balls don't cluster on one side.
+	var centre: Vector2
+	if ctx.controller != null and ctx.controller.has_method("drop_zone_global"):
+		centre = ctx.controller.drop_zone_global()
+		if centre == Vector2.ZERO:
+			centre = _safe_origin(ctx, source)
+	else:
+		centre = _safe_origin(ctx, source)
+	var spawn_pos := centre + Vector2(randf_range(-80.0, 80.0), -30.0)
+	ctx.spawn_ball("ball_normal", spawn_pos,
+			Vector2(randf_range(-40.0, 40.0), 0.0), ball_rank)
 
 
 # ── Ball manipulation ─────────────────────────────────────────────────────────
@@ -234,6 +266,28 @@ static func _upgrade_random_ball(ctx: BattleContext, by: int) -> void:
 	var ball := balls[randi() % balls.size()] as BallBase
 	ball.rank = clampi(ball.rank + by, 1, 7)
 	ball.refresh()
+
+
+## Same as _upgrade_random_ball but also plays the green expanding ring at the upgraded ball.
+static func _upgrade_random_ball_with_fx(ctx: BattleContext, by: int) -> void:
+	var balls := ctx.active_balls()
+	if balls.is_empty():
+		return
+	var ball := balls[randi() % balls.size()] as BallBase
+	ball.rank = clampi(ball.rank + by, 1, 7)
+	ball.refresh()
+	_spawn_merge_ring(ctx, ball.global_position)
+
+
+static func _spawn_merge_ring(ctx: BattleContext, world_pos: Vector2) -> void:
+	if ctx.controller == null:
+		return
+	const RingScript := preload("res://scenes/visual_effects/merge_ring_effect.gd")
+	var ring: Node2D = Node2D.new()
+	ring.set_script(RingScript)
+	ring.global_position = world_pos
+	ctx.controller.add_child(ring)
+	ring.play()
 
 
 static func _consume_random_ball_and_deal(ctx: BattleContext, amount: int, source: BallBase) -> void:
@@ -290,13 +344,41 @@ static func _schedule_damage_all(ctx: BattleContext, seconds: float, amount: int
 	)
 
 
+## Bomb Orb: 10-second countdown displayed on all enemies, then deals 50 to all.
+static func _schedule_bomb_orb(ctx: BattleContext) -> void:
+	if ctx.controller == null:
+		return
+	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
+	if tree == null:
+		return
+	const TICKS   := 10
+	const DAMAGE  := 50
+	ctx.battle_flags["bomb_orb_ticks"] = TICKS
+	# Tick down every second
+	for i in range(1, TICKS + 1):
+		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
+		var remaining := TICKS - i
+		t.timeout.connect(func():
+			ctx.battle_flags["bomb_orb_ticks"] = remaining
+			if ctx.controller != null and ctx.controller.has_method("_sync_status_tags_public"):
+				ctx.controller._sync_status_tags_public()
+		)
+	# Detonate at the end
+	var det: SceneTreeTimer = tree.create_timer(float(TICKS), true, false, true)
+	det.timeout.connect(func():
+		ctx.battle_flags["bomb_orb_ticks"] = 0
+		if ctx.controller != null and ctx.controller.has_method("damage_all_enemies"):
+			ctx.controller.damage_all_enemies(DAMAGE, ctx)
+	)
+
+
 # ── Chain Spark ───────────────────────────────────────────────────────────────
 
 static func _chain_spark(ctx: BattleContext) -> void:
 	var enemies := _alive_enemies(ctx)
 	if enemies.is_empty():
 		return
-	var dmg := 10
+	var dmg := 20
 	var last_idx := -1
 	for _i in range(3):
 		var idx: int
@@ -322,12 +404,10 @@ static func _apply_giant_orb(ctx: BattleContext) -> void:
 	var st := ctx.ball_status_for(ball)
 	if bool(st.get("is_giant", false)):
 		return
-	if not st.has("base_scale"):
-		st["base_scale"] = ball.scale
 	st["attack_mult"]   = 3.0
 	st["trigger_twice"] = false
 	st["is_giant"]      = true
-	ball.scale = (st["base_scale"] as Vector2) * 2.0
+	st["size_mult"]     = 2.0
 	ball.refresh()
 
 
@@ -342,12 +422,10 @@ static func _apply_giant_core(ctx: BattleContext) -> void:
 		return
 	var ball := eligible[randi() % eligible.size()] as BallBase
 	var st := ctx.ball_status_for(ball)
-	if not st.has("base_scale"):
-		st["base_scale"] = ball.scale
 	st["attack_mult"]   = 3.0
 	st["trigger_twice"] = true
 	st["is_giant"]      = true
-	ball.scale = (st["base_scale"] as Vector2) * 2.0
+	st["size_mult"]     = 2.0
 	ball.refresh()
 
 
@@ -399,22 +477,22 @@ static func _slow_time_for_seconds(ctx: BattleContext, seconds: float) -> void:
 # ── Magic Flood ───────────────────────────────────────────────────────────────
 
 static func _magic_flood(ctx: BattleContext) -> void:
-	for ball in ctx.active_balls():
-		(ball as BallBase).apply_central_impulse(Vector2(0.0, -300.0))
-	for e in _alive_enemies(ctx):
-		var r := randi_range(1, 3)
-		if r == 1:
-			ctx.add_enemy_status(e, "poison", 8)
-		elif r == 2:
-			ctx.add_enemy_status(e, "burn", 3)
-		else:
-			ctx.add_enemy_status(e, "freeze", 3)
+	var enemies := _alive_enemies(ctx)
+	if enemies.is_empty():
+		return
+	# 10 random hits: each picks a random enemy and a random enchantment.
+	for _i in range(10):
+		var target: EnemyBase = enemies[randi() % enemies.size()]
+		match randi_range(1, 3):
+			1: ctx.add_enemy_status(target, "poison", 8)
+			2: ctx.add_enemy_status(target, "burn",   3)
+			3: ctx.add_enemy_status(target, "freeze", 3)
 
 
 # ── Miracle Cascade ───────────────────────────────────────────────────────────
 
 static func _miracle_cascade(ctx: BattleContext, source: BallBase) -> void:
-	var r3: Array = [["power_slash", 3], ["toxic_burst", 3], ["fireball", 3],
+	var r3: Array = [["power_slash", 3], ["pollution", 3], ["fireball", 3],
 			["ice_shield", 3], ["charm", 3]]
 	var r4: Array = [["cleave", 4], ["chain_spark", 4], ["bomb_orb", 4],
 			["greater_heal", 4], ["mirror_shield", 4]]
@@ -444,18 +522,13 @@ static func _one_shower(ctx: BattleContext, source: BallBase) -> void:
 	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
 	if tree == null:
 		return
-	var origin: Vector2 = _safe_origin(ctx, source)
-	for i in range(10):
+	for i in range(12):
 		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
 		t.timeout.connect(func():
-			if ctx.controller != null:
-				var ball_rank := randi_range(1, 3)
-				ctx.spawn_ball(
-					"ball_normal",
-					origin + Vector2(randf_range(-60.0, 60.0), -50.0),
-					Vector2(randf_range(-20.0, 20.0), 0.0),
-					ball_rank
-				)
+			if ctx.controller == null:
+				return
+			# INF lets BattleBallManager pick a fully random local X inside the box.
+			ctx.drop_element_ball_in_box(randi_range(1, 3), INF)
 		)
 
 

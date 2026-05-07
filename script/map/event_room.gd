@@ -14,7 +14,10 @@ const PLINKO_SCENE := "res://scenes/plinko_room.tscn"
 @onready var _info_label   := $ConversationUI/Center/VBox/GoldInfo        as Label
 @onready var _vbox         := $ConversationUI/Center/VBox                 as VBoxContainer
 
-var _hp_bar: ProgressBar
+## Styled HP bar nodes (same layout as the map-screen PlayerHealthBar).
+var _hp_bg:    ColorRect
+var _hp_fill:  ColorRect
+var _hp_label: Label
 var _used := false
 
 
@@ -36,31 +39,70 @@ func _update_labels() -> void:
 	_sync_info()
 
 
+## Build a styled HP bar (Background / Fill / Label) and insert it at the top of the VBox.
+## Matches the visual style of the map-screen top-right PlayerHealthBar.
 func _insert_hp_bar() -> void:
-	_hp_bar = ProgressBar.new()
-	_hp_bar.custom_minimum_size = Vector2(0, 22)
-	_hp_bar.max_value = PlayerState.player_max_health
-	_hp_bar.value = PlayerState.player_health
-	_hp_bar.show_percentage = false
+	var font_bold := load("res://assets/dogica/TTF/dogicabold.ttf") as Font
 
-	var font := load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
-	if font != null:
-		_hp_bar.add_theme_font_override("font", font)
-		_hp_bar.add_theme_font_size_override("font_size", 10)
+	# Outer container — fixed height, fills VBox width.
+	var bar_container := Control.new()
+	bar_container.custom_minimum_size = Vector2(0, 38)
+	bar_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
-	_hp_bar.add_theme_color_override("font_color", Color(1, 1, 1))
-	# Insert at position 0 in the VBox (above dialog text, below nothing)
-	_vbox.add_child(_hp_bar)
-	_vbox.move_child(_hp_bar, 0)
+	# Dark background track.
+	_hp_bg = ColorRect.new()
+	_hp_bg.layout_mode = 1
+	_hp_bg.anchors_preset = Control.PRESET_FULL_RECT
+	_hp_bg.offset_top    =  2.0
+	_hp_bg.offset_bottom = -2.0
+	_hp_bg.color = Color(0.05, 0.05, 0.05, 1.0)
+	bar_container.add_child(_hp_bg)
+
+	# Green HP fill — width is set dynamically in _sync_info().
+	_hp_fill = ColorRect.new()
+	_hp_fill.layout_mode = 0
+	_hp_fill.anchor_top    = 0.0
+	_hp_fill.anchor_bottom = 1.0
+	_hp_fill.offset_top    =  2.0
+	_hp_fill.offset_bottom = -2.0
+	_hp_fill.size = Vector2(0.0, 0.0)
+	_hp_fill.color = Color(0.0, 0.76, 0.0, 1.0)
+	bar_container.add_child(_hp_fill)
+
+	# HP text label centred over the bar.
+	_hp_label = Label.new()
+	_hp_label.layout_mode = 1
+	_hp_label.anchors_preset = Control.PRESET_FULL_RECT
+	_hp_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	_hp_label.grow_vertical   = Control.GROW_DIRECTION_BOTH
+	_hp_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_hp_label.vertical_alignment   = VERTICAL_ALIGNMENT_CENTER
+	if font_bold != null:
+		_hp_label.add_theme_font_override("font", font_bold)
+	_hp_label.add_theme_font_size_override("font_size", 14)
+	_hp_label.add_theme_color_override("font_color", Color(1, 1, 1))
+	bar_container.add_child(_hp_label)
+
+	_vbox.add_child(bar_container)
+	_vbox.move_child(bar_container, 0)
+
+	# Hide the plain text info label — the bar replaces it visually.
+	if _info_label != null:
+		_info_label.visible = false
+
+	_sync_info()
 
 
 func _sync_info() -> void:
-	var hp := PlayerState.player_health
+	var hp     := PlayerState.player_health
 	var max_hp := PlayerState.player_max_health
-	_info_label.text = "HP: %d / %d" % [hp, max_hp]
-	if _hp_bar != null:
-		_hp_bar.max_value = max_hp
-		_hp_bar.value = hp
+	if _hp_label != null:
+		_hp_label.text = "%d / %d" % [hp, max_hp]
+	if _hp_bg != null and _hp_fill != null:
+		PlayerHealthBarSync.apply_hp_fill(
+			_hp_bg, _hp_fill,
+			float(hp) / maxf(1.0, float(max_hp))
+		)
 
 
 func _on_heal() -> void:
@@ -74,9 +116,7 @@ func _on_heal() -> void:
 	_gamble_button.disabled = true
 	_dialog_text.text = (
 		"[center][color=lime]The shrine glows warmly.[/color]\n\n"
-		+ "You recover [b]%d HP[/b].\n\nHP: %d / %d[/center]" % [
-			heal_amount, PlayerState.player_health, PlayerState.player_max_health
-		]
+		+ "You recover [b]%d HP[/b].[/center]" % heal_amount
 	)
 	await get_tree().create_timer(1.4).timeout
 	if is_inside_tree():

@@ -1,7 +1,8 @@
 extends EnemyActionBase
 class_name SpiderEggDropAction
 
-const EGG_BALL_ID := "ball_spider_egg"
+## "ball_spider_egg" is not in BallCatalog; fall back to a normal ball.
+const EGG_BALL_ID := "ball_normal"
 const EGG_RANK := 1
 const ThrowEffect := preload("res://scenes/visual_effects/throw_effect.tscn")
 

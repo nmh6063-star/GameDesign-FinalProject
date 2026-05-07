@@ -42,9 +42,9 @@ const TINTS := {
 	MapGenerator.Room.Type.EVENT: Color("d4a017"),
 }
 
-const BASE_ICON_SCALE := Vector2(0.015, 0.015)
-const BORDER_RADIUS := 8.0
-const CLICK_RADIUS := 28.0
+const BASE_ICON_SCALE := Vector2(0.026, 0.026)
+const BORDER_RADIUS := 16.0
+const CLICK_RADIUS := 40.0
 const BORDER_WIDTH := 2.0
 const BORDER_SUPERSAMPLE := 4.0
 const BORDER_COLOR := Color(0.10, 0.08, 0.14, 0.72)

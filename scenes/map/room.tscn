@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://o2hbc3bx108m" path="res://script/map/map_room.gd" id="1_script"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_room"]
-radius = 28.0
+radius = 40.0
 
 [sub_resource type="Animation" id="Animation_reset"]
 resource_name = "RESET"

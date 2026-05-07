@@ -266,6 +266,10 @@ func drop_ball_in_box(ball_id: String, rank: int = 1) -> BallBase:
 	return _box.drop_ball(ball_id, rank) if _box != null else null
 
 
+func drop_element_ball_in_box(rank: int, x: float = INF) -> BallBase:
+	return _box.drop_element_ball_at_x(rank, x) if _box != null else null
+
+
 func spawn_setup_ball() -> BallBase:
 	return _box.spawn_setup_ball() if _box != null else null
 
@@ -306,6 +310,13 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 func damage_player(amount: int) -> void:
 	if amount <= 0 or PlayerState.player_health <= 0:
 		return
+	# Corrupt Field: poisoned enemies deal 20% less damage for 1 shoot.
+	if bool(_context.battle_flags.get("corrupt_field_active", false)):
+		var attacker := active_enemy()
+		if attacker != null:
+			var atk_st := _context.status_for_enemy(attacker)
+			if int(atk_st.get("poison_stack", 0)) > 0:
+				amount = int(round(float(amount) * 0.8))
 	if _context.should_reflect_damage():
 		var attacker := active_enemy()
 		if attacker != null:
@@ -425,6 +436,13 @@ func _on_ball_dropped() -> void:
 	var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
 	if freeze > 0:
 		_context.player_statuses["freeze_stacks"] = freeze - 1
+	# Poison Rain: count down the shoot-duration timer.
+	var pr := int(_context.battle_flags.get("poison_rain_shoots", 0))
+	if pr > 0:
+		_context.battle_flags["poison_rain_shoots"] = pr - 1
+	# Corrupt Field: the attack-damage debuff lasts exactly 1 shoot.
+	if bool(_context.battle_flags.get("corrupt_field_active", false)):
+		_context.battle_flags["corrupt_field_active"] = false
 	_sync_status_tags()
 	_complete_turn_after_drop()
 
@@ -745,3 +763,8 @@ func _sync_status_tags() -> void:
 	for slot in _enemy_slots:
 		if slot != null and slot.has_method("sync_status_tag"):
 			slot.sync_status_tag(_context)
+
+
+## Public wrapper so external scripts (e.g. bomb timer callbacks) can trigger a status refresh.
+func _sync_status_tags_public() -> void:
+	_sync_status_tags()
