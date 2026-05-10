@@ -406,8 +406,72 @@
 
     * Deal **500 damage to all enemies**.
 
-* **1 Shower**
+* **Shower**
 
   * For **30 seconds**:
 
     * Continuously spawn Rank 1 balls into box at intervals.
+
+* **Baator's Flame** *(R7)*
+
+  * Convert all DoT on every enemy to Burn: Poison ×1.5, Thunder ×2, Freeze ×10 stacks.
+
+* **Thunder Strike** *(R7)*
+
+  * Deal 2% × thunder stacks of each enemy's current HP to that enemy.
+
+* **Elbaph's Power** *(R7)*
+
+  * 15s: ball sizes grow 0→+100% and direct damage scales 50→150%.
+
+* **Tide Turner** *(R4)*
+
+  * Shot alongside X other balls: deal X × total damage dealt by those balls this turn.
+
+* **Thunder Fang** *(R3)*
+
+  * 5% current HP to target + 5% to others. Apply 5/3 ⚡ thunder stacks.
+
+* **Storm Surge** *(R6)*
+
+  * 10% max HP to all enemies + 20 ⚡ thunder stacks to each.
+
+* **Gatekeeper** *(R6)*
+
+  * Next 3 damage instances: convert 50% of each hit into Shield.
+
+* **Chaos Slash** *(R5)*
+
+  * 5 random hits for 15 (can hit player). Player hits apply Fragile (+20% dmg taken) until next shoot.
+
+* **Decay** *(R3)*
+
+  * Permanently reduce active enemy's max HP by 10 (5×2) this battle.
+
+* **Regeneration** *(R3)*
+
+  * Heal 3 HP/s for 10 seconds.
+
+* **Weakness Brand** *(R4)*
+
+  * Active enemy takes +30% direct damage for 3 shoots (🔻 Brand ×N).
+
+* **Lifesteal Field** *(R4)*
+
+  * This battle: heal 10% of all direct damage dealt (🩸 Lifesteal).
+
+* **Fortress** *(R4)*
+
+  * Gain 50 Shield. Take 15 raw HP damage (bypasses shield, HP floored at 1).
+
+* **Guillotine** *(R5)*
+
+  * Deal 25% of active enemy's MISSING HP.
+
+* **Second Wind** *(R6)*
+
+  * When HP drops below 30%: heal 40% max HP (first use) or 10% missing HP (repeat).
+
+* **Overkill** *(R6)*
+
+  * Deal 40 damage. For rest of battle: excess damage on kills spills to next enemy.

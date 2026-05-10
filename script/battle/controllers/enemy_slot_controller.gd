@@ -40,6 +40,8 @@ var _bomb_label:    Label
 var _rain_label:      Label
 var _corrupt_label:   Label
 var _time_stop_label: Label
+var _thunder_label:   Label
+var _brand_label:     Label
 
 var enemy: EnemyBase
 var _selected := false
@@ -298,6 +300,8 @@ func sync_status_tag(ctx: BattleContext) -> void:
 		if _rain_label      != null: _rain_label.visible      = false
 		if _corrupt_label   != null: _corrupt_label.visible   = false
 		if _time_stop_label != null: _time_stop_label.visible = false
+		if _thunder_label   != null: _thunder_label.visible   = false
+		if _brand_label     != null: _brand_label.visible     = false
 		return
 	var st := ctx.status_for_enemy(enemy)
 
@@ -344,6 +348,16 @@ func sync_status_tag(ctx: BattleContext) -> void:
 		_time_stop_label.visible = ts_secs > 0
 		_time_stop_label.text = "⏱ Stop %ds (+50%%)" % ts_secs
 
+	var thunder := int(st.get("thunder_stack", 0))
+	if _thunder_label != null:
+		_thunder_label.visible = thunder > 0
+		_thunder_label.text = "⚡ Thdr %d" % thunder
+
+	var brand_shoots := int(st.get("weakness_brand_shoots", 0))
+	if _brand_label != null:
+		_brand_label.visible = brand_shoots > 0
+		_brand_label.text = "🔻 Brand ×%d" % brand_shoots
+
 
 func _is_hovering_cooldown() -> bool:
 	var radius := float(_cooldown_ring.get("radius")) + 8.0
@@ -360,6 +374,8 @@ func _ensure_status_labels() -> void:
 	_rain_label      = _get_or_create_status_label("StatusRain",     Vector2(-52, 163), Color(0.4,  0.9,  0.55))
 	_corrupt_label   = _get_or_create_status_label("StatusCorrupt",  Vector2(-52, 176), Color(0.8,  0.35, 1.0))
 	_time_stop_label = _get_or_create_status_label("StatusTimeStop", Vector2(-52, 189), Color(0.6,  0.85, 1.0))
+	_thunder_label   = _get_or_create_status_label("StatusThunder",  Vector2(-52, 202), Color(0.95, 0.9,  0.15))
+	_brand_label     = _get_or_create_status_label("StatusBrand",    Vector2(-52, 215), Color(1.0,  0.4,  0.4))
 
 
 func _get_or_create_status_label(node_name: String, pos: Vector2, color: Color) -> Label:

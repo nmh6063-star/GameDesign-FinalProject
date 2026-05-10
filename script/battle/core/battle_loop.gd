@@ -35,6 +35,7 @@ var _selected_enemy_index := 0
 var _enemy_slots: Array = []
 
 var _reward_overlay: RewardSelectionController
+var _elbaphs_update_acc := 0.0
 var _current_ability_overlay: CanvasLayer
 var _paused_for_ability_overlay := false
 var _playground_overlay: CanvasLayer
@@ -111,6 +112,7 @@ func _physics_process(_delta: float) -> void:
 	_context.tick_enemy_burn(_delta)
 	_context.tick_combo(_delta)
 	_sync_status_tags()
+	_update_elbaphs_power(_delta)
 
 
 func _handle_ability_overlay_input() -> void:
@@ -187,8 +189,18 @@ func try_shoot(target_area: Area2D, burst_origin: Vector2) -> void:
 	if _context.phase != BattleContext.Phase.PLAY or not _context.try_consume_shot():
 		return
 	var hit_balls := _targeted_balls(target_area)
+	# Set up per-shoot tracking flags for Tide Turner and friends
+	_context.battle_flags["shoot_ball_count"] = hit_balls.size()
+	_context.battle_flags["shoot_damage_acc"]  = 0
 	for ball in hit_balls:
 		ball.on_shot(_context)
+	# Tide Turner: deal X × total_shoot_damage right after all on_shot calls
+	if bool(_context.battle_flags.get("tide_turner_pending", false)):
+		_context.battle_flags.erase("tide_turner_pending")
+		var ball_count := int(_context.battle_flags.get("shoot_ball_count", 1))
+		var shoot_dmg  := int(_context.battle_flags.get("shoot_damage_acc",  0))
+		if ball_count >= 2 and shoot_dmg > 0:
+			damage_enemy(ball_count * shoot_dmg, active_enemy(), _context)
 	sound.play_sound_from_string("shotgun")
 	var effects = Effects.new()
 	_root.add_child(effects)
@@ -285,6 +297,11 @@ func heal_player(amount: int) -> void:
 	PlayerState.heal(amount)
 	_sync_player_bar()
 	_hud.show_damage(amount, _player_damage_anchor, HEAL_COLOR)
+	# Second Wind cooldown resets when HP climbs back above 30% threshold
+	if bool(_context.player_statuses.get("second_wind_cooldown", false)):
+		var sw_thresh := int(round(float(PlayerState.player_max_health) * 0.30))
+		if PlayerState.player_health >= sw_thresh:
+			_context.player_statuses["second_wind_cooldown"] = false
 
 
 func damage_all_enemies(amount: int, ctx: BattleContext = null) -> void:
@@ -300,6 +317,7 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 	var target: EnemyBase = enemy if enemy != null else active_enemy()
 	if amount <= 0 or target == null or not target.is_alive():
 		return
+	var pre_health := target.health()
 	var slot: EnemySlotController = _enemy_slot(target)
 	target.flash()
 	var applied := target.take_damage_with_context(amount, ctx)
@@ -308,6 +326,14 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 	if slot != null:
 		slot.sync_realtime_view()
 		slot.show_damage(applied, ENEMY_DAMAGE_COLOR)
+	# Overkill: overflow damage to next alive enemy when this kill is confirmed
+	if ctx != null and not target.is_alive():
+		if bool(ctx.battle_flags.get("overkill_active", false)):
+			var overflow := maxi(0, amount - pre_health)
+			if overflow > 0:
+				var remain := _alive_enemy_slots()
+				if not remain.is_empty():
+					damage_enemy(overflow, (remain[0] as EnemySlotController).enemy, ctx)
 	if _alive_enemy_slots().is_empty():
 		_finish_battle("Stage Clear")
 
@@ -339,6 +365,19 @@ func damage_player(amount: int) -> void:
 	_player.flash()
 	_sync_player_bar()
 	_hud.show_damage(amount, _player_damage_anchor, PLAYER_DAMAGE_COLOR)
+	# Second Wind: trigger when HP drops below 30%
+	if bool(_context.player_statuses.get("second_wind_ready", false)):
+		if PlayerState.player_health > 0 \
+				and not bool(_context.player_statuses.get("second_wind_cooldown", false)):
+			var sw_thresh := int(round(float(PlayerState.player_max_health) * 0.30))
+			if PlayerState.player_health < sw_thresh:
+				_context.player_statuses["second_wind_cooldown"] = true
+				if not bool(_context.player_statuses.get("second_wind_main_used", false)):
+					_context.player_statuses["second_wind_main_used"] = true
+					heal_player(int(round(float(PlayerState.player_max_health) * 0.40)))
+				else:
+					var sw_missing := PlayerState.player_max_health - PlayerState.player_health
+					heal_player(maxi(1, int(round(float(sw_missing) * 0.10))))
 	if PlayerState.player_health == 0:
 		if _context.can_resurrect():
 			_context.mark_resurrect_used()
@@ -450,6 +489,17 @@ func _on_ball_dropped() -> void:
 	# Corrupt Field: the attack-damage debuff lasts exactly 1 shoot.
 	if bool(_context.battle_flags.get("corrupt_field_active", false)):
 		_context.battle_flags["corrupt_field_active"] = false
+	# Fragile: debuff clears after each shoot
+	if int(_context.battle_flags.get("fragile_stacks", 0)) > 0:
+		_context.battle_flags["fragile_stacks"] = 0
+	# Weakness Brand: count down per shoot
+	for slot in _alive_enemy_slots():
+		var se := (slot as EnemySlotController).enemy
+		if se != null:
+			var st := _context.status_for_enemy(se)
+			var wb := int(st.get("weakness_brand_shoots", 0))
+			if wb > 0:
+				st["weakness_brand_shoots"] = wb - 1
 	_sync_status_tags()
 	_complete_turn_after_drop()
 
@@ -565,6 +615,22 @@ func _sync_player_bar() -> void:
 		var cl := int(_context.player_statuses.get("clone_stacks", 0))
 		if cl > 0:
 			tags.append("✦ Clone×%d" % cl)
+		var gk := int(_context.battle_flags.get("gatekeeper_charges", 0))
+		if gk > 0:
+			tags.append("🔰 GK×%d" % gk)
+		if bool(_context.player_statuses.get("second_wind_ready", false)):
+			if not bool(_context.player_statuses.get("second_wind_main_used", false)):
+				tags.append("💨 2nd Wind")
+			else:
+				tags.append("💨 2nd Wind+")
+		var ls := float(_context.player_statuses.get("direct_damage_heal_ratio", 0.0))
+		if ls > 0.0:
+			tags.append("🩸 Lifesteal")
+		var fr := int(_context.battle_flags.get("fragile_stacks", 0))
+		if fr > 0:
+			tags.append("💔 Fragile")
+		if int(_context.battle_flags.get("elbaphs_power_start_ms", 0)) > 0:
+			tags.append("⚡ Elbaph")
 		_player_status_label.text = "  ".join(tags)
 
 
@@ -775,3 +841,35 @@ func _sync_status_tags() -> void:
 ## Public wrapper so external scripts (e.g. bomb timer callbacks) can trigger a status refresh.
 func _sync_status_tags_public() -> void:
 	_sync_status_tags()
+
+
+## Public player bar sync used by BattleContext._damage_player_hp_only (Fortress).
+func _sync_player_bar_public() -> void:
+	_sync_player_bar()
+
+
+# ── Elbaph's Power: progressively grow all tagged balls over 15 seconds ───────
+
+func _update_elbaphs_power(delta: float) -> void:
+	var start_ms := int(_context.battle_flags.get("elbaphs_power_start_ms", 0))
+	if start_ms <= 0:
+		return
+	_elbaphs_update_acc += delta
+	if _elbaphs_update_acc < 0.1:
+		return
+	_elbaphs_update_acc = 0.0
+	var elapsed_ms := _context.now_ms() - start_ms
+	if elapsed_ms >= 15000:
+		_context.battle_flags.erase("elbaphs_power_start_ms")
+	var t := clampf(float(elapsed_ms) / 15000.0, 0.0, 1.0)
+	var size_mult   := lerpf(1.0, 2.0, t)
+	var attack_mult := lerpf(0.5, 1.5, t)
+	for ball in active_balls():
+		var b := ball as BallBase
+		var st := _context.ball_status_for(b)
+		if not bool(st.get("elbaphs_power", false)):
+			continue
+		st["size_mult"]   = size_mult
+		st["attack_mult"] = attack_mult
+		b._update_collision()
+		b.queue_redraw()

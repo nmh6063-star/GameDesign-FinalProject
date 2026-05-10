@@ -41,6 +41,8 @@ var ball_statuses := {}
 
 # Enemy whose attack is currently being redirected by Charm
 var _charm_redirect_source: EnemyBase = null
+# Guard to prevent infinite recursion in thunder chain propagation
+var _thunder_propagating := false
 
 
 func _init(p_controller = null) -> void:
@@ -71,6 +73,10 @@ func reset_for_battle() -> void:
 		"freeze_stacks": 0,
 		"dot_damage_heal_ratio": 0.0,
 		"dot_triggers_twice": false,
+		"direct_damage_heal_ratio": 0.0,
+		"second_wind_ready": false,
+		"second_wind_main_used": false,
+		"second_wind_cooldown": false,
 	}
 	battle_flags = {
 		"last_damage": 0,
@@ -80,6 +86,7 @@ func reset_for_battle() -> void:
 		"max_combo_reached": 0,
 	}
 	_charm_redirect_source = null
+	_thunder_propagating = false
 
 
 func start_turn() -> void:
@@ -249,6 +256,12 @@ func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
 	if controller == null:
 		return
 	var base := amount + int(player_statuses.get("attack_bonus", 0))
+	# Weakness Brand: marked target takes 30% more direct damage
+	var actual_target := enemy if enemy != null else active_enemy()
+	if actual_target != null:
+		var wb := int(status_for_enemy(actual_target).get("weakness_brand_shoots", 0))
+		if wb > 0:
+			base = int(round(float(base) * 1.30))
 	# Time Stop: struck enemies take 50% more damage.
 	var target_for_check := enemy if enemy != null else active_enemy()
 	if target_for_check != null:
@@ -267,6 +280,17 @@ func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
 		base *= 2
 	controller.damage_enemy(base, enemy, self)
 	battle_flags["last_damage"] = amount
+	# Lifesteal Field: heal 10% of direct damage dealt
+	var ls := float(player_statuses.get("direct_damage_heal_ratio", 0.0))
+	if ls > 0.0:
+		var ls_heal := maxi(1, int(round(float(base) * ls)))
+		heal_player(ls_heal)
+	# Accumulate shoot damage for Tide Turner
+	battle_flags["shoot_damage_acc"] = int(battle_flags.get("shoot_damage_acc", 0)) + base
+	# Thunder chain: the struck enemy's stacks echo damage to all other thundered enemies
+	var actual_target := enemy if enemy != null else active_enemy()
+	if actual_target != null:
+		_propagate_thunder(base, actual_target)
 	# Poison Rain: each direct hit adds 2 poison stacks to the struck enemy.
 	if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
 		var target := enemy if enemy != null else active_enemy()
@@ -286,10 +310,35 @@ func damage_player(amount: int) -> void:
 
 ## Damage to player that bypasses Time Drift storage (e.g. self-inflicted costs).
 func _damage_player_raw(amount: int) -> void:
+	# Fragile: +20% damage taken per stack (cleared at end of shoot)
+	var fragile := int(battle_flags.get("fragile_stacks", 0))
+	if fragile > 0:
+		amount = int(round(float(amount) * (1.0 + 0.2 * float(fragile))))
+	# Gatekeeper: convert 50% of each hit into Shield
+	var gk := int(battle_flags.get("gatekeeper_charges", 0))
+	if gk > 0:
+		var shield_gain := int(round(float(amount) * 0.5))
+		amount -= shield_gain
+		add_player_shield(shield_gain)
+		battle_flags["gatekeeper_charges"] = gk - 1
 	if controller != null:
 		var reduced := _consume_player_shield(amount)
 		if reduced > 0:
 			controller.damage_player(reduced)
+
+
+## Directly reduces player HP, bypassing shield, Gatekeeper, and Fragile.
+## Used for self-inflicted costs that are conceptually "internal" (e.g. Fortress).
+## Cannot reduce HP below 1.
+func _damage_player_hp_only(amount: int) -> void:
+	if controller == null or amount <= 0:
+		return
+	var safe := mini(amount, PlayerState.player_health - 1)
+	if safe <= 0:
+		return
+	PlayerState.damage(safe)
+	if controller.has_method("_sync_player_bar_public"):
+		controller._sync_player_bar_public()
 
 
 ## DOT damage: bypasses attack_bonus and clone multipliers.
@@ -305,6 +354,9 @@ func _damage_enemy_dot(amount: int, enemy: EnemyBase) -> void:
 	if ratio > 0.0 and total_dealt > 0:
 		var heal_amt := maxi(1, int(round(float(total_dealt) * ratio)))
 		heal_player(heal_amt)
+	# Thunder chain: DOT damage also propagates through thunder links
+	if not _thunder_propagating and total_dealt > 0:
+		_propagate_thunder(total_dealt, enemy)
 
 
 ## Copies poison/burn/charm stacks and remaining freeze duration from one enemy onto another (additive).
@@ -359,11 +411,13 @@ func status_for_enemy(enemy: EnemyBase) -> Dictionary:
 			"freeze_until_ms": 0,
 			"charm_stack": 0,
 			"time_stop_until_ms": 0,
+			"thunder_stack": 0,
 		}
 	return enemy_statuses[key]
 
 
 ## Stacks = total damage charges. Freeze: each stack = 1 second freeze (additive).
+## weakness_brand stores remaining shoot count directly (not "_stack" suffix).
 func add_enemy_status(enemy: EnemyBase, key: String, stack: int, _strength: int = 0) -> void:
 	if enemy == null:
 		return
@@ -371,6 +425,9 @@ func add_enemy_status(enemy: EnemyBase, key: String, stack: int, _strength: int 
 	if key == "freeze":
 		var current_until := maxi(now_ms(), int(st.get("freeze_until_ms", 0)))
 		st["freeze_until_ms"] = current_until + stack * 1000
+	elif key == "weakness_brand":
+		# Overwrite (not additive) — only one brand at a time
+		st["weakness_brand_shoots"] = max(0, stack)
 	else:
 		st[key + "_stack"] = int(st.get(key + "_stack", 0)) + max(0, stack)
 
@@ -490,6 +547,30 @@ func _consume_player_shield(amount: int) -> int:
 	var absorbed := mini(shield, amount)
 	player_statuses["shield"] = shield - absorbed
 	return amount - absorbed
+
+
+## Thunder chain: when a thundered enemy takes damage, every other enemy that
+## also has thunder stacks receives (their_stacks %) of that damage as DOT.
+## The struck enemy itself also takes (its_stacks %) extra damage.
+func _propagate_thunder(damage: int, source_enemy: EnemyBase) -> void:
+	if _thunder_propagating or damage <= 0 or source_enemy == null:
+		return
+	_thunder_propagating = true
+	# Extra resonance damage on the struck enemy itself
+	var src_stacks := int(status_for_enemy(source_enemy).get("thunder_stack", 0))
+	if src_stacks > 0:
+		var self_dmg := maxi(1, int(round(float(damage) * float(src_stacks) / 100.0)))
+		_damage_enemy_dot(self_dmg, source_enemy)
+	# Chain to every other thundered enemy
+	for other in _alive_enemies():
+		if other == source_enemy:
+			continue
+		var other_stacks := int(status_for_enemy(other).get("thunder_stack", 0))
+		if other_stacks <= 0:
+			continue
+		var chain_dmg := maxi(1, int(round(float(damage) * float(other_stacks) / 100.0)))
+		_damage_enemy_dot(chain_dmg, other)
+	_thunder_propagating = false
 
 
 func _alive_enemies() -> Array:

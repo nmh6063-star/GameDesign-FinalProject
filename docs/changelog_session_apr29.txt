@@ -196,7 +196,7 @@ RANK 7
     After  : Random enchantment — Poison (8 stacks) / Burn (3 stacks) /
              Freeze (3 stacks) on each enemy
 
-  1 Shower
+  Shower
     Before : Spawn rank 1 balls continuously for 30 seconds (30 balls)
     After  : Spawn rank 1–3 balls for 10 seconds (10 balls)
 
@@ -231,6 +231,67 @@ Apr 29, 2026
              Example (3 stacks): 3 → 2 → 1 = 6 total damage over 3 seconds.
 
   Freeze — unchanged (each stack = 1 second, no damage).
+
+================================================================================
+CHANGE 3 — New abilities + balance pass — May 10, 2026
+================================================================================
+
+NEW ABILITIES (Session May 10)
+────────────────────────────────────────────────────────────────────────────────
+
+  RANK 2 (reward pool)
+  Heavy Strike — now offered as a reward (was registered but not in pool).
+
+  RANK 3
+  Decay         — Permanently reduce active enemy's max HP by 10 (5×2).
+                  Clamps current_health to new max. Effect is per-battle only
+                  (_battle_hp_reduction reset on enemy respawn).
+  Regeneration  — Heal 3 HP per second for 10 seconds (10 timers, 1 HP/s).
+
+  RANK 4
+  Weakness Brand — Mark active enemy: +30% direct damage for 3 shoots.
+                   (🔻 Brand ×N displayed on enemy status bar.)
+  Lifesteal Field — This battle: heal 10% of all direct damage dealt.
+                   (🩸 Lifesteal shown in player status bar.)
+  Fortress       — Gain 50 Shield. Take 15 raw HP damage (bypasses shield;
+                   HP floored at 1). Self-damage is internal (no shield/GK).
+
+  RANK 5
+  Guillotine     — Deal 25% of active enemy's MISSING HP as damage.
+                   Stronger when enemy is already wounded.
+
+  RANK 6
+  Second Wind    — When HP drops below 30%: heal 40% max HP (first trigger)
+                   or 10% missing HP (subsequent triggers this battle).
+                   One trigger per low-HP event; cooldown resets above 30%.
+                   (💨 2nd Wind / 💨 2nd Wind+ shown in player status bar.)
+  Overkill       — Deal 40 damage immediately. For rest of battle: excess
+                   damage from any enemy kill spills to next alive enemy.
+
+────────────────────────────────────────────────────────────────────────────────
+BALANCE CHANGES (Session May 10)
+────────────────────────────────────────────────────────────────────────────────
+
+  R1  Strike (default)
+        Before : 5 × rank damage
+        After  : 8 × rank damage   (R1: 5 → 8, scales up across all ranks)
+
+  R1  Mend
+        Before : Heal flat 10 HP
+        After  : Heal 5% of missing HP; deal 10% of the heal as damage to
+                 current enemy.
+
+  R2  Heavy Strike (default / reward)
+        Before : 10 damage
+        After  : 18 damage
+
+  R2  Recovery
+        Before : Heal 15% of missing HP
+        After  : Heal 10% of missing HP
+
+  R3  Power Slash (default)
+        Before : 18 damage (was listed as 30 in earlier changelog — code was 18)
+        After  : 25 damage
 
 ================================================================================
 END

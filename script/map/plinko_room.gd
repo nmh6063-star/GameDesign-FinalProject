@@ -89,18 +89,12 @@ func _assign_slot_abilities(slots_root: Node) -> void:
 		var rank := int(ability.get("rank", 1))
 		_slot_abilities[child.name] = {"ability": ability, "rank": rank}
 
-		# Update the ValueLabel so the player can read the ability name
+		# Show only the rank in the slot label; full details revealed after landing
 		var value_label := child.get_node_or_null("ValueLabel") as Label
 		if value_label != null:
-			var short_name := String(ability.get("name", "?"))
-			# Abbreviate to fit small slot
-			if short_name.length() > 9:
-				short_name = short_name.substr(0, 8) + "…"
-			value_label.text = short_name
-			value_label.add_theme_font_size_override("font_size", 7)
-			value_label.tooltip_text = (
-				"%s (R%d)\n%s" % [ability.get("name","?"), rank, ability.get("description","")]
-			)
+			value_label.text = "R%d" % rank
+			value_label.add_theme_font_size_override("font_size", 9)
+			value_label.tooltip_text = ""
 			# Tint the polygon by rank
 			var vis := child.get_node_or_null("SlotVis") as Polygon2D
 			if vis != null:
@@ -244,10 +238,10 @@ func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
 
 	var card := PanelContainer.new()
 	card.set_anchors_preset(Control.PRESET_CENTER)
-	card.offset_left   = -260.0
-	card.offset_top    = -140.0
-	card.offset_right  =  260.0
-	card.offset_bottom =  140.0
+	card.offset_left   = -280.0
+	card.offset_top    = -200.0
+	card.offset_right  =  280.0
+	card.offset_bottom =  200.0
 	var card_style := StyleBoxFlat.new()
 	card_style.bg_color = Color(0.10, 0.07, 0.18)
 	card_style.border_color = Color(0.85, 0.8, 1.0)
@@ -277,7 +271,7 @@ func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
 	var current_lbl := Label.new()
 	current_lbl.text = "Current (Rank %d):\n  %s" % [rank, current_name]
 	if current_desc.length() > 0:
-		current_lbl.text += "\n  " + current_desc.substr(0, 60) + ("…" if current_desc.length() > 60 else "")
+		current_lbl.text += "\n  " + current_desc
 	current_lbl.add_theme_font_override("font", font)
 	current_lbl.add_theme_font_size_override("font_size", 9)
 	current_lbl.add_theme_color_override("font_color", Color(0.75, 0.75, 0.85))
@@ -297,7 +291,7 @@ func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
 	var new_lbl := Label.new()
 	new_lbl.text = "New (Rank %d):\n  %s" % [rank, new_name]
 	if new_desc.length() > 0:
-		new_lbl.text += "\n  " + new_desc.substr(0, 60) + ("…" if new_desc.length() > 60 else "")
+		new_lbl.text += "\n  " + new_desc
 	new_lbl.add_theme_font_override("font", font)
 	new_lbl.add_theme_font_size_override("font_size", 9)
 	new_lbl.add_theme_color_override("font_color", Color(0.5, 1.0, 0.5))

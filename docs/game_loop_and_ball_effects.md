@@ -157,7 +157,7 @@ Enemy turns are driven only by each enemy's real-time attack cooldown timer.
 `BattleBallManager.drop_element_ball_at_x(rank, x)` — like `drop_ball_at_x` but
 mirrors the full `element_list` / `type` setup from `spawn_setup_ball` before
 `configure()` is called. Use this when spawning balls that should display the
-player's current rank-class texture (e.g. the 1 Shower ability).
+player's current rank-class texture (e.g. the Shower ability).
 
 Exposed up the chain via:
 - `BattleLoop.drop_element_ball_in_box(rank, x)` → `_box.drop_element_ball_at_x`
@@ -180,6 +180,53 @@ Exposed up the chain via:
 
 Both `poison_rain_shoots` and `corrupt_field_active` are decremented/cleared in
 `BattleLoop._on_ball_dropped()` so duration is measured in ball drops (shoots).
+
+## Recent API Additions (May 10, 2026)
+
+### New enemy status keys (BattleContext.enemy_statuses)
+
+| Key | Type | Set by | Effect |
+|-----|------|--------|--------|
+| `thunder_stack` | int | Thunder Fang, Storm Surge | Chain damage propagation (see Thunder Debuff); displayed as ⚡ Thdr N |
+| `weakness_brand_shoots` | int (shoots) | Weakness Brand | Target takes +30% direct damage; counts down per shoot |
+
+### New player_statuses keys (BattleContext.player_statuses)
+
+| Key | Type | Set by | Effect |
+|-----|------|--------|--------|
+| `direct_damage_heal_ratio` | float | Lifesteal Field | Heal (ratio × damage) after every direct hit |
+| `second_wind_ready` | bool | Second Wind | Enables low-HP trigger |
+| `second_wind_main_used` | bool | Second Wind | Tracks first-use vs. repeat-use healing |
+| `second_wind_cooldown` | bool | Second Wind | Prevents re-trigger until HP recovers above 30% |
+
+### New battle_flags keys (BattleContext.battle_flags)
+
+| Key | Type | Set by | Effect |
+|-----|------|--------|--------|
+| `shoot_ball_count` | int | `try_shoot` | Number of balls in current shot; read by Tide Turner |
+| `shoot_damage_acc` | int | `damage_enemy` | Total direct damage dealt this shot; read by Tide Turner |
+| `tide_turner_pending` | bool | Tide Turner | Resolved after all `on_shot` calls in `try_shoot` |
+| `fragile_stacks` | int | Chaos Slash | Player takes +20% per stack; cleared in `_on_ball_dropped` |
+| `gatekeeper_charges` | int | Gatekeeper | Converts 50% of each incoming hit to Shield |
+| `overkill_active` | bool | Overkill | Kill overflow in `damage_enemy` (battle_loop) |
+| `elbaphs_power_start_ms` | int | Elbaph's Power | Start timestamp; drives progressive size/damage ramp |
+
+### New enemy_base.gd field
+
+`_battle_hp_reduction: int` — cumulative max-HP reduction applied during a battle by Decay.
+Reset to 0 in `EnemyBase.reset()`. `max_health()` subtracts this from `data.max_health` (floored at 1).
+
+### New BattleContext methods
+
+`_damage_player_hp_only(amount)` — reduces player HP directly, bypassing shield, Gatekeeper, and Fragile. HP is floored at 1. Used by Fortress.
+
+`_propagate_thunder(damage, source_enemy)` — called after every direct and DoT damage event to chain thunder stacks across all living enemies. Guarded by `_thunder_propagating` flag to prevent recursion.
+
+### New BattleLoop methods
+
+`_sync_player_bar_public()` — public wrapper so `BattleContext._damage_player_hp_only` can trigger a bar refresh.
+
+`_update_elbaphs_power(delta)` — throttled (every 0.1 s) updater that linearly ramps `size_mult` (1.0→2.0) and `attack_mult` (0.5→1.5) on all Elbaph-tagged balls over 15 seconds.
 
 ## Composition Model
 

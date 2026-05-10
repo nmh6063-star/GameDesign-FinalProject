@@ -8,7 +8,7 @@ const ELEMENT_TYPE := "Rank"
 
 static func default_element_for_rank(rank: int) -> Dictionary:
 	var r := clampi(rank, 1, 7)
-	var dmg := 5 * r
+	var dmg := 8 * r
 	return _ability("strike", r, "Strike", "Deal %d damage to current enemy." % dmg)
 
 
@@ -36,7 +36,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 	match rank:
 		1:
 			return [
-				_ability("mend", 1, "Mend", "Heal 5 HP."),
+				_ability("mend", 1, "Mend", "Heal 5% of missing HP. Deal 10% of the amount healed as damage to the current enemy."),
 				_ability("venom", 1, "Venom", "Poison current enemy (8 stacks)."),
 				_ability("ember", 1, "Ember", "Burn all enemies (3 stacks). Deals 1 damage/sec per stack."),
 				_ability("guard", 1, "Guard", "Gain 5 Shield."),
@@ -45,10 +45,11 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			]
 		2:
 			return [
-				_ability("recovery", 2, "Recovery", "Heal 15% of missing HP."),
+				_ability("recovery", 2, "Recovery", "Heal 10% of missing HP."),
 				_ability("frost_touch", 2, "Frost Touch", "Freeze all enemies for 5 seconds."),
 				_ability("iron_guard", 2, "Iron Guard", "Gain 25 Shield."),
 				_ability("triple_shot", 2, "Triple Shot", "Hit 3 random enemies for 8 each."),
+			_ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy."),
 			_ability("scatter_drop", 2, "Scatter Drop", "Drop 2 random balls (rank 1-3)."),
 			_ability("critical_strike", 2, "Critical Strike", "50% deal 8 to all enemies, else deal 8 to one."),
 			_ability("fireburn", 2, "FireBurn", "Burn all enemies (5 stacks)."),
@@ -61,17 +62,24 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("ice_shield", 3, "Ice Shield", "Gain 10 Shield and Freeze current enemy (5 stacks = 5s)."),
 				_ability("reinforce", 3, "Reinforce", "Gain +2 attack damage this battle (excludes DOT)."),
 				_ability("convert", 3, "Convert", "Upgrade 1 random ball in the box by +1 rank (this battle)."),
-				_ability("echo_shot", 3, "Echo Shot", "Reapply the last resolved damage + effect."),
-				_ability("charm", 3, "Charm", "All enemies redirect their next attack at each other (1 stack)."),
-			]
+			_ability("echo_shot", 3, "Echo Shot", "Reapply the last resolved damage + effect."),
+			_ability("charm", 3, "Charm", "All enemies redirect their next attack at each other (1 stack)."),
+			_ability("thunder_fang", 3, "Thunder Fang", "Deal 5% current HP to target and 5% to each other enemy. Apply 5 ⚡ stacks to target and 3 to others. Thundered enemies pass (stack)% of any damage they receive to every other thundered enemy."),
+			_ability("decay", 3, "Decay", "Permanently reduce the active enemy's max HP by 10 (5 stacks × 2). Clamps their current HP to the new max."),
+			_ability("regeneration", 3, "Regeneration", "Heal 3 HP per second for 10 seconds."),
+		]
 		4:
 			return [
 				_ability("greater_heal", 4, "Greater Heal", "Heal 30% of missing HP."),
 				_ability("bomb_orb", 4, "Bomb Orb", "After 10s, deal 50 damage to all enemies. Countdown shown on enemies."),
 				_ability("chain_spark", 4, "Chain Spark", "Hit 3 enemies — 10 → 20 → 40 damage (doubles each hit)."),
 				_ability("mirror_shield", 4, "Mirror Shield", "Reflect the next 2 incoming damage instances."),
-				_ability("corrupt_field", 4, "Corrupt Field", "Poison all enemies (12 stacks). This shoot, all poisoned enemies deal 20% less damage."),
-			]
+			_ability("corrupt_field", 4, "Corrupt Field", "Poison all enemies (12 stacks). This shoot, all poisoned enemies deal 20% less damage."),
+			_ability("tide_turner", 4, "Tide Turner", "Shot alongside X other balls: after all shots resolve, deal X × the total damage those balls dealt this turn."),
+			_ability("weakness_brand", 4, "Weakness Brand", "Mark the active enemy: they take 30% more direct damage for 3 shoots. (🔻 Brand indicator shown.)"),
+			_ability("lifesteal_field", 4, "Lifesteal Field", "This battle: heal 10% of all direct damage dealt to enemies (separate from DoT Siphon)."),
+			_ability("fortress", 4, "Fortress", "Gain 50 Shield. Take 15 HP damage (bypasses shield; cannot reduce HP below 1)."),
+		]
 		5:
 			return [
 				_ability("freeze_wave", 5, "Freeze Wave", "Freeze all enemies (3 stacks = 3s)."),
@@ -80,8 +88,10 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("upgrade_pulse", 5, "Upgrade Pulse", "Upgrade a random nearby ball by +1 rank."),
 				_ability("poison_rain", 5, "Poison Rain", "For 3 shoots: enemies gain poison stacks instead of losing them, and every hit adds +2 more. (☣ Rain indicator shown)"),
 				_ability("time_drift", 5, "Time Drift", "Slow time 10s. Damage you take in the first 5s is stored and reflected back to enemies over the final 5s."),
-				_ability("contagion", 5, "Contagion", "Copy current enemy debuffs to one random other enemy (stacks with theirs)."),
-			]
+			_ability("contagion", 5, "Contagion", "Copy current enemy debuffs to one random other enemy (stacks with theirs)."),
+			_ability("chaos_slash", 5, "Chaos Slash", "Strike 5 random targets for 15 each — can hit enemies or player. Each player hit inflicts Fragile: +20% damage taken until your next shoot."),
+			_ability("guillotine", 5, "Guillotine", "Deal damage equal to 25% of the active enemy's MISSING HP. (Stronger when enemy is already wounded.)"),
+		]
 		6:
 			return [
 				_ability("full_recovery", 6, "Full Recovery", "Restore 30% of max HP."),
@@ -90,8 +100,12 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("mass_morph", 6, "Mass Morph", "Upgrade all rank 1 and 2 balls in the box by +1."),
 				_ability("reflect_wall", 6, "Reflect Wall", "Reflect all incoming damage for 12 seconds."),
 				_ability("giant_core", 6, "Giant Core", "One rank 1-5 ball gets ×3 attack damage, triggers twice, ×2 size."),
-				_ability("dot_siphon", 6, "Siphon", "This battle: heal 20% of all DOT damage dealt to enemies."),
-			]
+			_ability("dot_siphon", 6, "Siphon", "This battle: heal 10% of all DOT damage dealt to enemies."),
+			_ability("gatekeeper", 6, "Gatekeeper", "The next 3 times you take damage, convert 50% of each hit into Shield."),
+			_ability("storm_surge", 6, "Storm Surge", "Deal 10% max HP to all enemies and apply 20 ⚡ thunder stacks to each."),
+			_ability("second_wind", 6, "Second Wind", "Trigger: when HP drops below 30%, instantly heal 40% max HP. If triggered again this battle, heals 10% missing HP instead. One trigger per low-HP event."),
+			_ability("overkill", 6, "Overkill", "Deal 40 damage to the active enemy. For the rest of this battle: excess damage from any kill spills to the next alive enemy."),
+		]
 		7:
 			return [
 			_ability("apocalypse", 7, "Apocalypse", "Deal 8 damage to all enemies 6 times (48 total)."),
@@ -100,9 +114,12 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			_ability("magic_flood", 7, "Magic Flood", "Apply 10 random enchantments (Poison 8 / Burn 3 / Freeze 3) each to a random enemy."),
 				_ability("miracle_cascade", 7, "Miracle Cascade", "Trigger one random ability from each of ranks 3, 4, and 5."),
 				_ability("sacrifice_nova", 7, "Sacrifice Nova", "Lose 50% current HP → deal 500 damage to all enemies after 10s."),
-				_ability("one_shower", 7, "1 Shower", "Spawn 10 rank 1-3 balls spread randomly across the box (1 per second for 10s)."),
-				_ability("dot_echo", 7, "Echo", "This battle: every DOT damage instance triggers twice."),
-			]
+				_ability("one_shower", 7, "Shower", "Spawn 10 rank 1-3 balls spread randomly across the box (1 per second for 10s)."),
+			_ability("dot_echo", 7, "Echo", "This battle: every DOT damage instance triggers twice."),
+			_ability("baators_flame", 7, "Baator's Flame", "Convert all DoT on enemies to Burn: Poison ×1.5, ⚡Thunder ×2, Freeze ×10 stacks."),
+			_ability("thunder_strike", 7, "Thunder Strike", "Strike each enemy for 2% of their current HP per ⚡ thunder stack they carry."),
+			_ability("elbaphs_power", 7, "Elbaph's Power", "For 15s: all ball sizes grow 0→+100% and direct damage scales 50→150%. Excludes DoT."),
+		]
 	return []
 
 

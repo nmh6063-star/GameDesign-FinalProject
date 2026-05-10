@@ -6,9 +6,13 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
-			_deal_single(ctx, 5 * clampi(rank, 1, 7), source)
+			_deal_single(ctx, 8 * clampi(rank, 1, 7), source)
 		"mend":
-			ctx.heal_player(10)
+			var lost_mend := maxi(0, PlayerState.player_max_health - PlayerState.player_health)
+			var heal_mend := maxi(1, int(round(float(lost_mend) * 0.05)))
+			ctx.heal_player(heal_mend)
+			var mend_dmg := maxi(1, int(round(float(heal_mend) * 0.10)))
+			_deal_single(ctx, mend_dmg, source)
 		"venom":
 			ctx.add_enemy_status(ctx.active_enemy(), "poison", 6)
 		"ember":
@@ -27,10 +31,10 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 2 ────────────────────────────────────────────────────────────
 		"heavy_strike":
-			_deal_single(ctx, 10, source)
+			_deal_single(ctx, 18, source)
 		"recovery":
 			var lost: int = maxi(0, PlayerState.player_max_health - PlayerState.player_health)
-			ctx.heal_player(int(round(lost * 0.15)))
+			ctx.heal_player(int(round(lost * 0.10)))
 		"frost_touch":
 			# Flat 5-second freeze on all enemies (5 stacks × 1 s each)
 			for e in _alive_enemies(ctx):
@@ -62,7 +66,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 3 ────────────────────────────────────────────────────────────
 		"power_slash":
-			_deal_single(ctx, 18, source)
+			_deal_single(ctx, 25, source)
 		"pollution":
 			# Doubles poison stacks on current target
 			var st := ctx.status_for_enemy(ctx.active_enemy())
@@ -91,6 +95,12 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			# All enemies redirect their next attack at each other (1 stack)
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "charm", 1)
+		"thunder_fang":
+			_thunder_fang(ctx)
+		"decay":
+			_decay(ctx)
+		"regeneration":
+			_regeneration(ctx)
 
 		# ── Rank 4 ────────────────────────────────────────────────────────────
 		"cleave":
@@ -108,6 +118,17 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "poison", 12)
 			ctx.battle_flags["corrupt_field_active"] = true
+		"tide_turner":
+			# Mark pending; resolved in battle_loop.try_shoot after all on_shot calls.
+			ctx.battle_flags["tide_turner_pending"] = true
+		"weakness_brand":
+			ctx.add_enemy_status(ctx.active_enemy(), "weakness_brand", 3)
+		"lifesteal_field":
+			ctx.player_statuses["direct_damage_heal_ratio"] = \
+					maxf(float(ctx.player_statuses.get("direct_damage_heal_ratio", 0.0)), 0.1)
+		"fortress":
+			ctx.add_player_shield(50)
+			ctx._damage_player_hp_only(15)
 
 		# ── Rank 5 ────────────────────────────────────────────────────────────
 		"critical_edge":
@@ -131,6 +152,10 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			_time_drift(ctx)
 		"contagion":
 			ctx.spread_debuffs_from_active_to_random_other()
+		"chaos_slash":
+			_chaos_slash(ctx)
+		"guillotine":
+			_guillotine(ctx, source)
 
 		# ── Rank 6 ────────────────────────────────────────────────────────────
 		"meteor_crash":
@@ -156,7 +181,19 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			_apply_giant_core(ctx)
 		"dot_siphon":
 			var cur_siphon := float(ctx.player_statuses.get("dot_damage_heal_ratio", 0.0))
-			ctx.player_statuses["dot_damage_heal_ratio"] = maxf(cur_siphon, 0.2)
+			ctx.player_statuses["dot_damage_heal_ratio"] = maxf(cur_siphon, 0.1)
+		"gatekeeper":
+			ctx.battle_flags["gatekeeper_charges"] = \
+					int(ctx.battle_flags.get("gatekeeper_charges", 0)) + 3
+		"storm_surge":
+			_storm_surge(ctx)
+		"second_wind":
+			ctx.player_statuses["second_wind_ready"]     = true
+			ctx.player_statuses["second_wind_main_used"] = false
+			ctx.player_statuses["second_wind_cooldown"]  = false
+		"overkill":
+			_deal_single(ctx, 40, source)
+			ctx.battle_flags["overkill_active"] = true
 
 		# ── Rank 7 ────────────────────────────────────────────────────────────
 		"final_judgment":
@@ -186,6 +223,12 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			_one_shower(ctx, source)
 		"dot_echo":
 			ctx.player_statuses["dot_triggers_twice"] = true
+		"baators_flame":
+			_baators_flame(ctx)
+		"thunder_strike":
+			_thunder_strike(ctx)
+		"elbaphs_power":
+			_elbaphs_power(ctx)
 
 	# Preserve last effect for Echo Shot (never record echo_shot itself)
 	if kind != "echo_shot":
@@ -514,7 +557,7 @@ static func _sacrifice_nova(ctx: BattleContext) -> void:
 	_schedule_damage_all(ctx, 10.0, 500)
 
 
-# ── 1 Shower ──────────────────────────────────────────────────────────────────
+# ── Shower ────────────────────────────────────────────────────────────────────
 
 static func _one_shower(ctx: BattleContext, source: BallBase) -> void:
 	if ctx.controller == null:
@@ -530,6 +573,134 @@ static func _one_shower(ctx: BattleContext, source: BallBase) -> void:
 			# INF lets BattleBallManager pick a fully random local X inside the box.
 			ctx.drop_element_ball_in_box(randi_range(1, 3), INF)
 		)
+
+
+# ── Decay ─────────────────────────────────────────────────────────────────────
+
+static func _decay(ctx: BattleContext) -> void:
+	var target := ctx.active_enemy()
+	if target == null:
+		return
+	# 5 stacks × 2 HP = 10 total permanent max-HP reduction
+	var orig_max := target.data.max_health if target.data != null else 1
+	target._battle_hp_reduction = mini(target._battle_hp_reduction + 10, orig_max - 1)
+	target.current_health = mini(target.current_health, target.max_health())
+
+
+# ── Regeneration ──────────────────────────────────────────────────────────────
+
+static func _regeneration(ctx: BattleContext) -> void:
+	if ctx.controller == null:
+		return
+	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
+	if tree == null:
+		return
+	for i in range(1, 11):
+		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
+		t.timeout.connect(func():
+			if ctx.controller != null:
+				ctx.heal_player(3)
+		)
+
+
+# ── Guillotine ────────────────────────────────────────────────────────────────
+
+static func _guillotine(ctx: BattleContext, source: BallBase) -> void:
+	var target := ctx.active_enemy()
+	if target == null:
+		return
+	var missing := target.max_health() - target.health()
+	var dmg := maxi(1, int(round(float(missing) * 0.25)))
+	ctx.damage_enemy(dmg, target)
+
+
+# ── Thunder Fang ──────────────────────────────────────────────────────────────
+
+static func _thunder_fang(ctx: BattleContext) -> void:
+	var target := ctx.active_enemy()
+	if target == null:
+		return
+	for e in _alive_enemies(ctx):
+		var dmg := maxi(1, int(round(float(e.health()) * 0.05)))
+		ctx.damage_enemy(dmg, e)
+		if e == target:
+			ctx.add_enemy_status(e, "thunder", 5)
+		else:
+			ctx.add_enemy_status(e, "thunder", 3)
+
+
+# ── Chaos Slash ───────────────────────────────────────────────────────────────
+
+static func _chaos_slash(ctx: BattleContext) -> void:
+	var enemies := _alive_enemies(ctx)
+	var hit_player := false
+	for _i in range(5):
+		var pool_size := enemies.size() + 1
+		if pool_size == 1:
+			# No enemies — all hits land on player
+			ctx._damage_player_raw(15)
+			hit_player = true
+			continue
+		var idx := randi() % pool_size
+		if idx < enemies.size():
+			ctx.damage_enemy(15, enemies[idx])
+		else:
+			ctx._damage_player_raw(15)
+			hit_player = true
+	if hit_player:
+		ctx.battle_flags["fragile_stacks"] = \
+				int(ctx.battle_flags.get("fragile_stacks", 0)) + 1
+
+
+# ── Storm Surge ───────────────────────────────────────────────────────────────
+
+static func _storm_surge(ctx: BattleContext) -> void:
+	for e in _alive_enemies(ctx):
+		var dmg := maxi(1, int(round(float(e.max_health()) * 0.10)))
+		ctx.damage_enemy(dmg, e)
+		ctx.add_enemy_status(e, "thunder", 20)
+
+
+# ── Baator's Flame ────────────────────────────────────────────────────────────
+
+static func _baators_flame(ctx: BattleContext) -> void:
+	var now := ctx.now_ms()
+	for e in _alive_enemies(ctx):
+		var st := ctx.status_for_enemy(e)
+		var poison  := int(st.get("poison_stack",  0))
+		var thunder := int(st.get("thunder_stack", 0))
+		var freeze_ms := int(st.get("freeze_until_ms", 0))
+		var freeze_secs := maxi(0, (freeze_ms - now) / 1000)
+		var burn_gain := int(round(float(poison)      * 1.5)) \
+					   + int(round(float(thunder)     * 2.0)) \
+					   + int(round(float(freeze_secs) * 10.0))
+		st["poison_stack"]    = 0
+		st["thunder_stack"]   = 0
+		st["freeze_until_ms"] = 0
+		if burn_gain > 0:
+			ctx.add_enemy_status(e, "burn", burn_gain)
+
+
+# ── Thunder Strike ────────────────────────────────────────────────────────────
+
+static func _thunder_strike(ctx: BattleContext) -> void:
+	for e in _alive_enemies(ctx):
+		var stacks := int(ctx.status_for_enemy(e).get("thunder_stack", 0))
+		if stacks <= 0:
+			continue
+		var dmg := maxi(1, int(round(float(e.health()) * float(stacks) * 0.02)))
+		ctx.damage_enemy(dmg, e)
+
+
+# ── Elbaph's Power ────────────────────────────────────────────────────────────
+
+static func _elbaphs_power(ctx: BattleContext) -> void:
+	ctx.battle_flags["elbaphs_power_start_ms"] = ctx.now_ms()
+	for ball in ctx.active_balls():
+		var st := ctx.ball_status_for(ball)
+		st["elbaphs_power"] = true
+		st["attack_mult"]   = 0.5
+		st["size_mult"]     = 1.0
 
 
 # ── Alive enemies helper ──────────────────────────────────────────────────────

@@ -13,6 +13,8 @@ signal action_requested
 var current_health := 0
 var current_shield := 0
 var _action_index := 0
+## Permanent max-HP reduction applied during battle (Decay ability). Reset on death/respawn.
+var _battle_hp_reduction := 0
 
 @onready var _sprite := $Sprite2D as Sprite2D
 @onready var _base_modulate: Color = _sprite.modulate
@@ -30,6 +32,7 @@ func setup() -> void:
 
 
 func reset() -> void:
+	_battle_hp_reduction = 0
 	current_health = max_health()
 	current_shield = max_shield()
 	_action_index = 0
@@ -45,7 +48,8 @@ func health() -> int:
 
 
 func max_health() -> int:
-	return data.max_health if data != null else 0
+	var base := data.max_health if data != null else 0
+	return maxi(1, base - _battle_hp_reduction)
 
 
 func shield() -> int:

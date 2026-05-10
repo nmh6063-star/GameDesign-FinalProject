@@ -33,7 +33,7 @@ CHANGELOG
       Poison 8 stacks / Burn 3 stacks / Freeze 3 stacks.
     - Apocalypse redesigned: 6 hits × 8 damage to all enemies (was 48 flat).
     - Final Judgment redesigned: 4 hits × 12 damage to current enemy (was 45 flat).
-    - 1 Shower: balls now spawn with the player's current element class texture
+    - Shower: balls now spawn with the player's current element class texture
       (matching queued setup balls). Position range shifted left so all 10 balls
       reliably land inside the box.
     - New API: BattleBallManager.drop_element_ball_at_x(rank, x) — element-aware
@@ -87,10 +87,12 @@ RANK 1
 --------------------------------------------------------------------------------
 
   Strike (DEFAULT)
-    Deal 5 damage to current enemy.
+    Deal 8 × rank damage to current enemy.  (R1: 8, R2: 16, R3: 24 …)
 
   Mend
-    Heal 5 HP.
+    Heal 5% of missing HP.
+    Then deal 10% of the amount healed as direct damage to the current enemy.
+    Example: 100 HP missing → heal 5, deal 1 damage to enemy.
 
   Venom
     Apply Poison (8 stacks) to current enemy.
@@ -126,12 +128,12 @@ RANK 1
 RANK 2
 --------------------------------------------------------------------------------
 
-  Heavy Strike (DEFAULT)
-    Deal 10 damage to one enemy.
+  Heavy Strike (DEFAULT / REWARD)
+    Deal 18 damage to current enemy.
 
   Recovery
-    Heal 15% of missing HP.
-    Example: max HP 100, current HP 60 → missing 40 → heal 6.
+    Heal 10% of missing HP.
+    Example: max HP 100, current HP 60 → missing 40 → heal 4.
 
   Frost Touch
     Freeze ALL enemies for 5 seconds.
@@ -155,6 +157,9 @@ RANK 2
   Toxic Burst
     Apply Poison (15 stacks) to ALL enemies.
 
+  Heavy Strike (reward — same as default)
+    Deal 18 damage to current enemy.
+
   --- Dark ---
 
   Dark Brew  [rank 2]
@@ -165,7 +170,7 @@ RANK 3
 --------------------------------------------------------------------------------
 
   Power Slash (DEFAULT)
-    Deal 30 damage to one enemy.
+    Deal 25 damage to current enemy.
 
   Pollution
     Double the current poison stack count on the current enemy.
@@ -193,6 +198,20 @@ RANK 3
   Charm
     Apply 1 charm stack to ALL enemies.
     Each enemy redirects their next attack at a random other enemy.
+
+  Thunder Fang
+    Deal 5% of current HP to the active target and 5% to every other enemy.
+    Apply 5 ⚡ thunder stacks to the target and 3 to all others.
+    Thunder stacks persist forever and cause chain damage (see Thunder Debuff below).
+
+  Decay
+    Permanently reduce the active enemy's max HP by 10 (5 stacks × 2) for this battle.
+    Their current HP is immediately clamped down to the new max.
+    Effect stacks across multiple uses; can never reduce max HP below 1.
+
+  Regeneration
+    Heal the player for 3 HP at the end of each of the next 10 seconds.
+    Total: 30 HP over 10 s. Multiple Regenerations run independently.
 
   --- Dark ---
 
@@ -225,6 +244,26 @@ RANK 4
     Apply Poison (12 stacks) to ALL enemies.
     For this shoot only: all enemies that have poison stacks deal 20% less damage
     to the player. (⚗ Wkn 1 indicator shown while active.)
+
+  Tide Turner
+    When this ball is shot alongside X other balls in the same turn:
+    after all on_shot effects resolve, deal X × (total damage dealt by those balls)
+    as bonus direct damage to the active enemy.
+    Example: shot with 2 others that dealt 30 damage total → deal 3 × 30 = 90 bonus.
+
+  Weakness Brand
+    Mark the active enemy for 3 shoots: they take 30% more direct damage.
+    (🔻 Brand ×N indicator on enemy status bar.)
+    Refreshes to 3 if applied again while still active.
+
+  Lifesteal Field
+    For the rest of this battle: heal 10% of every direct damage instance dealt
+    to any enemy. Separate from Siphon (which heals from DoT only).
+    (🩸 Lifesteal shown in player status bar.)
+
+  Fortress
+    Gain 50 Shield immediately.
+    Take 15 raw HP damage (bypasses shield, Gatekeeper, and Fragile; HP floored at 1).
 
   --- Dark ---
 
@@ -270,6 +309,17 @@ RANK 5
     Copy poison, burn, and charm stacks plus remaining freeze duration from the
     current enemy onto one random other enemy (adds to their existing debuffs).
 
+  Chaos Slash
+    Strike 5 random targets for 15 direct damage each.
+    Targets are chosen from ALL living enemies PLUS the player (equal weight).
+    Each time the player is hit: +1 Fragile stack.
+    Fragile: +20% damage taken per stack (all stacks clear at the end of this shoot).
+
+  Guillotine
+    Deal 25% of the active enemy's MISSING HP as direct damage.
+    Example: enemy has 200 max HP and 80 current HP → missing 120 → deal 30.
+    Deals at least 1 damage even if the enemy is at full health.
+
   --- Dark ---
 
   Biggering  [rank 5]
@@ -307,8 +357,31 @@ RANK 6
     Cannot be applied to a ball already giant.
 
   Siphon
-    For the rest of this battle: heal for 20% of all DOT damage dealt to enemies
+    For the rest of this battle: heal for 10% of all DOT damage dealt to enemies
     (_damage_enemy_dot paths).
+
+  Gatekeeper
+    The next 3 times the player takes damage:
+    50% of each hit is converted into Shield (added immediately).
+    The other 50% still hits (reduced by any existing shield after gain).
+    Charges shown as 🔰 GK×N in the player status bar.
+
+  Storm Surge
+    Deal 10% of each enemy's max HP as direct damage to ALL living enemies.
+    Apply 20 ⚡ thunder stacks to each enemy hit.
+    See Thunder Debuff below for chain mechanics.
+
+  Second Wind
+    Passive trigger: whenever HP drops below 30% of max (crossing threshold):
+      First trigger this battle → heal 40% of max HP.
+      Subsequent triggers      → heal 10% of missing HP.
+    One trigger per low-HP event (cooldown clears when HP recovers to ≥30%).
+    (💨 2nd Wind / 💨 2nd Wind+ shown in player status bar.)
+
+  Overkill
+    Immediately deal 40 direct damage to the active enemy.
+    For the rest of this battle: when any direct hit kills an enemy, the excess
+    damage (amount − enemy HP before hit) carries over to the next alive enemy.
 
   --- Dark ---
 
@@ -355,12 +428,30 @@ RANK 7
     Immediately lose 50% of current HP.
     After 10 seconds (real time), deal 500 damage to ALL enemies.
 
-  1 Shower
+  Shower
     Over 10 seconds, spawn 10 balls (rank 1–3) one per second.
     Each ball drops at a random X position spread across the full box width.
 
   Echo
     For the rest of this battle: every DOT damage instance triggers twice.
+
+  Baator's Flame
+    Convert ALL DoT status stacks on every living enemy into Burn:
+      Poison  → Burn ×1.5  (e.g. 20 poison → 30 burn stacks)
+      Thunder → Burn ×2    (e.g. 10 thunder → 20 burn stacks)
+      Freeze  → Burn ×10   (remaining seconds × 10 burn stacks)
+    Source stacks are cleared; only Burn remains.
+
+  Thunder Strike
+    For each living enemy that carries at least 1 ⚡ thunder stack:
+      Deal (enemy's current HP) × (2% per thunder stack) as direct damage.
+    Example: enemy with 200 HP and 15 stacks takes 200 × 0.30 = 60 damage.
+
+  Elbaph's Power
+    For 15 seconds, all balls on the board grow continuously:
+      Size multiplier:   1.0× → 2.0×   (full-size at 15 s)
+      Direct damage mult: 0.5× → 1.5×  (150% at 15 s)
+    Does NOT affect DoT damage.  Ball collision shapes scale in real-time.
 
   --- Dark ---
 
@@ -377,7 +468,7 @@ RANK 7
     50% chance: all enemies execute all of their actions 3 times.
     50% chance: deal 100 damage to current enemy AND trigger one random
     rank-7 rank ability (Apocalypse / Time Stop / Magic Flood /
-    Miracle Cascade / Sacrifice Nova / 1 Shower / Echo).
+    Miracle Cascade / Sacrifice Nova / Shower / Echo).
 
 --------------------------------------------------------------------------------
 PASSIVES (always active, type-wide)
@@ -429,6 +520,27 @@ MODIFIER BALLS (BallCatalog — queue pool & mana special slots)
   ball_virus — Virus Ball  (V)
     Touching behavior (partial / experimental): long contact halves ball
     value and can destroy balls.
+
+--------------------------------------------------------------------------------
+THUNDER DEBUFF MECHANIC
+--------------------------------------------------------------------------------
+
+  Applied by: Thunder Fang (R3), Storm Surge (R6).
+  Displayed as: ⚡ Thdr N  on the enemy's status bar (yellow).
+  Stacks last forever (never decay on their own).
+
+  When any enemy with N thunder stacks takes D damage (direct or DOT):
+    1. That enemy takes an extra D × N% damage (its own stacks resonate).
+    2. Every OTHER living enemy with M thunder stacks also takes D × M% as DoT.
+
+  Example — A(20), B(30), C(40) stacks; 100 direct damage on B:
+    B → 100 + 100×30% = 130 total
+    A → 100×20% = 20 DoT
+    C → 100×40% = 40 DoT
+
+  Chain damage uses the DOT path so it bypasses attack_bonus and clone stacks
+  but CAN trigger the Siphon heal and dot_echo (Echo) effects.
+  Recursion is guarded — thunder chain damage does NOT re-chain.
 
 ================================================================================
 END OF ABILITIES REFERENCE
