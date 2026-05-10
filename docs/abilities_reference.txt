@@ -148,8 +148,8 @@ RANK 2
     Spawn 2 random balls (rank 1–3) into the box.
 
   Critical Strike
-    50% chance: deal 8 damage to ALL enemies.
-    Otherwise: deal 8 damage to one enemy.
+    50% chance: deal 25 damage to current enemy.
+    Otherwise: deal 10 damage to current enemy.
 
   FireBurn
     Apply Burn (5 stacks) to ALL enemies.
@@ -203,11 +203,6 @@ RANK 3
     Deal 5% of current HP to the active target and 5% to every other enemy.
     Apply 5 ⚡ thunder stacks to the target and 3 to all others.
     Thunder stacks persist forever and cause chain damage (see Thunder Debuff below).
-
-  Decay
-    Permanently reduce the active enemy's max HP by 10 (5 stacks × 2) for this battle.
-    Their current HP is immediately clamped down to the new max.
-    Effect stacks across multiple uses; can never reduce max HP below 1.
 
   Regeneration
     Heal the player for 3 HP at the end of each of the next 10 seconds.
@@ -449,8 +444,8 @@ RANK 7
 
   Elbaph's Power
     For 15 seconds, all balls on the board grow continuously:
-      Size multiplier:   1.0× → 2.0×   (full-size at 15 s)
-      Direct damage mult: 0.5× → 1.5×  (150% at 15 s)
+      Size multiplier:        1.0× → 1.5×  (50% larger at 15 s)
+      Direct damage multiplier: 1.0× → 3.0×  (triple damage at 15 s)
     Does NOT affect DoT damage.  Ball collision shapes scale in real-time.
 
   --- Dark ---

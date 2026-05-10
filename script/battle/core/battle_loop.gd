@@ -862,8 +862,8 @@ func _update_elbaphs_power(delta: float) -> void:
 	if elapsed_ms >= 15000:
 		_context.battle_flags.erase("elbaphs_power_start_ms")
 	var t := clampf(float(elapsed_ms) / 15000.0, 0.0, 1.0)
-	var size_mult   := lerpf(1.0, 2.0, t)
-	var attack_mult := lerpf(0.5, 1.5, t)
+	var size_mult   := lerpf(1.0, 1.5, t)
+	var attack_mult := lerpf(1.0, 3.0, t)
 	for ball in active_balls():
 		var b := ball as BallBase
 		var st := _context.ball_status_for(b)

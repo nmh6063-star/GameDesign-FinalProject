@@ -288,7 +288,6 @@ func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
 	# Accumulate shoot damage for Tide Turner
 	battle_flags["shoot_damage_acc"] = int(battle_flags.get("shoot_damage_acc", 0)) + base
 	# Thunder chain: the struck enemy's stacks echo damage to all other thundered enemies
-	var actual_target := enemy if enemy != null else active_enemy()
 	if actual_target != null:
 		_propagate_thunder(base, actual_target)
 	# Poison Rain: each direct hit adds 2 poison stacks to the struck enemy.

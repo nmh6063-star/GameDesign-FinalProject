@@ -51,7 +51,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("triple_shot", 2, "Triple Shot", "Hit 3 random enemies for 8 each."),
 			_ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy."),
 			_ability("scatter_drop", 2, "Scatter Drop", "Drop 2 random balls (rank 1-3)."),
-			_ability("critical_strike", 2, "Critical Strike", "50% deal 8 to all enemies, else deal 8 to one."),
+			_ability("critical_strike", 2, "Critical Strike", "50% deal 25 to current enemy, else deal 10 to current enemy."),
 			_ability("fireburn", 2, "FireBurn", "Burn all enemies (5 stacks)."),
 			_ability("toxic_burst", 2, "Toxic Burst", "Poison all enemies (15 stacks)."),
 			]
@@ -65,7 +65,6 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			_ability("echo_shot", 3, "Echo Shot", "Reapply the last resolved damage + effect."),
 			_ability("charm", 3, "Charm", "All enemies redirect their next attack at each other (1 stack)."),
 			_ability("thunder_fang", 3, "Thunder Fang", "Deal 5% current HP to target and 5% to each other enemy. Apply 5 ⚡ stacks to target and 3 to others. Thundered enemies pass (stack)% of any damage they receive to every other thundered enemy."),
-			_ability("decay", 3, "Decay", "Permanently reduce the active enemy's max HP by 10 (5 stacks × 2). Clamps their current HP to the new max."),
 			_ability("regeneration", 3, "Regeneration", "Heal 3 HP per second for 10 seconds."),
 		]
 		4:
@@ -118,7 +117,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			_ability("dot_echo", 7, "Echo", "This battle: every DOT damage instance triggers twice."),
 			_ability("baators_flame", 7, "Baator's Flame", "Convert all DoT on enemies to Burn: Poison ×1.5, ⚡Thunder ×2, Freeze ×10 stacks."),
 			_ability("thunder_strike", 7, "Thunder Strike", "Strike each enemy for 2% of their current HP per ⚡ thunder stack they carry."),
-			_ability("elbaphs_power", 7, "Elbaph's Power", "For 15s: all ball sizes grow 0→+100% and direct damage scales 50→150%. Excludes DoT."),
+			_ability("elbaphs_power", 7, "Elbaph's Power", "For 15s: all ball sizes scale 1.0×→1.5× and direct damage scales 1.0×→3.0×. Excludes DoT."),
 		]
 	return []
 

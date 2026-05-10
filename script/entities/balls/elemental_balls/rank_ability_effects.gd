@@ -50,9 +50,9 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				_spawn_random_ball_rank_1_to_3(ctx, source)
 		"critical_strike":
 			if randi_range(1, 2) == 1:
-				_deal_all(ctx, 12, source)
+				_deal_single(ctx, 25, source)
 			else:
-				_deal_all(ctx, 6, source)
+				_deal_single(ctx, 10, source)
 		"fireburn":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "burn", 5)
@@ -97,8 +97,6 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				ctx.add_enemy_status(e, "charm", 1)
 		"thunder_fang":
 			_thunder_fang(ctx)
-		"decay":
-			_decay(ctx)
 		"regeneration":
 			_regeneration(ctx)
 
@@ -575,18 +573,6 @@ static func _one_shower(ctx: BattleContext, source: BallBase) -> void:
 		)
 
 
-# ── Decay ─────────────────────────────────────────────────────────────────────
-
-static func _decay(ctx: BattleContext) -> void:
-	var target := ctx.active_enemy()
-	if target == null:
-		return
-	# 5 stacks × 2 HP = 10 total permanent max-HP reduction
-	var orig_max := target.data.max_health if target.data != null else 1
-	target._battle_hp_reduction = mini(target._battle_hp_reduction + 10, orig_max - 1)
-	target.current_health = mini(target.current_health, target.max_health())
-
-
 # ── Regeneration ──────────────────────────────────────────────────────────────
 
 static func _regeneration(ctx: BattleContext) -> void:
@@ -699,7 +685,7 @@ static func _elbaphs_power(ctx: BattleContext) -> void:
 	for ball in ctx.active_balls():
 		var st := ctx.ball_status_for(ball)
 		st["elbaphs_power"] = true
-		st["attack_mult"]   = 0.5
+		st["attack_mult"]   = 1.0
 		st["size_mult"]     = 1.0
 
 
