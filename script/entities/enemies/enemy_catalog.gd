@@ -18,6 +18,7 @@ const IDS: Array[String] = [
 	"enemy_mage",
 	"enemy_machine_core",
 	"enemy_playground",
+	"enemy1-tutorial",
 ]
 const DATA_BY_ID := {
 	IDS[0]: preload("res://data/enemies/enemy1.tres"),
@@ -35,6 +36,7 @@ const DATA_BY_ID := {
 	IDS[12]: preload("res://data/enemies/enemy_mage.tres"),
 	IDS[13]: preload("res://data/enemies/enemy_machine_core.tres"),
 	IDS[14]: preload("res://data/enemies/enemy_playground.tres"),
+	IDS[15]: preload("res://data/enemies/enemy1-tutorial.tres"),
 }
 
 
