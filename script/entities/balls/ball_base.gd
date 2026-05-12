@@ -31,7 +31,6 @@ var element_list = []
 var _status_tag_label: Label
 var previous_velocity: Vector2
 
-
 func _ready() -> void:
 	if ui_preview:
 		gravity_scale = 0.0
@@ -75,63 +74,25 @@ func set_preview(ball_data: BallData, ball_rank: int) -> void:
 	set_collision_enabled(false)
 	refresh()
 
-func soften_alpha(img: Image):
-	var w = img.get_width()
-	var h = img.get_height()
-
-	var temp = Image.create(w, h, false, Image.FORMAT_RGBA8)
-
-	# number of blur passes (increase for stronger smoothing)
-	var passes = 3
-
-	for p in range(passes):
-		for y in range(h):
-			for x in range(w):
-				var sum = 0.0
-				var count = 0
-
-				# 5x5 kernel (stronger than before)
-				for oy in range(-2, 3):
-					for ox in range(-2, 3):
-						var nx = x + ox
-						var ny = y + oy
-
-						if nx >= 0 and nx < w and ny >= 0 and ny < h:
-							var c = img.get_pixel(nx, ny)
-							sum += c.a
-							count += 1
-
-				var avg = sum / max(count, 1)
-
-				var c = img.get_pixel(x, y)
-				c.a = avg
-				temp.set_pixel(x, y, c)
-
-		# copy back for next pass
-		img.copy_from(temp)
-
-func center(poly: PackedVector2Array, size: Vector2) -> PackedVector2Array:
-	var half = size * 0.5
-	var result = PackedVector2Array()
-
-	for p in poly:
-		result.append((p - half) * get_radius() * 0.05)
-
-	return result
-
-func get_texture_center_global(sprite: Sprite2D) -> Vector2:
-	if sprite.texture == null:
-		return sprite.global_position
-
-	var tex_size = sprite.texture.get_size()
-	var local_center = tex_size / 2
-
-	if sprite.centered:
-		local_center = Vector2.ZERO
-	else:
-		local_center -= sprite.offset
-
-	return sprite.to_global(local_center)
+func rank_to_color(rank):
+	match rank:
+		1:
+			return Color(0, 1.0, 0)
+		2:
+			return Color(0, 0, 1.0)
+		3:
+			return Color(0.5, 0, 0.5)
+		4:
+			return Color(1.0, 0, 0)
+		5:
+			return Color(1.0, 0.5, 0)
+		6:
+			return Color(1.0, 1.0, 0)
+		7:
+			return Color(1.0, 1.0, 1.0)
+		_:
+			return Color(1.0, 1.0, 1.0)
+		
 
 func percent_to_7(n: float) -> float:
 	var min_val = 1.0
@@ -145,49 +106,24 @@ func refresh() -> void:
 	if data == null:
 		return
 	var capsule := $Sprite2D as Sprite2D
-	var element_base := $base as Sprite2D
-	var element_overlay := $overlay as Sprite2D
-	element_base.visible = false
-	element_overlay.visible = false
 	capsule.visible = true
 	for elements in element_list:
 		if elements["element"].matching_function(self, elements["effect"]):
 			var polygon = get_node_or_null("Polygon2D")
 			if polygon:
 				polygon.queue_free()
-			var base = get_node_or_null("Sprite2D")
 			var overlay = get_node_or_null("overlay")
-			var collision = get_node_or_null("collision")
-			if get_node_or_null("collision") == null:
+			if get_node_or_null("overlay") == null:
 				overlay = Sprite2D.new()
 				overlay.name = "overlay"
-				collision = CollisionPolygon2D.new()
-				collision.name = "collision"
 				self.add_child(overlay)
-				self.add_child(collision)
-				get_node("CollisionShape2D").queue_free()
-			base.texture = elements["element"].get_sprite_files(elements["effect"])["base"][rank-1]
+			#base.texture = elements["element"].get_sprite_files(elements["effect"])["base"][rank-1]
 			overlay.texture = elements["element"].get_sprite_files(elements["effect"])["overlay"]
-			overlay.modulate = Color(0.68, 0.85, 0.9)
-			base.modulate = Color(percent_to_7(rank), percent_to_7(rank), percent_to_7(rank))
+			overlay.modulate = Color(0, 0, 0, 0.5)
+			capsule.modulate = rank_to_color(rank)
 			#base.scale = Vector2(1.0 + get_radius()/100.0, 1.0 + get_radius()/100.0)
 			overlay.scale = Vector2(get_radius()/25.0, get_radius()/25.0)
-			overlay.position.y = 25.0
 			typing = elements["element"].get_function_info(elements["effect"])["class"]
-			var image = base.texture.get_image()
-			image.convert(Image.FORMAT_RGBA8)
-			soften_alpha(image)
-			var bitmap = BitMap.new()
-			bitmap.create_from_image_alpha(image)
-			var polys = bitmap.opaque_to_polygons(
-				Rect2(Vector2.ZERO, image.get_size()),
-				0.5
-			)
-
-			var poly = center(polys[0], image.get_size())
-
-			collision.polygon = poly
-			collision.position = base.position + Vector2(0, 1.0)
 			break
 	_sync_rank()
 	_update_collision()
@@ -216,10 +152,7 @@ func die():
 	timer.one_shot = true
 	timer.timeout.connect(_on_timer_timeout)
 	self.freeze = true
-	if $collision:
-		$collision.disabled = true
-	else:
-		$CollisionShape2D.disabled = true
+	$CollisionShape2D.disabled = true
 	dying = true
 	queue_redraw()
 	timer.start()
@@ -243,7 +176,7 @@ func has_tag(tag: String) -> bool:
 func get_radius() -> float:
 	var plus = 0
 	if typing && !ui_preview:
-		plus = 25.0
+		plus = 15.0
 	var base = 20.0 if data == null else data.radius_for_rank(rank) + plus
 	if battle_context != null:
 		var mult := float(battle_context.ball_status_for(self).get("size_mult", 1.0))
@@ -329,7 +262,6 @@ func merge_into_me(ctx: BattleContext, merger: BallBase) -> void:
 	for elements in element_list:
 		if elements["element"].get_target_function(self, elements["effect"], "on_merge"):
 			elements["element"].on_merge(ctx, self, elements["effect"])
-	sound.play_sound_from_string("merge")
 	refresh()
 
 
@@ -342,9 +274,42 @@ func multiply_rank(multiplier: int = 2) -> void:
 func rank_state():
 	print("test")
 	
-
+func get_shapes_outer_x_bounds(
+) -> Dictionary:
+		var right_shape = get_node("/root/Main/Background/Box/left_bound").shape as RectangleShape2D
+		var left_shape = get_node("/root/Main/Background/Box/right_bound").shape as RectangleShape2D
+		var right_transform = get_node("/root/Main/Background/Box/left_bound").global_transform
+		var left_transform = get_node("/root/Main/Background/Box/right_bound").global_transform
+		
+		var left_half_width = left_shape.size.x / 2.0
+		var right_half_width = right_shape.size.x / 2.0
+		
+		var left_local_point = Vector2(-left_half_width - 10.0, 0)
+		var right_local_point = Vector2(right_half_width + 10.0, 0)
+		
+		var left_global_point = left_transform * left_local_point
+		var right_global_point = right_transform * right_local_point
+		
+		var circle_shape = get_node("CollisionShape2D").shape as CircleShape2D
+		var circle_transform = get_node("CollisionShape2D").global_transform
+		
+		var radius = circle_shape.radius
+		
+		var left_local_point2 = Vector2(-radius, 0)
+		var right_local_point2 = Vector2(radius, 0)
+		
+		var left_global_point2 = circle_transform * left_local_point2
+		var right_global_point2 = circle_transform * right_local_point2
+		
+		return {
+				"left": left_global_point.x,
+				"right": right_global_point.x,
+				"bounds": [left_global_point2.x, right_global_point2.x]
+		}
 
 func _physics_process(_delta: float) -> void:
+	if is_setup_ball():
+		$CollisionShape2D.disabled = false
 	if type.size() > 0:
 		var base_color = Vector3.ZERO
 		for i in type:
@@ -385,10 +350,20 @@ func _physics_process(_delta: float) -> void:
 	if (touchingDir == 'right' and linear_velocity.x < 0) or (touchingDir == 'left' and linear_velocity.x > 0):
 		touchingDir = ''
 	if Input.is_action_just_pressed("drop"):
-		sleeping = false
-		gravity_scale = GRAVITY_SCALE
-		set_up = false
-		dropped.emit()
+		#sleeping = false
+		#gravity_scale = GRAVITY_SCALE
+		#set_up = false
+		#dropped.emit()
+		pass
+	var xBounds = get_shapes_outer_x_bounds()
+	if is_setup_ball():
+		$CollisionShape2D.disabled = true
+	else:
+		print(linear_velocity)
+	if xBounds["bounds"][1] > xBounds["left"] and linear_velocity.x > 0:
+		linear_velocity.x = 0
+	elif xBounds["bounds"][0] < xBounds["right"] and linear_velocity.x < 0:
+		linear_velocity.x = 0
 		
 				
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -417,8 +392,8 @@ func _draw() -> void:
 		return
 	var radius := get_radius()
 	var color := data.display_color(rank)
-	#if dying:
-		#draw_arc(Vector2(0, 25.0), radius*0.5, 0.0, TAU, OUTLINE_POINTS, $base.modulate, radius, true)
+	if dying:
+		draw_arc(Vector2.ZERO, radius, 0.0, TAU, OUTLINE_POINTS, $Sprite2D.modulate, OUTLINE_WIDTH, true)
 	var sprite := $Sprite2D as Sprite2D
 	var scale := (radius * 2.0) / float(sprite.texture.get_width())
 	sprite.scale = Vector2.ONE * scale

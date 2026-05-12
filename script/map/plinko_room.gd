@@ -47,6 +47,7 @@ var _camera_base_offset   := Vector2.ZERO
 # Ability slots: maps slot name → {ability: Dictionary, rank: int}
 var _slot_abilities: Dictionary = {}
 
+const sound := preload("res://script/game_manager/sound_manager.gd")
 
 func _ready() -> void:
 	var gm := get_node_or_null("/root/GameManager")
@@ -76,6 +77,7 @@ func _ready() -> void:
 				child.body_entered.connect(_on_slot_body_entered.bind(child))
 
 	_refresh_drop_ui()
+	sound.play_sound_from_string("Jawbreaker", 0.5, true)
 
 
 # ── Assign a random rank ability to every slot ────────────────────────────────
@@ -180,6 +182,7 @@ func _drop_ball(local_pos: Vector2) -> void:
 	_drops_remaining -= 1
 
 	var ball := BALL_SCENE.instantiate() as RigidBody2D
+	ball.body_entered.connect(func(_body): sound.play_sound_from_string("peg_hit"))
 	ball.add_to_group("plinko_ball")
 	add_child(ball)
 	ball.position = local_pos
@@ -225,6 +228,11 @@ func _finalize_active_ball(slot_data) -> void:
 # ── Swap dialog ───────────────────────────────────────────────────────────────
 
 func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
+	for child in get_tree().root.get_children():
+		if child.name.contains("player"):
+			child.queue_free()
+	sound.play_sound_from_string("coin")
+	sound.play_sound_from_string("payout", 0.5, false, false)
 	var font: Font = load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
 
 	var overlay := CanvasLayer.new()
@@ -313,10 +321,12 @@ func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
 		PlayerState.equip_rank_ability(rank, new_ability)
 		overlay.queue_free()
 		_check_end())
+	swap_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
 
 	skip_btn.pressed.connect(func():
 		overlay.queue_free()
 		_check_end())
+	skip_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
 
 
 func _make_dialog_button(label_text: String, color: Color) -> Button:

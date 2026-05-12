@@ -1,27 +1,19 @@
 [gd_scene format=3 uid="uid://c05de2nvcjb74"]
 
-[ext_resource type="Script" uid="uid://b_event_room" path="res://script/map/event_room.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://cdqgg1wkgfth7" path="res://script/map/event_room.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://cv37c1rsrb6jg" path="res://assets/buttonTemplate.png" id="2_btn"]
 [ext_resource type="FontFile" uid="uid://bxb64wxaym54g" path="res://assets/dogica/TTF/dogicapixelbold.ttf" id="3_font"]
-[ext_resource type="PackedScene" uid="uid://cmap_player_hp_bar" path="res://scenes/map/map_player_health_bar.tscn" id="4_map_hp"]
+[ext_resource type="PackedScene" path="res://scenes/map/map_player_health_bar.tscn" id="4_map_hp"]
 
 [node name="EventRoom" type="Node2D" unique_id=2015461015]
 script = ExtResource("1_script")
 
-[node name="MapHud" type="CanvasLayer" parent="."]
+[node name="MapHud" type="CanvasLayer" parent="." unique_id=320882438]
 layer = 15
 
-[node name="PlayerHealthBar" parent="MapHud" instance=ExtResource("4_map_hp")]
-layout_mode = 1
-anchors_preset = 0
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -348.0
-offset_top = 28.0
-offset_right = -24.0
-offset_bottom = 66.0
-grow_horizontal = 0
-grow_vertical = 0
+[node name="PlayerHealthBar" parent="MapHud" unique_id=453415719 instance=ExtResource("4_map_hp")]
+layout_mode = 3
+anchors_preset = 1
 
 [node name="Background" type="ColorRect" parent="." unique_id=1565285003]
 anchors_preset = 15

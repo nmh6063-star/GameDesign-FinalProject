@@ -14,14 +14,19 @@ const PLINKO_SCENE := "res://scenes/plinko_room.tscn"
 @onready var _info_label := $ConversationUI/Center/VBox/GoldInfo as Label
 @onready var _map_hp_bar := $MapHud/PlayerHealthBar
 
+const sound := preload("res://script/game_manager/sound_manager.gd")
+
 var _used := false
 
 
 func _ready() -> void:
 	_update_labels()
 	_sync_map_hp_bar()
+	_heal_button.pressed.connect(sound.play_sound_from_string.bind("heal", 0.5, false, false))
 	_heal_button.pressed.connect(_on_heal)
+	_heal_button.pressed.connect(sound.play_sound_from_string.bind("click"))
 	_gamble_button.pressed.connect(_on_gamble)
+	_gamble_button.pressed.connect(sound.play_sound_from_string.bind("click"))
 
 
 func _update_labels() -> void:
@@ -55,6 +60,7 @@ func _on_heal() -> void:
 		+ "You recover [b]%d HP[/b].[/center]" % heal_amount
 	)
 	await get_tree().create_timer(1.4).timeout
+	sound.play_sound_from_string.bind("Beneath The Mask", 0.25, true)
 	if is_inside_tree():
 		GameManager.complete_current_room()
 

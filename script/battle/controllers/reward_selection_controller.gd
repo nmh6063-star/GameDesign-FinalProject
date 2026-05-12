@@ -56,6 +56,8 @@ var _ability_hover_stat: Label
 ## Tracks hover content so we only reflow the tip when the target changes ("rank:3", "reward:1", …).
 var _hover_tip_key: String = ""
 
+const sound := preload("res://script/game_manager/sound_manager.gd")
+
 
 func _ready() -> void:
 	_build_style_templates()
@@ -68,14 +70,18 @@ func _ready() -> void:
 	set_process(true)
 	_collection_button().pressed.connect(_on_collection_pressed)
 	_next_button().pressed.connect(_on_next_pressed)
+	_next_button().pressed.connect(sound.play_sound_from_string.bind("click"))
 	for i in range(REWARD_SLOT_COUNT):
 		var card := _reward_card(i)
 		card.pressed.connect(_on_reward_card_pressed.bind(i))
+		card.pressed.connect(sound.play_sound_from_string.bind("click"))
 		var orb := _reward_orb(i)
 		if orb != null:
 			orb.pressed.connect(_on_reward_card_pressed.bind(i))
+			orb.pressed.connect(sound.play_sound_from_string.bind("click"))
 		card.disabled = true
 	_begin_rank_pick_phase()
+	sound.play_sound_from_string("Beneath the Mask", 0.25, true)
 
 
 func _process(_delta: float) -> void:

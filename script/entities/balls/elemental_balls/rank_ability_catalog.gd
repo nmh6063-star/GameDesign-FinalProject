@@ -8,7 +8,7 @@ const ELEMENT_TYPE := "Rank"
 
 static func default_element_for_rank(rank: int) -> Dictionary:
 	var r := clampi(rank, 1, 7)
-	var dmg := 8 * r
+	var dmg := 8
 	return _ability("strike", r, "Strike", "Deal %d damage to current enemy." % dmg)
 
 
@@ -37,9 +37,9 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 		1:
 			return [
 				_ability("mend", 1, "Mend", "Heal 5% of missing HP. Deal 10% of the amount healed as damage to the current enemy."),
-				_ability("venom", 1, "Venom", "Poison current enemy (8 stacks)."),
+				_ability("venom", 1, "Venom", "Poison current enemy (5 stacks)."),
 				_ability("ember", 1, "Ember", "Burn all enemies (3 stacks). Deals 1 damage/sec per stack."),
-				_ability("guard", 1, "Guard", "Gain 5 Shield."),
+				_ability("guard", 1, "Guard", "Gain 20 Shield."),
 				_ability("critical", 1, "Critical", "50% deal 5 to all enemies, else deal 5 to current enemy."),
 				_ability("refresh", 1, "Refresh", "Gain +1 mana."),
 			]
@@ -47,25 +47,25 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			return [
 				_ability("recovery", 2, "Recovery", "Heal 10% of missing HP."),
 				_ability("frost_touch", 2, "Frost Touch", "Freeze all enemies for 5 seconds."),
-				_ability("iron_guard", 2, "Iron Guard", "Gain 25 Shield."),
-				_ability("triple_shot", 2, "Triple Shot", "Hit 3 random enemies for 8 each."),
+				_ability("iron_guard", 2, "Iron Guard", "Gain 80 Shield."),
+				_ability("triple_shot", 2, "Triple Shot", "Hit 4 random enemies for 6 each."),
 			_ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy."),
 			_ability("scatter_drop", 2, "Scatter Drop", "Drop 2 random balls (rank 1-3)."),
-			_ability("critical_strike", 2, "Critical Strike", "50% deal 25 to current enemy, else deal 10 to current enemy."),
+			_ability("critical_strike", 2, "Critical Strike", "50% deal 30 to current enemy, else deal 10 to current enemy."),
 			_ability("fireburn", 2, "FireBurn", "Burn all enemies (5 stacks)."),
-			_ability("toxic_burst", 2, "Toxic Burst", "Poison all enemies (15 stacks)."),
+			_ability("toxic_burst", 2, "Toxic Burst", "Apply Poison (6 stacks) to 2 random enemies."),
 			]
 		3:
 			return [
 				_ability("pollution", 3, "Pollution", "Double poison stacks on current enemy."),
 				_ability("fireball", 3, "Fireball", "Hit 2 random enemies for 8 each and apply Burn (8 stacks) to each."),
-				_ability("ice_shield", 3, "Ice Shield", "Gain 10 Shield and Freeze current enemy (5 stacks = 5s)."),
+				_ability("ice_shield", 3, "Ice Shield", "Gain 50 Shield and Freeze current enemy (5 stacks = 5s)."),
 				_ability("reinforce", 3, "Reinforce", "Gain +2 attack damage this battle (excludes DOT)."),
 				_ability("convert", 3, "Convert", "Upgrade 1 random ball in the box by +1 rank (this battle)."),
 			_ability("echo_shot", 3, "Echo Shot", "Reapply the last resolved damage + effect."),
 			_ability("charm", 3, "Charm", "All enemies redirect their next attack at each other (1 stack)."),
 			_ability("thunder_fang", 3, "Thunder Fang", "Deal 5% current HP to target and 5% to each other enemy. Apply 5 ⚡ stacks to target and 3 to others. Thundered enemies pass (stack)% of any damage they receive to every other thundered enemy."),
-			_ability("regeneration", 3, "Regeneration", "Heal 3 HP per second for 10 seconds."),
+			_ability("regeneration", 3, "Regeneration", "Heal 20 HP per second for 10 seconds (200 HP total)."),
 		]
 		4:
 			return [
@@ -73,7 +73,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("bomb_orb", 4, "Bomb Orb", "After 10s, deal 50 damage to all enemies. Countdown shown on enemies."),
 				_ability("chain_spark", 4, "Chain Spark", "Hit 3 enemies — 10 → 20 → 40 damage (doubles each hit)."),
 				_ability("mirror_shield", 4, "Mirror Shield", "Reflect the next 2 incoming damage instances."),
-			_ability("corrupt_field", 4, "Corrupt Field", "Poison all enemies (12 stacks). This shoot, all poisoned enemies deal 20% less damage."),
+			_ability("corrupt_field", 4, "Corrupt Field", "Poison all enemies (9 stacks). This shoot, all poisoned enemies deal 20% less damage."),
 			_ability("tide_turner", 4, "Tide Turner", "Shot alongside X other balls: after all shots resolve, deal X × the total damage those balls dealt this turn."),
 			_ability("weakness_brand", 4, "Weakness Brand", "Mark the active enemy: they take 30% more direct damage for 3 shoots. (🔻 Brand indicator shown.)"),
 			_ability("lifesteal_field", 4, "Lifesteal Field", "This battle: heal 10% of all direct damage dealt to enemies (separate from DoT Siphon)."),

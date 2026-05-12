@@ -4,13 +4,13 @@
 [ext_resource type="Script" uid="uid://bhnoaq5lxpmfo" path="res://script/battle/core/battle_loop.gd" id="2_gm"]
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
-[ext_resource type="Script" uid="uid://criai3atwptwp" path="res://script/ui/limit_hud.gd" id="9_jkv2x"]
+[ext_resource type="Texture2D" uid="uid://cwkwc8veij7iu" path="res://assets/white.jpg" id="8_muem4"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
-[ext_resource type="Script" uid="uid://cpctoqyaugfnj" path="res://script/ui/line_limit.gd" id="13_a8y0u"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="14_a8y0u"]
 [ext_resource type="Script" uid="uid://iukvcakcydbb" path="res://script/ui/stats_hud.gd" id="15_statshud"]
+[ext_resource type="Texture2D" uid="uid://703ku8dm3a5w" path="res://assets/frost.png" id="16_jbj1t"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="17_dp3eg"]
 [ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="21_ring"]
 [ext_resource type="Script" uid="uid://cnatsjj6h2nci" path="res://script/ui/combo_hud.gd" id="22_combo"]
@@ -82,16 +82,16 @@ corner_radius_bottom_left = 20
 friction = 2.5
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_trceg"]
-size = Vector2(455, 743.5)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_a8y0u"]
-size = Vector2(1807.0571, 369.89984)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_jbj1t"]
-size = Vector2(69.99997, 898)
+size = Vector2(416.5, 743.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_jkv2x"]
-size = Vector2(760, 41.99997)
+size = Vector2(912, 145)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_muem4"]
+size = Vector2(469, 647)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_a8y0u"]
+size = Vector2(1807.0571, 54.924606)
 
 [node name="Main" type="Node2D" unique_id=1625147204]
 position = Vector2(328, 323)
@@ -180,6 +180,35 @@ texture = ExtResource("12_indicator")
 script = ExtResource("2_gm")
 
 [node name="UI" type="CanvasLayer" parent="." unique_id=1800000000]
+
+[node name="Effects" type="Control" parent="UI" unique_id=505197911]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Image" type="TextureRect" parent="UI/Effects" unique_id=312463753]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("16_jbj1t")
+
+[node name="Color" type="TextureRect" parent="UI/Effects" unique_id=1395769825]
+visible = false
+modulate = Color(1, 1, 1, 0.19607843)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_muem4")
 
 [node name="BallQueue" type="Control" parent="UI" unique_id=1041509987]
 layout_mode = 3
@@ -576,36 +605,6 @@ offset_right = 124.0
 offset_bottom = 8.0
 color = Color(0.9607843, 0.8, 0.12156863, 1)
 
-[node name="LineLimit" type="Control" parent="UI" unique_id=1133250344]
-layout_mode = 3
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -88.0
-offset_top = -148.0
-offset_right = -48.0
-offset_bottom = -108.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("9_jkv2x")
-
-[node name="RichTextLabel" type="RichTextLabel" parent="UI/LineLimit" unique_id=1879806430]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-pivot_offset = Vector2(19.5, 20.5)
-text = "0"
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Timer" type="Timer" parent="UI/LineLimit" unique_id=169813689]
-one_shot = true
-
 [node name="GameOver" type="CenterContainer" parent="UI" unique_id=555100001]
 visible = false
 offset_right = 1152.0
@@ -685,6 +684,36 @@ theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 12
 text = "All enemies defeated."
 horizontal_alignment = 1
+
+[node name="OverEffects" type="Control" parent="UI" unique_id=611375903]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Image" type="TextureRect" parent="UI/OverEffects" unique_id=1788480312]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("16_jbj1t")
+
+[node name="Color" type="TextureRect" parent="UI/OverEffects" unique_id=2091611010]
+visible = false
+modulate = Color(1, 1, 1, 0.19607843)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("8_muem4")
 
 [node name="Aim" type="Node2D" parent="." unique_id=2058900465]
 
@@ -1179,13 +1208,14 @@ position = Vector2(56, 109)
 physics_material_override = SubResource("PhysicsMaterial_surface")
 
 [node name="Interior" type="Polygon2D" parent="Background/Box" unique_id=1908746543]
-position = Vector2(8, -5)
+position = Vector2(101.791214, -5)
+scale = Vector2(0.4931319, 1)
 color = Color(0.24, 0.06, 0.31, 1)
 polygon = PackedVector2Array(-176, -195, 552, -195, 552, 213, -176, 213)
 
 [node name="box_left2" type="Polygon2D" parent="Background/Box" unique_id=1908746544]
-position = Vector2(14, -226)
-scale = Vector2(1, 10.75)
+position = Vector2(100, -220)
+scale = Vector2(0.50789475, 10.75)
 color = Color(0.55, 0.45, 0.63, 1)
 polygon = PackedVector2Array(-198, 2.4186058, -166, 2.4186058, -166, 38.88372, 530, 38.88372, 530, 2.4186058, 562, 2.4186058, 562, 41.860466, -198, 41.860466)
 uv = PackedVector2Array(-200, 0, -160.48761, 0, -146.41681, 0, -56.703583, 0, 0.3521576, 0, 164.01239, 0, 200, 0, 200, 40, -136.33289, 40, -200, 40)
@@ -1195,119 +1225,21 @@ position = Vector2(8, 16)
 scale = Vector2(7.6547318, 8.198811)
 polygon = PackedVector2Array(-25.082525, -26.345284, -25.082525, 25.369534, 74.20247, 25.369534, 74.20247, -26.345284, 70.02205, -26.345284, 70.02205, 21.466526, -20.902103, 21.466526, -20.902103, -26.345284)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Box" unique_id=183793935]
-position = Vector2(-398.5, 155.25)
+[node name="left_bound" type="CollisionShape2D" parent="Background/Box" unique_id=183793935]
+position = Vector2(-196, 120)
 shape = SubResource("RectangleShape2D_trceg")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="Background/Box" unique_id=1075060659]
-position = Vector2(624, 0)
-shape = SubResource("RectangleShape2D_trceg")
+[node name="top_bound" type="CollisionShape2D" parent="Background/Box" unique_id=1306062777]
+position = Vector2(200, -266)
+shape = SubResource("RectangleShape2D_jkv2x")
 
-[node name="CollisionShape2D3" type="CollisionShape2D" parent="Background/Box" unique_id=2010969369]
-position = Vector2(148, 419.1034)
+[node name="right_bound" type="CollisionShape2D" parent="Background/Box" unique_id=1075060659]
+position = Vector2(607, 57)
+shape = SubResource("RectangleShape2D_muem4")
+
+[node name="bottom_bound" type="CollisionShape2D" parent="Background/Box" unique_id=2010969369]
+position = Vector2(149, 233.0517)
 scale = Vector2(0.9983083, 1.1997659)
 shape = SubResource("RectangleShape2D_a8y0u")
 
-[node name="Limit" type="Node2D" parent="Background" unique_id=876298834]
-position = Vector2(0, -67)
-rotation = -1.5707964
-script = ExtResource("13_a8y0u")
-
-[node name="StaticBody2D" type="StaticBody2D" parent="Background/Limit" unique_id=1093467990]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Limit/StaticBody2D" unique_id=339860119]
-position = Vector2(76.99997, 270)
-shape = SubResource("RectangleShape2D_jbj1t")
-
-[node name="Area2D" type="Area2D" parent="Background/Limit" unique_id=1377853102]
-position = Vector2(-312, -1.3987647e-06)
-rotation = 1.5707964
-scale = Vector2(1.8, 1.8)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Background/Limit/Area2D" unique_id=543735123]
-position = Vector2(140.00002, -208.8889)
-scale = Vector2(0.5555556, 0.5555556)
-shape = SubResource("RectangleShape2D_jkv2x")
-
-[node name="Indicator6" type="Sprite2D" parent="Background/Limit" unique_id=60190688]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199982, -83.2)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator7" type="Sprite2D" parent="Background/Limit" unique_id=1676875058]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199978, -27.199999)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator8" type="Sprite2D" parent="Background/Limit" unique_id=1667927655]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199974, 28.800001)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator9" type="Sprite2D" parent="Background/Limit" unique_id=226431649]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199974, 84.80002)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator10" type="Sprite2D" parent="Background/Limit" unique_id=219717652]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199974, 140.80002)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator11" type="Sprite2D" parent="Background/Limit" unique_id=1291136728]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199982, 196.80002)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator12" type="Sprite2D" parent="Background/Limit" unique_id=1456147676]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199978, 252.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator13" type="Sprite2D" parent="Background/Limit" unique_id=391565968]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199974, 308.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator14" type="Sprite2D" parent="Background/Limit" unique_id=1340067398]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.19997, 364.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator15" type="Sprite2D" parent="Background/Limit" unique_id=1635652383]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199966, 420.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator16" type="Sprite2D" parent="Background/Limit" unique_id=28687514]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199963, 476.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator17" type="Sprite2D" parent="Background/Limit" unique_id=619099257]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199959, 532.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[node name="Indicator18" type="Sprite2D" parent="Background/Limit" unique_id=2020495291]
-modulate = Color(1, 1, 1, 0.5019608)
-position = Vector2(27.199955, 588.8)
-scale = Vector2(1.8, 1.8)
-texture = ExtResource("12_indicator")
-
-[connection signal="timeout" from="UI/LineLimit/Timer" to="UI/LineLimit" method="_on_timer_timeout"]
 [connection signal="timeout" from="PlayerHolder/Player/Timer" to="PlayerHolder/Player" method="_on_timer_timeout"]
-[connection signal="body_entered" from="Background/Limit/Area2D" to="Background/Limit" method="_on_area_2d_body_entered"]
-[connection signal="body_exited" from="Background/Limit/Area2D" to="Background/Limit" method="_on_area_2d_body_exited"]

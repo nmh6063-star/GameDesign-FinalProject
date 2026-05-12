@@ -87,7 +87,7 @@ RANK 1
 --------------------------------------------------------------------------------
 
   Strike (DEFAULT)
-    Deal 8 × rank damage to current enemy.  (R1: 8, R2: 16, R3: 24 …)
+    Deal 8 damage to current enemy (flat, all ranks).
 
   Mend
     Heal 5% of missing HP.
@@ -95,13 +95,13 @@ RANK 1
     Example: 100 HP missing → heal 5, deal 1 damage to enemy.
 
   Venom
-    Apply Poison (8 stacks) to current enemy.
+    Apply Poison (5 stacks) to current enemy.
 
   Ember
     Apply Burn (3 stacks) to ALL enemies.
 
   Guard
-    Gain 5 Shield.
+    Gain 20 Shield.
 
   Critical
     50% chance: deal 5 damage to ALL enemies.
@@ -139,23 +139,23 @@ RANK 2
     Freeze ALL enemies for 5 seconds.
 
   Iron Guard
-    Gain 25 Shield.
+    Gain 80 Shield.
 
   Triple Shot
-    Hit 3 random enemies for 8 damage each (same enemy can be hit twice).
+    Hit 4 random enemies for 6 damage each (same enemy can be hit more than once).
 
   Scatter Drop
     Spawn 2 random balls (rank 1–3) into the box.
 
   Critical Strike
-    50% chance: deal 25 damage to current enemy.
+    50% chance: deal 30 damage to current enemy.
     Otherwise: deal 10 damage to current enemy.
 
   FireBurn
     Apply Burn (5 stacks) to ALL enemies.
 
   Toxic Burst
-    Apply Poison (15 stacks) to ALL enemies.
+    Apply Poison (6 stacks) to 2 random enemies (can hit the same enemy twice).
 
   Heavy Strike (reward — same as default)
     Deal 18 damage to current enemy.
@@ -180,7 +180,7 @@ RANK 3
     Each hit also applies Burn (8 stacks) to that enemy.
 
   Ice Shield
-    Gain 10 Shield.
+    Gain 50 Shield.
     Freeze current enemy for 5 seconds.
 
   Reinforce
@@ -205,8 +205,8 @@ RANK 3
     Thunder stacks persist forever and cause chain damage (see Thunder Debuff below).
 
   Regeneration
-    Heal the player for 3 HP at the end of each of the next 10 seconds.
-    Total: 30 HP over 10 s. Multiple Regenerations run independently.
+    Heal the player for 20 HP at the end of each of the next 10 seconds.
+    Total: 200 HP over 10 s. Multiple Regenerations run independently.
 
   --- Dark ---
 
@@ -236,7 +236,7 @@ RANK 4
     Does not reflect status effects.
 
   Corrupt Field
-    Apply Poison (12 stacks) to ALL enemies.
+    Apply Poison (9 stacks) to ALL enemies.
     For this shoot only: all enemies that have poison stacks deal 20% less damage
     to the player. (⚗ Wkn 1 indicator shown while active.)
 
