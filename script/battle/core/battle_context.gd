@@ -6,6 +6,7 @@ enum Phase { PLAY, RESOLVE }
 const MAX_MANA_PIPES := 5
 const MERGES_PER_MANA_PIPE := 5
 var COMBO_TIMEOUT := 5.0
+var BACK_TO_BACK_TIMEOUT := 0.25
 
 var controller
 var phase := Phase.PLAY
@@ -16,7 +17,9 @@ var merge_progress := 0
 var battle_result_text := ""
 var slow_mo_active := false
 var combo := 0
+var back2back := 0
 var combo_timer := 0.0
+var b2b_timer := BACK_TO_BACK_TIMEOUT
 var enemy_statuses := {}
 var player_statuses := {
 	"shield": 0,
@@ -42,6 +45,8 @@ var ball_statuses := {}
 # Enemy whose attack is currently being redirected by Charm
 var _charm_redirect_source: EnemyBase = null
 
+const sound := preload("res://script/game_manager/sound_manager.gd")
+
 
 func _init(p_controller = null) -> void:
 	controller = p_controller
@@ -58,6 +63,8 @@ func reset_for_battle() -> void:
 	slow_mo_active = false
 	combo = 0
 	combo_timer = 0.0
+	back2back = 0
+	b2b_timer = 0.0
 	enemy_statuses.clear()
 	ball_statuses.clear()
 	player_statuses = {
@@ -108,6 +115,8 @@ func has_battle_result() -> bool:
 
 
 func combo_multiplier() -> float:
+	return 1.0 + snapped(float(combo) / 7.0, 0.01)
+	"""
 	if combo < 3:
 		return 1.0
 	if combo < 5:
@@ -123,6 +132,7 @@ func combo_multiplier() -> float:
 	if combo < 20:
 		return 2.7
 	return 3
+	"""
 
 
 func combo_timer_ratio() -> float:
@@ -142,11 +152,73 @@ func tick_combo(delta: float) -> void:
 	if controller != null:
 		controller.sync_combo_hud()
 
+func tick_b2b(delta: float) -> void:
+	if back2back <= 0:
+		return
+	b2b_timer -= delta
+	if b2b_timer <= 0.0:
+		b2b_timer = 0
+		back2back = 0
+	
+func create_floating_text(text: int, global_pos: Vector2):
+	var label = Label.new()
+	
+	label.text = str(text) + "x"
+	#remember to change font
+	#label.add_theme_font_override("font", font)
+	label.add_theme_font_size_override("font_size", text * 5.0)
+	label.add_theme_color_override("font_color", Color.WHITE)
+	
+	# Yellow outline/highlight
+	label.add_theme_color_override("font_outline_color", Color.YELLOW)
+	label.add_theme_constant_override("outline_size", 3)
+	
+	label.z_index = 100
+	
+	label.modulate = Color(1, 1, 1, 1)
+	
+	Engine.get_main_loop().root.get_node("Main").add_child(label)
+	
+	# Wait for the label to size itself
+	await Engine.get_main_loop().process_frame
+	
+	# Center the text on the position
+	label.global_position = global_pos - (label.size / 2)
+	
+	# Create tween
+	var tween = Engine.get_main_loop().create_tween()
+	
+	# Move upward
+	tween.parallel().tween_property(
+		label,
+		"global_position:y",
+		label.global_position.y - 50,
+		1.0
+	)
+	
+	# Fade out
+	tween.parallel().tween_property(
+		label,
+		"modulate:a",
+		0.0,
+		1.0
+	)
+	
+	# Delete when finished
+	tween.finished.connect(func():
+		label.queue_free()
+	)
 
-func register_merge() -> void:
+func register_merge(ball: Node2D) -> void:
+	sound.play_sound_from_string("merge", null, false, true, float(back2back) / 10.0)
 	combo += 1
-	COMBO_TIMEOUT -= clampf(0.1 / (combo/2.0), 0.25, 5.0)
+	COMBO_TIMEOUT -= clampf(0.1 / (float(combo)/2.0), 0.25, 5.0)
 	combo_timer = COMBO_TIMEOUT
+	back2back += 1
+	b2b_timer = BACK_TO_BACK_TIMEOUT
+	if(back2back > 1):
+		combo += back2back
+		create_floating_text(back2back, ball.global_position)
 	if combo > int(battle_flags.get("max_combo_reached", 0)):
 		battle_flags["max_combo_reached"] = combo
 	if mana_pipes < MAX_MANA_PIPES:

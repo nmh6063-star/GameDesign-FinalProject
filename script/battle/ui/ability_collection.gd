@@ -2,6 +2,7 @@ extends CanvasLayer
 
 const RankAbilityCatalog := preload("res://script/entities/balls/elemental_balls/rank_ability_catalog.gd")
 const FONT := preload("res://assets/dogica/TTF/dogicabold.ttf")
+const sound := preload("res://script/game_manager/sound_manager.gd")
 
 
 func _ready() -> void:
@@ -14,6 +15,7 @@ func _ready() -> void:
 		tabs.set_tab_title(i, "Rank %d" % (i + 1))
 	tabs.current_tab = 0
 	$Overlay/Card/Close.pressed.connect(queue_free)
+	$Overlay/Card/Close.pressed.connect(sound.play_sound_from_string.bind("click"))
 
 
 func _build_rank_page(rank: int) -> Control:
@@ -87,3 +89,7 @@ func _ability_card(row: Dictionary) -> Control:
 	fn.custom_minimum_size = Vector2(INNER_TEXT_W, 0)
 	vb.add_child(fn)
 	return outer
+
+
+func _on_tab_container_tab_changed(tab: int) -> void:
+	sound.play_sound_from_string("click")

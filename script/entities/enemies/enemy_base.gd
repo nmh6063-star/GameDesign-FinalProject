@@ -13,6 +13,8 @@ signal action_requested
 var current_health := 0
 var current_shield := 0
 var _action_index := 0
+var scaler = randi_range(0, 100)
+var scale_dir = false
 
 @onready var _sprite := $Sprite2D as Sprite2D
 @onready var _base_modulate: Color = _sprite.modulate
@@ -23,6 +25,10 @@ var _action_index := 0
 func _ready() -> void:
 	add_to_group("enemy")
 	reset()
+	
+func _physics_process(delta: float) -> void:
+	scaler += 1.5 * delta
+	self.scale.y = 0.5 + abs(sin(scaler))/2.0
 
 
 func setup() -> void:

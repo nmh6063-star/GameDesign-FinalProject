@@ -16,6 +16,7 @@ func _resolve_one_merge(ctx: BattleContext) -> BallBase:
 			var other := balls[j] as BallBase
 			if ball.check_merge(ctx, other):
 				ball.merge_with(ctx, other, ball.rank)
+				
 				return ball
 	return null
 

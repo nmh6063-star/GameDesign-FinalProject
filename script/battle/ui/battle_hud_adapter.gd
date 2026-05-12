@@ -31,6 +31,7 @@ var _player_stats_label: Label
 func _init(root: CanvasLayer) -> void:
 	_root = root
 	_bind_nodes()
+	_root.process_mode = Node.PROCESS_MODE_ALWAYS
 
 
 func sync_ball_queue(next_item: Dictionary, queue_items: Array, hold_item: Dictionary) -> void:
@@ -172,8 +173,9 @@ func _render_preview(root: Node2D, item: Dictionary, scale: float) -> void:
 		return
 	var ball: BallBase = (item["scene"] as PackedScene).instantiate() as BallBase
 	ball.ui_preview = true
-	print(item["scene"])
 	root.add_child(ball)
+	ball.type = (item.get("type", []) as Array).duplicate(true)
+	ball.element_list = (item.get("element_list", []) as Array).duplicate(true)
 	ball.set_preview(item["data"], int(item.get("rank", 1)))
 	ball.position = Vector2.ZERO
 	ball.scale = Vector2.ONE * scale

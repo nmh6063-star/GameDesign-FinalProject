@@ -1,16 +1,12 @@
 [gd_scene format=3 uid="uid://bqd7tgo0v2d3o"]
 
-[ext_resource type="Script" path="res://script/map/map_graph.gd" id="1_script"]
-[ext_resource type="FontFile" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]
-[ext_resource type="PackedScene" uid="uid://cmap_player_hp_bar" path="res://scenes/map/map_player_health_bar.tscn" id="3_map_hp"]
-[ext_resource type="Script" path="res://script/map/map_graph_edges.gd" id="4_edges"]
+[ext_resource type="Script" uid="uid://cnnjwc6k3cm0h" path="res://script/map/map_graph.gd" id="1_script"]
+[ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="2_font"]
+[ext_resource type="PackedScene" path="res://scenes/map/map_player_health_bar.tscn" id="3_map_hp"]
+[ext_resource type="Script" uid="uid://c4roqccbv5vig" path="res://script/map/map_graph_edges.gd" id="4_edges"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_root"]
 bg_color = Color(0.25, 0.08, 0.34, 1)
-border_width_left = 0
-border_width_top = 0
-border_width_right = 0
-border_width_bottom = 0
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.96, 0.92, 0.76, 1)
@@ -24,19 +20,17 @@ corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
-[node name="MapGraph" type="Panel"]
-mouse_filter = 2
-layout_mode = 3
+[node name="MapGraph" type="Panel" unique_id=1042975406]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_root")
 script = ExtResource("1_script")
 
-[node name="CurrentRoomLabel" type="Label" parent="."]
-mouse_filter = 2
+[node name="CurrentRoomLabel" type="Label" parent="." unique_id=2087198752]
 layout_mode = 0
 offset_left = 48.0
 offset_top = 34.0
@@ -46,22 +40,12 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "CURRENT ROOM: START"
 
-[node name="PlayerHealthBar" parent="." instance=ExtResource("3_map_hp")]
-layout_mode = 1
-anchors_preset = 0
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -348.0
-offset_top = 28.0
-offset_right = -24.0
-offset_bottom = 66.0
-grow_horizontal = 0
-grow_vertical = 0
+[node name="PlayerHealthBar" parent="." unique_id=759179228 instance=ExtResource("3_map_hp")]
+anchors_preset = 1
 
-[node name="SeedLabel" type="Label" parent="."]
-mouse_filter = 2
+[node name="SeedLabel" type="Label" parent="." unique_id=796882730]
 layout_mode = 1
-anchors_preset = 0
+anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -280.0
@@ -75,8 +59,7 @@ theme_override_font_sizes/font_size = 12
 text = "Seed 0"
 horizontal_alignment = 2
 
-[node name="StatusLabel" type="Label" parent="."]
-mouse_filter = 2
+[node name="StatusLabel" type="Label" parent="." unique_id=1354167936]
 layout_mode = 0
 offset_left = 318.0
 offset_top = 96.0
@@ -87,8 +70,7 @@ theme_override_font_sizes/font_size = 14
 text = "CHOOSE YOUR PATH"
 horizontal_alignment = 1
 
-[node name="GraphPanel" type="Panel" parent="."]
-mouse_filter = 2
+[node name="GraphPanel" type="Panel" parent="." unique_id=485862905]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -99,14 +81,13 @@ offset_right = -48.0
 offset_bottom = -56.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="EdgeDrawer" type="Node2D" parent="GraphPanel"]
-z_index = 0
+[node name="EdgeDrawer" type="Node2D" parent="GraphPanel" unique_id=1919231301]
 script = ExtResource("4_edges")
 
-[node name="Title" type="Label" parent="GraphPanel"]
-mouse_filter = 2
+[node name="Title" type="Label" parent="GraphPanel" unique_id=1698101843]
 layout_mode = 0
 offset_left = 16.0
 offset_top = 10.0
@@ -116,11 +97,10 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "MAP"
 
-[node name="Rooms" type="Node2D" parent="GraphPanel"]
+[node name="Rooms" type="Node2D" parent="GraphPanel" unique_id=1077941507]
 z_index = 2
 
-[node name="InstructionsLabel" type="Label" parent="."]
-mouse_filter = 2
+[node name="InstructionsLabel" type="Label" parent="." unique_id=1181987779]
 layout_mode = 1
 anchors_preset = 12
 anchor_top = 1.0

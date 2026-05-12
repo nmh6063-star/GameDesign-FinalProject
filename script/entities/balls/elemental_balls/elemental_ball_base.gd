@@ -16,5 +16,5 @@ func merge_with(ctx: BattleContext, other: BallBase, rank_strength: float) -> vo
 	rule.resolve(ctx, self, other)
 	for effect in _effects():
 		effect.on_merge(ctx, self, other)
-	ctx.register_merge()
+	ctx.register_merge(self)
 	ctx.burst(global_position, rank_strength)

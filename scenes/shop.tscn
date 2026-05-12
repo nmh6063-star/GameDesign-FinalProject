@@ -100,11 +100,11 @@ corner_radius_top_right = 16
 corner_radius_bottom_right = 16
 corner_radius_bottom_left = 16
 
-[node name="Shop" type="CanvasLayer"]
+[node name="Shop" type="CanvasLayer" unique_id=1440498284]
 layer = 110
 script = ExtResource("1_shop")
 
-[node name="Overlay" type="Control" parent="."]
+[node name="Overlay" type="Control" parent="." unique_id=1323834396]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -112,7 +112,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Dim" type="ColorRect" parent="Overlay"]
+[node name="Dim" type="ColorRect" parent="Overlay" unique_id=1659219055]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -121,7 +121,7 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.05, 0.03, 0.09, 0.82)
 
-[node name="Card" type="Panel" parent="Overlay"]
+[node name="Card" type="Panel" parent="Overlay" unique_id=734826364]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -136,7 +136,7 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_card_outer")
 
-[node name="Title" type="Label" parent="Overlay/Card"]
+[node name="Title" type="Label" parent="Overlay/Card" unique_id=1884267009]
 layout_mode = 0
 offset_left = 24.0
 offset_top = 28.0
@@ -148,7 +148,7 @@ theme_override_font_sizes/font_size = 22
 text = "Shop"
 horizontal_alignment = 1
 
-[node name="TopBar" type="Panel" parent="Overlay/Card"]
+[node name="TopBar" type="Panel" parent="Overlay/Card" unique_id=728229427]
 layout_mode = 0
 offset_left = 32.0
 offset_top = 76.0
@@ -156,7 +156,7 @@ offset_right = 928.0
 offset_bottom = 248.0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_transparent")
 
-[node name="Background" type="Panel" parent="Overlay/Card/TopBar"]
+[node name="Background" type="Panel" parent="Overlay/Card/TopBar" unique_id=1258966581]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -166,7 +166,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_rank_bar")
 
-[node name="RankOrbs" type="HBoxContainer" parent="Overlay/Card/TopBar"]
+[node name="RankOrbs" type="HBoxContainer" parent="Overlay/Card/TopBar" unique_id=2041638240]
 z_index = 2
 layout_mode = 1
 anchors_preset = 15
@@ -181,7 +181,7 @@ grow_vertical = 2
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="RankBall1" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall1" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=213848463]
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
 size_flags_vertical = 4
@@ -189,7 +189,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 11
 text = "1"
 
-[node name="RankBall2" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall2" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=172018124]
 custom_minimum_size = Vector2(65, 65)
 layout_mode = 2
 size_flags_vertical = 4
@@ -197,7 +197,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 12
 text = "2"
 
-[node name="RankBall3" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall3" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=229816875]
 custom_minimum_size = Vector2(82, 82)
 layout_mode = 2
 size_flags_vertical = 4
@@ -205,7 +205,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 13
 text = "3"
 
-[node name="RankBall4" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall4" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1445155317]
 custom_minimum_size = Vector2(98, 98)
 layout_mode = 2
 size_flags_vertical = 4
@@ -213,7 +213,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 14
 text = "4"
 
-[node name="RankBall5" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall5" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1468343945]
 custom_minimum_size = Vector2(114, 114)
 layout_mode = 2
 size_flags_vertical = 4
@@ -221,7 +221,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 15
 text = "5"
 
-[node name="RankBall6" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall6" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=253833063]
 custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
 size_flags_vertical = 4
@@ -229,7 +229,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "6"
 
-[node name="RankBall7" type="Button" parent="Overlay/Card/TopBar/RankOrbs"]
+[node name="RankBall7" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=662574101]
 custom_minimum_size = Vector2(148, 148)
 layout_mode = 2
 size_flags_vertical = 4
@@ -237,7 +237,7 @@ theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 17
 text = "7"
 
-[node name="SelectionPanel" type="Panel" parent="Overlay/Card"]
+[node name="SelectionPanel" type="Panel" parent="Overlay/Card" unique_id=1694701115]
 layout_mode = 0
 offset_left = 32.0
 offset_top = 260.0
@@ -245,7 +245,7 @@ offset_right = 928.0
 offset_bottom = 588.0
 theme_override_styles/panel = SubResource("StyleBoxEmpty_transparent")
 
-[node name="Background" type="Panel" parent="Overlay/Card/SelectionPanel"]
+[node name="Background" type="Panel" parent="Overlay/Card/SelectionPanel" unique_id=916048224]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -255,7 +255,7 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_selection")
 
-[node name="HintLabel" type="Label" parent="Overlay/Card/SelectionPanel"]
+[node name="HintLabel" type="Label" parent="Overlay/Card/SelectionPanel" unique_id=178705169]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 16.0
@@ -268,7 +268,7 @@ text = "Your abilities by rank (below). Pick a shop ball — the matching rank p
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="PhaseLabel" type="Label" parent="Overlay/Card/SelectionPanel"]
+[node name="PhaseLabel" type="Label" parent="Overlay/Card/SelectionPanel" unique_id=195034307]
 layout_mode = 0
 offset_left = 20.0
 offset_top = 54.0
@@ -281,7 +281,7 @@ text = "Select an offer, then Buy."
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="ShopRow" type="HBoxContainer" parent="Overlay/Card/SelectionPanel"]
+[node name="ShopRow" type="HBoxContainer" parent="Overlay/Card/SelectionPanel" unique_id=1863491829]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -295,7 +295,7 @@ grow_vertical = 2
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="ShopCard0" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow"]
+[node name="ShopCard0" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow" unique_id=250917902]
 custom_minimum_size = Vector2(156, 198)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -306,7 +306,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
 flat = true
 
-[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0"]
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0" unique_id=1935500875]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -319,11 +319,11 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0/Margin" unique_id=774789463]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0/Margin/VBox"]
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0/Margin/VBox" unique_id=1356223304]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
 theme_override_fonts/font = ExtResource("2_font")
@@ -332,7 +332,7 @@ text = "—"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0/Margin/VBox"]
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard0/Margin/VBox" unique_id=1821081559]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -341,7 +341,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
-[node name="ShopCard1" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow"]
+[node name="ShopCard1" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow" unique_id=1027062400]
 custom_minimum_size = Vector2(156, 198)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -352,7 +352,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
 flat = true
 
-[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1"]
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1" unique_id=732168515]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -365,11 +365,11 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1/Margin" unique_id=460528499]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1/Margin/VBox"]
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1/Margin/VBox" unique_id=1473200504]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
 theme_override_fonts/font = ExtResource("2_font")
@@ -378,7 +378,7 @@ text = "—"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1/Margin/VBox"]
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard1/Margin/VBox" unique_id=799407398]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -387,7 +387,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
-[node name="ShopCard2" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow"]
+[node name="ShopCard2" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow" unique_id=537434664]
 custom_minimum_size = Vector2(156, 198)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -398,7 +398,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
 flat = true
 
-[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2"]
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2" unique_id=1866381711]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -411,11 +411,11 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2/Margin" unique_id=125800341]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2/Margin/VBox"]
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2/Margin/VBox" unique_id=1641046559]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
 theme_override_fonts/font = ExtResource("2_font")
@@ -424,7 +424,7 @@ text = "—"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2/Margin/VBox"]
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard2/Margin/VBox" unique_id=134038064]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -433,7 +433,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
-[node name="ShopCard3" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow"]
+[node name="ShopCard3" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow" unique_id=185833089]
 custom_minimum_size = Vector2(156, 198)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -444,7 +444,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
 flat = true
 
-[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3"]
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3" unique_id=1459327644]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -457,11 +457,11 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3/Margin" unique_id=1441426250]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3/Margin/VBox"]
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3/Margin/VBox" unique_id=887431171]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
 theme_override_fonts/font = ExtResource("2_font")
@@ -470,7 +470,7 @@ text = "—"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3/Margin/VBox"]
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard3/Margin/VBox" unique_id=1810252609]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -479,7 +479,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
-[node name="ShopCard4" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow"]
+[node name="ShopCard4" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow" unique_id=698012383]
 custom_minimum_size = Vector2(156, 198)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -490,7 +490,7 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_reward_hover")
 theme_override_styles/focus = SubResource("StyleBoxFlat_reward_idle")
 flat = true
 
-[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4"]
+[node name="Margin" type="MarginContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4" unique_id=1997839894]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -503,11 +503,11 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4/Margin"]
+[node name="VBox" type="VBoxContainer" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4/Margin" unique_id=1581105404]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4/Margin/VBox"]
+[node name="Name" type="Label" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4/Margin/VBox" unique_id=530248545]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.12, 0.1, 0.18, 1)
 theme_override_fonts/font = ExtResource("2_font")
@@ -516,7 +516,7 @@ text = "—"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4/Margin/VBox"]
+[node name="Orb" type="Button" parent="Overlay/Card/SelectionPanel/ShopRow/ShopCard4/Margin/VBox" unique_id=1229967989]
 custom_minimum_size = Vector2(72, 72)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -525,7 +525,7 @@ theme_override_styles/pressed = SubResource("StyleBoxFlat_orb")
 theme_override_styles/hover = SubResource("StyleBoxFlat_orb")
 theme_override_styles/focus = SubResource("StyleBoxFlat_orb")
 
-[node name="BottomRow" type="HBoxContainer" parent="Overlay/Card"]
+[node name="BottomRow" type="HBoxContainer" parent="Overlay/Card" unique_id=1379015800]
 layout_mode = 0
 offset_left = 120.0
 offset_top = 602.0
@@ -534,7 +534,7 @@ offset_bottom = 658.0
 theme_override_constants/separation = 28
 alignment = 1
 
-[node name="Buy" type="Button" parent="Overlay/Card/BottomRow"]
+[node name="Buy" type="Button" parent="Overlay/Card/BottomRow" unique_id=645641442]
 custom_minimum_size = Vector2(208, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -547,7 +547,7 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_buy")
 disabled = true
 text = "Buy"
 
-[node name="Continue" type="Button" parent="Overlay/Card/BottomRow"]
+[node name="Continue" type="Button" parent="Overlay/Card/BottomRow" unique_id=146252903]
 custom_minimum_size = Vector2(248, 48)
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
@@ -559,14 +559,13 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_continue")
 theme_override_styles/focus = SubResource("StyleBoxFlat_continue")
 text = "Leave shop"
 
-[node name="HoverTip" type="Panel" parent="."]
+[node name="HoverTip" type="Panel" parent="." unique_id=265002540]
 visible = false
 z_index = 100
-layout_mode = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hover_tip")
 
-[node name="MarginContainer" type="MarginContainer" parent="HoverTip"]
+[node name="MarginContainer" type="MarginContainer" parent="HoverTip" unique_id=240860823]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -579,34 +578,29 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 18
 theme_override_constants/margin_bottom = 16
 
-[node name="VBox" type="VBoxContainer" parent="HoverTip/MarginContainer"]
+[node name="VBox" type="VBoxContainer" parent="HoverTip/MarginContainer" unique_id=633006527]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 8
 
-[node name="TipTitle" type="Label" parent="HoverTip/MarginContainer/VBox"]
+[node name="TipTitle" type="Label" parent="HoverTip/MarginContainer/VBox" unique_id=572889298]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 16
 text = "Ability"
 
-[node name="TipBody" type="Label" parent="HoverTip/MarginContainer/VBox"]
+[node name="TipBody" type="Label" parent="HoverTip/MarginContainer/VBox" unique_id=1686433921]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 12
-text = ""
 autowrap_mode = 3
 
-[node name="TipStat" type="Label" parent="HoverTip/MarginContainer/VBox"]
+[node name="TipStat" type="Label" parent="HoverTip/MarginContainer/VBox" unique_id=531938468]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("2_font")
 theme_override_font_sizes/font_size = 12
-text = ""
 autowrap_mode = 2

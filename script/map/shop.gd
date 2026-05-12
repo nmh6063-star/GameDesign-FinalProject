@@ -49,6 +49,8 @@ var _ability_hover_body: Label
 var _ability_hover_stat: Label
 var _hover_tip_key: String = ""
 
+const sound := preload("res://script/game_manager/sound_manager.gd")
+
 
 func _ready() -> void:
 	_build_style_templates()
@@ -59,6 +61,7 @@ func _ready() -> void:
 	_populate_slots()
 	_connect_signals()
 	set_process(true)
+	sound.play_sound_from_string("PokeMart", 0.25, true)
 
 
 func _process(_delta: float) -> void:
@@ -636,13 +639,24 @@ func _connect_signals() -> void:
 		var card := _shop_cards()[i] if i < _shop_cards().size() else null
 		if card == null:
 			continue
+		card.pressed.connect(sound.play_sound_from_string.bind("click"))
 		card.pressed.connect(_on_shop_card_pressed.bind(i))
 		var orb := _shop_card_orb(i)
 		if orb != null:
 			orb.pressed.connect(_on_shop_card_pressed.bind(i))
+			orb.pressed.connect(sound.play_sound_from_string.bind("click"))
 	if _buy_button() != null:
 		_buy_button().pressed.connect(_on_buy_pressed)
+		_buy_button().pressed.connect(sound.play_sound_from_string.bind("cashout"))
+	_continue_button().pressed.connect(sound.play_sound_from_string.bind("click"))
+	_continue_button().pressed.connect(_switch_songs)
 	_continue_button().pressed.connect(_on_continue_pressed)
+
+func _switch_songs():
+	for child in get_node("/root").get_children():
+		if child.name.contains("player"):
+			child.queue_free()
+	sound.play_sound_from_string("Beneath The Mask", 0.25, true)
 
 
 func _on_shop_card_pressed(index: int) -> void:

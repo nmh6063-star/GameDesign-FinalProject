@@ -225,6 +225,9 @@ static var typing_by_id = {
 		},
 		"dot_echo": {
 			"class": "alchemist",
+		},
+		"resurrection": {
+			"class": "alchemist",
 		}
 	}
 
