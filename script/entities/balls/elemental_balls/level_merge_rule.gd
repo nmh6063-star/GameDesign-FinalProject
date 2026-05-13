@@ -21,6 +21,15 @@ func can_merge(ctx: BattleContext, a: BallBase, b: BallBase) -> bool:
 
 
 func resolve(ctx: BattleContext, a: BallBase, b: BallBase) -> void:
+	# Giant buff inheritance: if b carries the buff and a doesn't, pass it to a
+	var b_st := ctx.ball_status_for(b)
+	var a_st := ctx.ball_status_for(a)
+	if int(b_st.get("giant_drops_left", 0)) > 0 and not bool(a_st.get("is_giant", false)):
+		a_st["attack_mult"]      = float(b_st.get("attack_mult", 1.0))
+		a_st["size_mult"]        = float(b_st.get("size_mult", 1.0))
+		a_st["trigger_twice"]    = bool(b_st.get("trigger_twice", false))
+		a_st["is_giant"]         = true
+		a_st["giant_drops_left"] = int(b_st.get("giant_drops_left", 0))
 	a.merge_into_me(ctx, b)
 	var temp = a.type.duplicate()
 	for type in b.type:

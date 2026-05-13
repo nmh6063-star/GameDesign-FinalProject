@@ -74,6 +74,12 @@ static var functions: Array[String] = [
 	"guillotine",
 	"second_wind",
 	"overkill",
+	"mend_plus",
+	"bulwark",
+	"glacial_ward",
+	"recovery_plus",
+	"iron_fortress",
+	"regen_pulse",
 ]
 
 static var functions_by_id := {}
@@ -256,6 +262,12 @@ static var typing_by_id = {
 	"guillotine":     {"class": "alchemist"},
 	"second_wind":    {"class": "alchemist"},
 	"overkill":       {"class": "alchemist"},
+	"mend_plus":      {"class": "alchemist"},
+	"bulwark":        {"class": "alchemist"},
+	"glacial_ward":   {"class": "alchemist"},
+	"recovery_plus":  {"class": "alchemist"},
+	"iron_fortress":  {"class": "alchemist"},
+	"regen_pulse":    {"class": "alchemist"},
 		"resurrection": {
 			"class": "alchemist",
 		}

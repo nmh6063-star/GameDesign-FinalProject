@@ -39,6 +39,8 @@ var burnt = true
 
 var _reward_overlay: RewardSelectionController
 var _elbaphs_update_acc := 0.0
+## Playground only: when > 0, every setup ball is forced to this rank.
+var _playground_pinned_rank := 0
 var _current_ability_overlay: CanvasLayer
 var _paused_for_ability_overlay := false
 var _playground_overlay: CanvasLayer
@@ -214,8 +216,10 @@ func _handle_shoot_input() -> void:
 
 
 func _can_enter_action_mode() -> bool:
-	if int(_context.player_statuses.get("freeze_stacks", 0)) > 0:
-		return false
+	# During Time Drift, player ignores freeze/control effects
+	if not bool(_context.battle_flags.get("time_drift_active", false)):
+		if int(_context.player_statuses.get("freeze_stacks", 0)) > 0:
+			return false
 	return _context.can_shoot()
 
 
@@ -330,7 +334,11 @@ func drop_element_ball_in_box(rank: int, x: float = INF) -> BallBase:
 
 
 func spawn_setup_ball() -> BallBase:
-	return _box.spawn_setup_ball() if _box != null else null
+	var ball := _box.spawn_setup_ball() if _box != null else null
+	if ball != null and _playground_pinned_rank > 0:
+		ball.rank = clampi(_playground_pinned_rank, 1, 7)
+		ball.refresh()
+	return ball
 
 
 func heal_player(amount: int) -> void:
@@ -368,6 +376,9 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 	if slot != null:
 		slot.sync_realtime_view()
 		slot.show_damage(applied, ENEMY_DAMAGE_COLOR)
+	# Track enemies killed for gold calculation
+	if ctx != null and not target.is_alive():
+		ctx.battle_flags["enemies_killed"] = int(ctx.battle_flags.get("enemies_killed", 0)) + 1
 	# Overkill: overflow damage to next alive enemy when this kill is confirmed
 	if ctx != null and not target.is_alive():
 		if bool(ctx.battle_flags.get("overkill_active", false)):
@@ -410,6 +421,12 @@ func damage_player(amount: int) -> void:
 			damage_enemy(amount, others[randi() % others.size()], _context)
 			return
 		# Only one enemy (the charmed one) — attack still hits player
+	# Playground: never let HP drop below 100
+	var gm_pg := _game_manager()
+	if gm_pg != null and bool(gm_pg.get("is_playground_mode")):
+		amount = mini(amount, maxi(0, PlayerState.player_health - 100))
+		if amount <= 0:
+			return
 	PlayerState.damage(amount)
 	_player.flash()
 	_sync_player_bar()
@@ -555,13 +572,16 @@ func _on_ball_dropped() -> void:
 		if _context.are_touching(ball_check, ball, -4.0):
 			_topout()
 	_context.consume_freeze_on_ball_drop()
-	var burn := int(_context.player_statuses.get("burn_stacks", 0))
-	if burn > 0:
-		damage_player(burn * 3)
-		_context.player_statuses["burn_stacks"] = burn - 1
-	var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
-	if freeze > 0:
-		_context.player_statuses["freeze_stacks"] = freeze - 1
+	# During Time Drift, player is immune to control and DOT effects
+	var td_active := bool(_context.battle_flags.get("time_drift_active", false))
+	if not td_active:
+		var burn := int(_context.player_statuses.get("burn_stacks", 0))
+		if burn > 0:
+			damage_player(burn * 3)
+			_context.player_statuses["burn_stacks"] = burn - 1
+		var freeze := int(_context.player_statuses.get("freeze_stacks", 0))
+		if freeze > 0:
+			_context.player_statuses["freeze_stacks"] = freeze - 1
 	# Poison Rain: count down the shoot-duration timer.
 	var pr := int(_context.battle_flags.get("poison_rain_shoots", 0))
 	if pr > 0:
@@ -572,6 +592,22 @@ func _on_ball_dropped() -> void:
 	# Fragile: debuff clears after each shoot
 	if int(_context.battle_flags.get("fragile_stacks", 0)) > 0:
 		_context.battle_flags["fragile_stacks"] = 0
+	# Giant Orb / Giant Core: decrement per-ball drop counter; clear buff when expired
+	for ball in active_balls():
+		var gb := ball as BallBase
+		var gst := _context.ball_status_for(gb)
+		var drops_left := int(gst.get("giant_drops_left", 0))
+		if drops_left > 0:
+			drops_left -= 1
+			gst["giant_drops_left"] = drops_left
+			if drops_left <= 0:
+				gst["attack_mult"]   = 1.0
+				gst["size_mult"]     = 1.0
+				gst["trigger_twice"] = false
+				gst.erase("is_giant")
+				gst.erase("giant_drops_left")
+				gb._update_collision()
+				gb.queue_redraw()
 	# Weakness Brand: count down per shoot
 	for slot in _alive_enemy_slots():
 		var se := (slot as EnemySlotController).enemy
@@ -766,11 +802,15 @@ func _should_show_post_battle_reward() -> bool:
 	return true
 
 
-## Base 50 gold + 15 per 3 combo tier reached this battle.
+## Gold = base (8 + 6 per enemy killed) × rank multiplier × combo multiplier, capped at 80.
 func _compute_battle_gold_reward() -> int:
-	var max_combo := int(_context.battle_flags.get("max_combo_reached", 0))
-	var combo_bonus := (max_combo / 3) * 15
-	return 50 + combo_bonus
+	var enemies_killed := int(_context.battle_flags.get("enemies_killed", 0))
+	var max_rank       := int(_context.battle_flags.get("max_rank_played", 0))
+	var max_combo      := int(_context.battle_flags.get("max_combo_reached", 0))
+	var base           := 8 + enemies_killed * 6
+	var rank_mult      := 1.0 + float(max_rank) / 14.0    # R7 → ×1.5
+	var combo_mult     := 1.0 + float(max_combo) / 25.0   # combo 25 → ×2
+	return mini(80, int(round(float(base) * rank_mult * combo_mult)))
 
 
 ## Called in playground mode when the dummy enemy is defeated — respawn it.

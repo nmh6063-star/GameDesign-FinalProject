@@ -36,7 +36,7 @@ func _update_labels() -> void:
 		+ "\"Rest here, weary traveler... or tempt fate.\"[/center]"
 	)
 	_heal_label.text = "Heal 20% Max HP"
-	_gamble_label.text = "Gamble  (Plinko Board)"
+	_gamble_label.text = "Plinko  (score shop)"
 	if _info_label != null:
 		_info_label.visible = true
 
