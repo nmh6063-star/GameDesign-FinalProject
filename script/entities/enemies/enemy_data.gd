@@ -15,8 +15,8 @@ class_name EnemyData
 
 ## Global tuning: exported `attack_damage` is halved when applied to the player.
 const DAMAGE_TO_PLAYER_MULT := 0.5
-## Shorter wait between attacks (half the exported interval = ~2× attack frequency).
-const ATTACK_INTERVAL_MULT := 0.5
+## Global tuning: use exported `attack_interval` as the real cooldown (was 0.5 for faster fights).
+const ATTACK_INTERVAL_MULT := 1.0
 
 
 func effective_attack_damage() -> int:
