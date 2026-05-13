@@ -39,6 +39,27 @@ CHANGELOG
     - New API: BattleBallManager.drop_element_ball_at_x(rank, x) — element-aware
       drop that mirrors spawn_setup_ball's element_list/type assignment before
       configure() is called. Exposed via BattleLoop and BattleContext.
+
+  May 13, 2026 — Plinko prize counter
+    - After drops: shop offers seven fixed-rank rolls (R1–R7), each pulling a
+      random ability from that rank’s catalog pool (same idea as slot tiers).
+      Ranks 1–5 share one score price; R6 and R7 cost slightly more (tunable on
+      PlinkoRoom → Settings child).
+    - Lucky draw (random rank in configured min–max) and cash-out-all-score-for-gold
+      remain. Hover tooltips on rolls / lucky draw / cash out show the player’s
+      current ability for that rank (or the default Strike entry from the catalog
+      if the slot is unset).
+
+  May 13, 2026 — Freeze Wave
+    - No longer deals 50 damage each second while enemies are frozen; break-free
+      checks unchanged. Casts grant 50 Shield immediately.
+    - Doc/clarify: frozen enemies do not execute attack turns (BattleLoop skips
+      enemy.on_turn while freeze_until_ms is active).
+
+  May 13, 2026 — Ice Shield
+    - Freeze on current enemy is 3 seconds (3 stacks), matching shield + freeze
+      intent; reference text aligned with code (25 Shield).
+
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -58,9 +79,11 @@ STATUS EFFECT RULES
     - Total damage (3 stacks): 3+2+1 = 6
 
   FREEZE
-    - Each stack = 1 second of frozen timer (additive, stacks are cumulative).
-    - Completely pauses the enemy's action/attack timer while active.
-    - No damage component.
+    - Each stack = 1 second added to freeze_until_ms (additive when re-applied).
+    - While frozen, the enemy does not run their attack turn (on_turn is skipped);
+      no attack damage or on-attack poison ticks. Attack cooldown timers may still
+      elapse between attempts, but each attempt is blocked until thawed.
+    - No damage from freeze itself (unless another effect applies damage separately).
 
   CHARM
     - Enemy's next attack is redirected at another enemy.
@@ -180,8 +203,8 @@ RANK 3
     Each hit also applies Burn (8 stacks) to that enemy.
 
   Ice Shield
-    Gain 50 Shield.
-    Freeze current enemy for 5 seconds.
+    Gain 25 Shield.
+    Freeze current enemy for 3 seconds (cannot attack while frozen; see FREEZE).
 
   Reinforce
     Gain +2 attack damage for this battle.
@@ -273,7 +296,10 @@ RANK 5
     Deal 25 or 30 damage to one enemy (chosen randomly).
 
   Freeze Wave
-    Freeze ALL enemies for 3 seconds (3 stacks).
+    Freeze ALL enemies for 8 seconds (8 freeze stacks). While frozen, they cannot
+    attack (turn resolution is skipped until thawed). Each second they may break
+    free early: chance = (current HP%) × 60% + 5% per elapsed second (no damage
+    ticks). Gain 50 Shield immediately.
 
   Giant Orb
     One random ball in the box gains:
@@ -536,6 +562,16 @@ THUNDER DEBUFF MECHANIC
   Chain damage uses the DOT path so it bypasses attack_bonus and clone stacks
   but CAN trigger the Siphon heal and dot_echo (Echo) effects.
   Recursion is guarded — thunder chain damage does NOT re-chain.
+
+--------------------------------------------------------------------------------
+PLINKO ROOM (shrine gamble)
+--------------------------------------------------------------------------------
+  Score is banked from slot values (symmetric tiers on the board) and misses.
+  Prize counter: Lucky draw spends score for a random rank in the configured
+  range and offers a swap; fixed rolls R1–R7 each spend that rank’s price for a
+  random ability at exactly that rank; Cash out converts all remaining score to
+  gold (rate on Settings). All roll pools match RankAbilityCatalog.reward_options
+  plus that rank’s default Strike-style entry.
 
 ================================================================================
 END OF ABILITIES REFERENCE
