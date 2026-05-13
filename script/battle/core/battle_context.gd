@@ -4,7 +4,7 @@ class_name BattleContext
 enum Phase { PLAY, RESOLVE }
 
 const MAX_MANA_PIPES := 3
-const MERGES_PER_MANA_PIPE := 15
+const MERGES_PER_MANA_PIPE := 10
 var COMBO_TIMEOUT := 5.0
 var BACK_TO_BACK_TIMEOUT := 0.25
 

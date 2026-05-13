@@ -79,7 +79,7 @@ func _on_first_merge() -> void:
 func _on_first_pip() -> void:
 	await get_tree().create_timer(0.3).timeout
 	_pending_attack_cursor = true
-	_enqueue_tip("Mana pipe filled! \nPress X to enter aim mode, \nthen click a ball to spend a pip and shoot it.")
+	_enqueue_tip("Mana pipe filled! \nPress X to enter aim mode, \nthen click a ball to spend a pipe and shoot it.")
 
 
 func _on_mana_depleted() -> void:
@@ -108,7 +108,7 @@ func spawn_set():
 func _on_toppedout():
 	await get_tree().create_timer(1.0).timeout
 	toppedout = true
-	_enqueue_tip("Topouts deal damange, clear your board, \nand take away a mana pip! \nMake sure to avoid topping out if you can!")
+	_enqueue_tip("Topouts deal damange, clear your board, \nand take away a mana pipe! \nMake sure to avoid topping out if you can!")
 	_enqueue_tip("Throughout your run you will find \nvarious different ball types. \nThe higher the rank of the ball, \nthe more powerful the abilities. \nTry out different combinations as you play \nto find the best way to win!")
 
 
@@ -117,6 +117,7 @@ func _on_battle_finished() -> void:
 	for child in get_tree().root.get_children():
 		if child.name.contains("player"):
 			child.queue_free()
+	get_node("/root/TOPOUT").queue_free()
 	get_tree().change_scene_to_file("res://scenes/menu_screen.tscn")
 
 
