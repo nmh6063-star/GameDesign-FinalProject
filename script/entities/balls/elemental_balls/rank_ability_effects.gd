@@ -13,7 +13,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
-			_deal_single(ctx, 8, source)
+			_deal_single(ctx, (8 + ((rank-1) * 4)), source)
 		"mend":
 			var lost_mend := maxi(0, PlayerState.player_max_health - PlayerState.player_health)
 			var heal_mend := maxi(1, int(round(float(lost_mend) * 0.05)))

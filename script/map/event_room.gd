@@ -60,10 +60,10 @@ func _on_heal() -> void:
 		+ "You recover [b]%d HP[/b].[/center]" % heal_amount
 	)
 	await get_tree().create_timer(1.4).timeout
-	sound.play_sound_from_string.bind("Beneath The Mask", 0.25, true)
+	sound.play_sound_from_string("Beneath The Mask", 0.25, true)
+	await get_tree().create_timer(0.1).timeout
 	if is_inside_tree():
 		GameManager.complete_current_room()
-
 
 func _on_gamble() -> void:
 	if _used:

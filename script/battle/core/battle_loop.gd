@@ -825,7 +825,7 @@ func _finish_battle(text: String) -> void:
 
 
 func _should_show_post_battle_reward() -> bool:
-	return false
+	return true
 
 
 func _should_open_victory_screen() -> bool:

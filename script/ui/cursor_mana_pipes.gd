@@ -3,7 +3,7 @@ extends Control
 
 const _PIP_FILLED := Color(0.33, 0.66, 1.0, 1.0)
 const _PIP_EMPTY := Color(0.62, 0.62, 0.68, 0.55)
-const _VISIBLE_PIP_COUNT := 5
+const _VISIBLE_PIP_COUNT := 3
 const _PIP_CURSOR_OFFSET_Y := 20.0
 const _PIP_SCREEN_MARGIN := 20.0
 const PIP_SIZE_PX := 8

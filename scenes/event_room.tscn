@@ -14,6 +14,11 @@ layer = 15
 [node name="PlayerHealthBar" parent="MapHud" unique_id=453415719 instance=ExtResource("4_map_hp")]
 layout_mode = 3
 anchors_preset = 1
+offset_left = -324.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 38.0
+grow_vertical = 1
 
 [node name="Background" type="ColorRect" parent="." unique_id=1565285003]
 anchors_preset = 15

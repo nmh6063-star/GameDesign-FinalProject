@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://703ku8dm3a5w" path="res://assets/frost.png" id="8_ikfo1"]
 [ext_resource type="Texture2D" uid="uid://cwkwc8veij7iu" path="res://assets/white.jpg" id="9_dwom6"]
 [ext_resource type="Texture2D" uid="uid://dx12fl0tb44r5" path="res://assets/Target.png" id="10_7a100"]
+[ext_resource type="Texture2D" uid="uid://edk4f4pptld7" path="res://assets/color_wheel.png" id="10_ikfo1"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="11_feaue"]
 [ext_resource type="Script" uid="uid://bbhmuk5567trq" path="res://script/ui/timer_ring.gd" id="12_210s6"]
 [ext_resource type="Texture2D" uid="uid://rw75j44x1fra" path="res://assets/background.png" id="13_5qvs7"]
@@ -347,6 +348,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_5qvs7")
 position = Vector2(34, 34)
 
 [node name="HoldBox" type="Panel" parent="UI/BallQueue" unique_id=50428750]
+visible = false
 layout_mode = 0
 offset_left = 960.0
 offset_top = 1.0
@@ -404,6 +406,15 @@ offset_bottom = 450.0
 theme_override_fonts/font = ExtResource("3_e13mp")
 theme_override_font_sizes/font_size = 10
 text = "I"
+
+[node name="TextureRect" type="TextureRect" parent="UI/BallQueue" unique_id=1536022365]
+layout_mode = 0
+offset_left = 750.0
+offset_top = 54.0
+offset_right = 1453.0
+offset_bottom = 700.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("10_ikfo1")
 
 [node name="StatsHUD" type="Control" parent="UI" unique_id=290810136]
 layout_mode = 3
@@ -534,7 +545,7 @@ layout_mode = 2
 
 [node name="Meter" type="Control" parent="UI/CursorManaPipes" unique_id=177972243]
 custom_minimum_size = Vector2(80, 9)
-layout_mode = 0
+anchors_preset = 0
 mouse_filter = 2
 
 [node name="Background" type="ColorRect" parent="UI/CursorManaPipes/Meter" unique_id=1189486536]

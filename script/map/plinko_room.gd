@@ -46,8 +46,7 @@ var _camera_base_offset := Vector2.ZERO
 var _slot_abilities: Dictionary = {}
 
 const sound := preload("res://script/game_manager/sound_manager.gd")
-const REWARD_SCENE := preload("res://scenes/reward_selection.tscn")
-var _reward_overlay: RewardSelectionController
+
 
 func _ready() -> void:
 	if _settings == null:
@@ -296,143 +295,103 @@ func _after_ball_resolved() -> void:
 
 
 func _show_prize_counter_ui() -> void:
-	if _settings == null:
-		return
-	if _prize_layer != null and is_instance_valid(_prize_layer):
-		_prize_layer.queue_free()
-		_prize_layer = null
-	"""
+	for child in get_tree().root.get_children():
+		if child.name.contains("player"):
+			child.queue_free()
+	var panel := Panel.new()
+	panel.name = "PrizeCounterUI"
+	panel.custom_minimum_size = Vector2(420, 220)
 
-	var font: Font = load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
-	_prize_layer = CanvasLayer.new()
-	_prize_layer.layer = 20
-	add_child(_prize_layer)
+	panel.anchor_left = 0.5
+	panel.anchor_top = 0.5
+	panel.anchor_right = 0.5
+	panel.anchor_bottom = 0.5
 
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.72)
-	dim.anchors_preset = Control.PRESET_FULL_RECT
-	_prize_layer.add_child(dim)
+	panel.offset_left = -210
+	panel.offset_top = -110
+	panel.offset_right = 210
+	panel.offset_bottom = 110
 
-	var card := PanelContainer.new()
-	card.set_anchors_preset(Control.PRESET_CENTER)
-	card.offset_left = -320.0
-	card.offset_top = -_settings.prize_counter_panel_half_height
-	card.offset_right = 320.0
-	card.offset_bottom = _settings.prize_counter_panel_half_height
-	var card_style := StyleBoxFlat.new()
-	card_style.bg_color = Color(0.08, 0.06, 0.14)
-	card_style.border_color = Color(0.75, 0.7, 1.0)
-	card_style.set_border_width_all(3)
-	for i in 4:
-		card_style.set_corner_radius(i, 14)
-	card.add_theme_stylebox_override("panel", card_style)
-	_prize_layer.add_child(card)
+	# Background style
+	var panel_style := StyleBoxFlat.new()
+	panel_style.bg_color = Color(0.08, 0.08, 0.12, 0.96)
+	panel_style.border_color = Color(1.0, 0.85, 0.2)
+	panel_style.border_width_left = 4
+	panel_style.border_width_top = 4
+	panel_style.border_width_right = 4
+	panel_style.border_width_bottom = 4
+	panel_style.corner_radius_top_left = 18
+	panel_style.corner_radius_top_right = 18
+	panel_style.corner_radius_bottom_left = 18
+	panel_style.corner_radius_bottom_right = 18
+	panel_style.shadow_color = Color(0, 0, 0, 0.5)
+	panel_style.shadow_size = 12
 
-	var vbox := VBoxContainer.new()
-	vbox.add_theme_constant_override("separation", 10)
-	card.add_child(vbox)
+	panel.add_theme_stylebox_override("panel", panel_style)
 
-	var title := Label.new()
-	title.text = _settings.prize_counter_title
-	title.add_theme_font_override("font", font)
-	title.add_theme_font_size_override("font_size", 15)
-	title.add_theme_color_override("font_color", Color(1.0, 0.88, 0.35))
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(title)
+	add_child(panel)
 
-	var pts_lbl := Label.new()
-	pts_lbl.text = _settings.score_label_format % _plinko_points
-	pts_lbl.add_theme_font_override("font", font)
-	pts_lbl.add_theme_font_size_override("font_size", 11)
-	pts_lbl.add_theme_color_override("font_color", Color(0.55, 1.0, 0.65))
-	pts_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(pts_lbl)
+	# Title text
+	var label := Label.new()
+	label.text = str(_plinko_points) + " \ngold got!"
+	PlayerState.player_gold += _plinko_points
 
-	var rmin_intro := clampi(_settings.lucky_draw_rank_min, 1, 7)
-	var rmax_intro := clampi(_settings.lucky_draw_rank_max, 1, 7)
-	if rmin_intro > rmax_intro:
-		var tmp_i := rmin_intro
-		rmin_intro = rmax_intro
-		rmax_intro = tmp_i
-	var draw_intro := Label.new()
-	draw_intro.text = _settings.lucky_draw_intro_format % [rmin_intro, rmax_intro]
-	draw_intro.add_theme_font_override("font", font)
-	draw_intro.add_theme_font_size_override("font_size", 8)
-	draw_intro.add_theme_color_override("font_color", Color(0.78, 0.76, 0.92))
-	draw_intro.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	draw_intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	vbox.add_child(draw_intro)
+	label.anchor_left = 0.0
+	label.anchor_top = 0.15
+	label.anchor_right = 1.0
+	label.anchor_bottom = 0.5
+	const font = preload("res://assets/dogica/OTF/dogicabold.otf")
+	label.add_theme_font_override("font", font)
 
-	var row1 := HBoxContainer.new()
-	row1.alignment = BoxContainer.ALIGNMENT_CENTER
-	row1.add_theme_constant_override("separation", 10)
-	vbox.add_child(row1)
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 
-	var draw_btn := _make_dialog_button(
-		"Lucky draw (%d)" % _settings.draw_cost,
-		Color(0.25, 0.35, 0.65))
-	draw_btn.disabled = _plinko_points < _settings.draw_cost
-	draw_btn.tooltip_text = _lucky_draw_hover_tooltip(rmin_intro, rmax_intro)
-	draw_btn.pressed.connect(_on_counter_lucky_draw)
-	draw_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
-	row1.add_child(draw_btn)
+	label.add_theme_font_size_override("font_size", 42)
+	label.add_theme_color_override("font_color", Color(1, 0.95, 0.5))
 
-	var shop_hint := Label.new()
-	shop_hint.text = "Fixed rank rolls — hover for your current ball ability."
-	shop_hint.add_theme_font_override("font", font)
-	shop_hint.add_theme_font_size_override("font_size", 8)
-	shop_hint.add_theme_color_override("font_color", Color(0.72, 0.7, 0.85))
-	shop_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	vbox.add_child(shop_hint)
+	# Text outline
+	label.add_theme_color_override("font_outline_color", Color.BLACK)
+	label.add_theme_constant_override("outline_size", 8)
 
-	var row_r1234 := HBoxContainer.new()
-	row_r1234.alignment = BoxContainer.ALIGNMENT_CENTER
-	row_r1234.add_theme_constant_override("separation", 6)
-	vbox.add_child(row_r1234)
-	for rank in range(1, 5):
-		row_r1234.add_child(_make_rank_roll_button(rank))
+	panel.add_child(label)
 
-	var row_r567 := HBoxContainer.new()
-	row_r567.alignment = BoxContainer.ALIGNMENT_CENTER
-	row_r567.add_theme_constant_override("separation", 6)
-	vbox.add_child(row_r567)
-	for rank in range(5, 8):
-		row_r567.add_child(_make_rank_roll_button(rank))
+	# Next button
+	var next_button := Button.new()
+	next_button.text = "NEXT"
+	next_button.add_theme_font_override("font", font)
 
-	var bottom_spacer := Control.new()
-	bottom_spacer.custom_minimum_size = Vector2(0, _settings.prize_counter_bottom_spacer_px)
-	vbox.add_child(bottom_spacer)
+	next_button.custom_minimum_size = Vector2(160, 52)
 
-	var gold_preview := _gold_for_all_score()
-	var cash_btn := _make_dialog_button(
-		"Cash out all score → +%d gold" % gold_preview,
-		Color(0.2, 0.42, 0.38))
-	cash_btn.disabled = gold_preview <= 0
-	if gold_preview > 0:
-		cash_btn.tooltip_text = _clamp_tooltip_text(
-			"Score: %d.\nConverts ALL of it to +%d gold (see gold_per_plinko_point on Settings).\nRank abilities stay as they are until you roll or swap." % [
-				_plinko_points, gold_preview
-			])
-	else:
-		cash_btn.tooltip_text = "Not enough score for at least 1 gold at the current rate."
-	cash_btn.pressed.connect(_on_counter_cash_out_all)
-	cash_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
-	vbox.add_child(cash_btn)
+	next_button.anchor_left = 0.5
+	next_button.anchor_top = 0.72
+	next_button.anchor_right = 0.5
+	next_button.anchor_bottom = 0.72
 
-	var done := _make_dialog_button("Continue", Color(0.22, 0.38, 0.22))
-	done.tooltip_text = "Return to the map. Unspent score is lost."
-	done.pressed.connect(_on_counter_done)
-	done.pressed.connect(sound.play_sound_from_string.bind("click"))
-	vbox.add_child(done)
-	"""
-	_reward_overlay = REWARD_SCENE.instantiate() as RewardSelectionController
-	_reward_overlay.coins_for_instance = _plinko_points
-	
-	_reward_overlay.selection_completed.connect(_on_counter_done)
-	add_child(_reward_overlay)
-	sound.play_sound_from_string("coin")
+	next_button.offset_left = -80
+	next_button.offset_top = 0
+	next_button.offset_right = 80
+	next_button.offset_bottom = 52
+
+	# Button style
+	var button_style := StyleBoxFlat.new()
+	button_style.bg_color = Color(0.18, 0.18, 0.28)
+	button_style.border_width_left = 3
+	button_style.border_width_top = 3
+	button_style.border_width_right = 3
+	button_style.border_width_bottom = 3
+	button_style.corner_radius_top_left = 12
+	button_style.corner_radius_top_right = 12
+	button_style.corner_radius_bottom_left = 12
+	button_style.corner_radius_bottom_right = 12
+
+	next_button.add_theme_stylebox_override("normal", button_style)
+
+	next_button.add_theme_font_size_override("font_size", 24)
+	next_button.add_theme_color_override("font_color", Color.WHITE)
+
+	panel.add_child(next_button)
+	next_button.pressed.connect(_on_counter_done)
 	_refresh_drop_ui()
-	
 
 
 func _shop_cost_for_rank(rank: int) -> int:
@@ -563,6 +522,7 @@ func _on_counter_done() -> void:
 	if _prize_layer != null and is_instance_valid(_prize_layer):
 		_prize_layer.queue_free()
 		_prize_layer = null
+	sound.play_sound_from_string("Beneath The Mask", 0.25, true)
 	_complete_room()
 
 

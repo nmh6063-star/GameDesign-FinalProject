@@ -693,9 +693,9 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_orb")
 
 [node name="Next" type="Button" parent="Overlay/Card" unique_id=164586871]
 layout_mode = 0
-offset_left = 190.0
+offset_left = 360.0
 offset_top = 638.0
-offset_right = 430.0
+offset_right = 600.0
 offset_bottom = 688.0
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(0.95, 0.95, 1, 1)
@@ -708,23 +708,6 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_next")
 theme_override_styles/focus = SubResource("StyleBoxFlat_next")
 disabled = true
 text = "Next"
-
-[node name="Skip" type="Button" parent="Overlay/Card" unique_id=1453779994]
-layout_mode = 0
-offset_left = 530.0
-offset_top = 638.0
-offset_right = 770.0
-offset_bottom = 688.0
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_pressed_color = Color(0.95, 0.95, 1, 1)
-theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
-theme_override_fonts/font = ExtResource("3_font")
-theme_override_font_sizes/font_size = 16
-theme_override_styles/normal = SubResource("StyleBoxFlat_next")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_next")
-theme_override_styles/hover = SubResource("StyleBoxFlat_next")
-theme_override_styles/focus = SubResource("StyleBoxFlat_next")
-text = "Skip"
 
 [node name="HoverTip" type="Panel" parent="." unique_id=1511428514]
 visible = false

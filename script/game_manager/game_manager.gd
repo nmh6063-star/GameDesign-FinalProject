@@ -13,6 +13,7 @@ const PLAYGROUND_SCENE_PATH := "res://scenes/playground.tscn"
 const MENU_SCENE_PATH := "res://scenes/menu_screen.tscn"
 const VICTORY_SCENE_PATH := "res://scenes/victory_screen.tscn"
 const PAUSE_MENU_SCENE := preload("res://scenes/pause_menu.tscn")
+const sound := preload("res://script/game_manager/sound_manager.gd")
 
 const _NON_GAME_SCENES := [
 	"res://scenes/menu_screen.tscn",
@@ -171,6 +172,7 @@ func complete_current_room() -> void:
 	_controller.mark_current_room_complete()
 	room_completed.emit(_room_payload(room))
 	open_map()
+	sound.play_sound_from_string.bind("Beneath The Mask", 0.25, true)
 
 
 ## Boss victory screen: persist completion, then leave run UI for the title menu.

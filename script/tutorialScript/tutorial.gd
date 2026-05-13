@@ -71,13 +71,15 @@ func _on_first_ball_dropped() -> void:
 
 func _on_first_merge() -> void:
 	await get_tree().create_timer(0.3).timeout
-	_enqueue_tip("Great merge! \n Every 5 merges gives you 1 mana pip")
+	_enqueue_tip("Great merge! \n Maintaining combos of 15 gives you 1 mana pipe")
+	_enqueue_tip("Combos are made by doing \nmultiple merges within a given time frame. \nStack merges to build combos!")
+	_enqueue_tip("Merges follow the order on the right. \nGoing from ranks 1-7 to the color white. \nTry building a combo of 15 now!")
 
 
 func _on_first_pip() -> void:
 	await get_tree().create_timer(0.3).timeout
 	_pending_attack_cursor = true
-	_enqueue_tip("Mana pip filled! \nPress X to enter aim mode, \nthen click a ball to spend a pip and shoot it.")
+	_enqueue_tip("Mana pipe filled! \nPress X to enter aim mode, \nthen click a ball to spend a pip and shoot it.")
 
 
 func _on_mana_depleted() -> void:
@@ -112,7 +114,10 @@ func _on_toppedout():
 
 func _on_battle_finished() -> void:
 	await get_tree().create_timer(0.5).timeout
-	get_tree().change_scene_to_file("res://scenes/tutorial_complete.tscn")
+	for child in get_tree().root.get_children():
+		if child.name.contains("player"):
+			child.queue_free()
+	get_tree().change_scene_to_file("res://scenes/menu_screen.tscn")
 
 
 func _enqueue_tip(text: String) -> void:
