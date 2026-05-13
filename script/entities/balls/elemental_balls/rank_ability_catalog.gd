@@ -8,27 +8,8 @@ const ELEMENT_TYPE := "Rank"
 
 static func default_element_for_rank(rank: int) -> Dictionary:
 	var r := clampi(rank, 1, 7)
-	match r:
-		1:
-			return _ability("strike", 1, "Strike", "Deal 10 damage to current enemy.")
-		2:
-			return _ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy.")
-		3:
-			return _ability("power_slash", 3, "Power Slash", "Deal 25 damage to current enemy.")
-		4:
-			return _ability("cleave", 4, "Cleave", "Deal 20 damage to each of 2 random enemies (same enemy can be hit twice).")
-		5:
-			var opts5 := reward_options_for_rank(5)
-			if opts5.is_empty():
-				return _ability("strike", 5, "Strike", "Deal 26 damage to current enemy.")
-			return (opts5[0] as Dictionary).duplicate(true)
-		6:
-			return _ability("strike", 6, "Strike", "Deal 30 damage to current enemy.")
-		7:
-			return _ability("strike", 7, "Strike", "Deal 34 damage to current enemy.")
-		_:
-			# clampi(1,7) makes this unreachable; satisfies analyzer for Dictionary return.
-			return _ability("strike", r, "Strike", "Deal 10 damage to current enemy.")
+	var dmg := 10 + (r - 1) * 4
+	return _ability("strike", r, "Strike", "Deal %d damage to current enemy." % dmg)
 
 
 ## Combined reward pools for reward tiers: 0 → ranks 1–3, 1 → 4–6, 2 → rank 7 only.
