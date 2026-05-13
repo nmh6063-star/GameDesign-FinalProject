@@ -255,10 +255,10 @@
 
 * **Freeze Wave**
 
-  * Apply Freeze:
-
-    * **5 stacks**
-  * Affect all enemies.
+  * Freeze **all** enemies for **8** seconds (8 freeze stacks).
+  * While frozen, enemies **cannot attack** (their attack turn is not executed until they thaw or break free early).
+  * Each second they may **break free** early: chance = (current HP%) × 60% + 5% per elapsed second (no damage over time).
+  * Gain **50 Shield** immediately.
 
 * **Giant Orb**
 

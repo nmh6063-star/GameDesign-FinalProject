@@ -26,7 +26,9 @@ script = ExtResource("1_script")
 [node name="Settings" type="Node" parent="." unique_id=451465565]
 script = ExtResource("2_psettings")
 lucky_draw_intro_format = "Cheaper roll: random rank %d–%d ability for the score cost below."
+gold_per_plinko_point = 2.0
 prize_counter_bottom_spacer_px = 96
+prize_counter_panel_half_height = 340.0
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=362862435]
 position = Vector2(248, 0)

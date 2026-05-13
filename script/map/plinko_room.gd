@@ -313,9 +313,9 @@ func _show_prize_counter_ui() -> void:
 
 	var card := PanelContainer.new()
 	card.set_anchors_preset(Control.PRESET_CENTER)
-	card.offset_left = -300.0
+	card.offset_left = -320.0
 	card.offset_top = -_settings.prize_counter_panel_half_height
-	card.offset_right = 300.0
+	card.offset_right = 320.0
 	card.offset_bottom = _settings.prize_counter_panel_half_height
 	var card_style := StyleBoxFlat.new()
 	card_style.bg_color = Color(0.08, 0.06, 0.14)
@@ -370,37 +370,32 @@ func _show_prize_counter_ui() -> void:
 		"Lucky draw (%d)" % _settings.draw_cost,
 		Color(0.25, 0.35, 0.65))
 	draw_btn.disabled = _plinko_points < _settings.draw_cost
+	draw_btn.tooltip_text = _lucky_draw_hover_tooltip(rmin_intro, rmax_intro)
 	draw_btn.pressed.connect(_on_counter_lucky_draw)
 	draw_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
 	row1.add_child(draw_btn)
 
-	var row2 := HBoxContainer.new()
-	row2.alignment = BoxContainer.ALIGNMENT_CENTER
-	row2.add_theme_constant_override("separation", 8)
-	vbox.add_child(row2)
+	var shop_hint := Label.new()
+	shop_hint.text = "Fixed rank rolls — hover for your current ball ability."
+	shop_hint.add_theme_font_override("font", font)
+	shop_hint.add_theme_font_size_override("font_size", 8)
+	shop_hint.add_theme_color_override("font_color", Color(0.72, 0.7, 0.85))
+	shop_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(shop_hint)
 
-	var b4 := _make_dialog_button("R4 roll (%d)" % _settings.shop_r4_cost, Color(0.45, 0.22, 0.55))
-	b4.disabled = _plinko_points < _settings.shop_r4_cost
-	b4.pressed.connect(_on_counter_shop_rank.bind(4, _settings.shop_r4_cost))
-	b4.pressed.connect(sound.play_sound_from_string.bind("click"))
-	row2.add_child(b4)
+	var row_r1234 := HBoxContainer.new()
+	row_r1234.alignment = BoxContainer.ALIGNMENT_CENTER
+	row_r1234.add_theme_constant_override("separation", 6)
+	vbox.add_child(row_r1234)
+	for rank in range(1, 5):
+		row_r1234.add_child(_make_rank_roll_button(rank))
 
-	var b5 := _make_dialog_button("R5 roll (%d)" % _settings.shop_r5_cost, Color(0.55, 0.35, 0.15))
-	b5.disabled = _plinko_points < _settings.shop_r5_cost
-	b5.pressed.connect(_on_counter_shop_rank.bind(5, _settings.shop_r5_cost))
-	b5.pressed.connect(sound.play_sound_from_string.bind("click"))
-	row2.add_child(b5)
-
-	var row3 := HBoxContainer.new()
-	row3.alignment = BoxContainer.ALIGNMENT_CENTER
-	row3.add_theme_constant_override("separation", 8)
-	vbox.add_child(row3)
-
-	var b6 := _make_dialog_button("R6 roll (%d)" % _settings.shop_r6_cost, Color(0.92, 0.48, 0.18))
-	b6.disabled = _plinko_points < _settings.shop_r6_cost
-	b6.pressed.connect(_on_counter_shop_rank.bind(6, _settings.shop_r6_cost))
-	b6.pressed.connect(sound.play_sound_from_string.bind("click"))
-	row3.add_child(b6)
+	var row_r567 := HBoxContainer.new()
+	row_r567.alignment = BoxContainer.ALIGNMENT_CENTER
+	row_r567.add_theme_constant_override("separation", 6)
+	vbox.add_child(row_r567)
+	for rank in range(5, 8):
+		row_r567.add_child(_make_rank_roll_button(rank))
 
 	var bottom_spacer := Control.new()
 	bottom_spacer.custom_minimum_size = Vector2(0, _settings.prize_counter_bottom_spacer_px)
@@ -411,17 +406,98 @@ func _show_prize_counter_ui() -> void:
 		"Cash out all score → +%d gold" % gold_preview,
 		Color(0.2, 0.42, 0.38))
 	cash_btn.disabled = gold_preview <= 0
+	if gold_preview > 0:
+		cash_btn.tooltip_text = _clamp_tooltip_text(
+			"Score: %d.\nConverts ALL of it to +%d gold (see gold_per_plinko_point on Settings).\nRank abilities stay as they are until you roll or swap." % [
+				_plinko_points, gold_preview
+			])
+	else:
+		cash_btn.tooltip_text = "Not enough score for at least 1 gold at the current rate."
 	cash_btn.pressed.connect(_on_counter_cash_out_all)
 	cash_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
 	vbox.add_child(cash_btn)
 
 	var done := _make_dialog_button("Continue", Color(0.22, 0.38, 0.22))
+	done.tooltip_text = "Return to the map. Unspent score is lost."
 	done.pressed.connect(_on_counter_done)
 	done.pressed.connect(sound.play_sound_from_string.bind("click"))
 	vbox.add_child(done)
 
 	sound.play_sound_from_string("coin")
 	_refresh_drop_ui()
+
+
+func _shop_cost_for_rank(rank: int) -> int:
+	if _settings == null:
+		return 9999
+	var r := clampi(rank, 1, 7)
+	if r >= 7:
+		return _settings.shop_roll_rank_7_cost
+	if r == 6:
+		return _settings.shop_roll_rank_6_cost
+	return _settings.shop_roll_rank_1_to_5_cost
+
+
+func _clamp_tooltip_text(s: String, max_len: int = 950) -> String:
+	if s.length() <= max_len:
+		return s
+	return s.substr(0, maxi(0, max_len - 2)) + "…"
+
+
+func _dictionary_for_rank_tooltip(rank: int) -> Dictionary:
+	var r := clampi(rank, 1, 7)
+	var ab: Variant = PlayerState.elements.get(r)
+	if ab != null and typeof(ab) == TYPE_DICTIONARY:
+		return (ab as Dictionary).duplicate(true)
+	return RankAbilityCatalog.default_element_for_rank(r)
+
+
+func _ability_hover_tooltip(rank: int) -> String:
+	var r := clampi(rank, 1, 7)
+	var d := _dictionary_for_rank_tooltip(r)
+	var name_str := String(d.get("name", "?"))
+	var desc_str := String(d.get("description", ""))
+	var lines := "Rank %d ball — current ability\n%s" % [r, name_str]
+	if desc_str.length() > 0:
+		lines += "\n\n" + desc_str
+	return _clamp_tooltip_text(lines)
+
+
+func _lucky_draw_hover_tooltip(rank_min: int, rank_max: int) -> String:
+	if _settings == null:
+		return ""
+	var lo := clampi(rank_min, 1, 7)
+	var hi := clampi(rank_max, 1, 7)
+	if lo > hi:
+		var sw := lo
+		lo = hi
+		hi = sw
+	var parts: Array[String] = []
+	parts.append(
+		"Spend %d score: one random new ability, rank rolled between %d and %d (same pools as fixed rank rolls)." % [
+			_settings.draw_cost, lo, hi
+		])
+	parts.append("\n\nAbilities on your team in that range:")
+	for rr in range(lo, hi + 1):
+		var d := _dictionary_for_rank_tooltip(rr)
+		parts.append("\n• Rank %d: %s" % [rr, String(d.get("name", "?"))])
+	var acc: String = ""
+	for p in parts:
+		acc += p
+	return _clamp_tooltip_text(acc)
+
+
+func _make_rank_roll_button(rank: int) -> Button:
+	var cost := _shop_cost_for_rank(rank)
+	var tint := _rank_color(rank).lerp(Color(0.06, 0.05, 0.12), 0.45)
+	var btn := _make_dialog_button("R%d (%d)" % [rank, cost], tint)
+	btn.custom_minimum_size = Vector2(72, 34)
+	btn.add_theme_font_size_override("font_size", 10)
+	btn.tooltip_text = _ability_hover_tooltip(rank)
+	btn.disabled = _plinko_points < cost
+	btn.pressed.connect(_on_counter_shop_rank.bind(rank, cost))
+	btn.pressed.connect(sound.play_sound_from_string.bind("click"))
+	return btn
 
 
 func _gold_for_all_score() -> int:

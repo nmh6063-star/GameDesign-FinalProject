@@ -79,7 +79,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 		5:
 			return [
 			_ability("critical_edge", 5, "Critical Edge", "Deal 25 damage to 2 random enemies."),
-			_ability("freeze_wave", 5, "Freeze Wave", "Freeze all enemies 8s. Deals 50 damage/s while frozen. Enemies may break free: chance = (HP%) × 60% + 5% per elapsed second."),
+			_ability("freeze_wave", 5, "Freeze Wave", "Freeze all enemies 8s — they cannot attack until thawed or they break free (chance each second: (HP%)×60% + 5%×elapsed s). No damage while frozen. Gain 50 Shield."),
 			_ability("giant_orb", 5, "Giant Orb", "All current balls gain ×3 attack and ×2 size for 5 ball drops. Effect is inherited on merge (does not stack)."),
 			_ability("consume_core", 5, "Consume Core", "Remove 1 ball from the box → deal 100 damage to current enemy."),
 			_ability("upgrade_pulse", 5, "Upgrade Pulse", "Upgrade a random nearby ball by +1 rank."),

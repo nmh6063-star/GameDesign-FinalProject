@@ -89,7 +89,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			ctx.battle_flags["last_damage"] = 8
 		"ice_shield":
 			ctx.add_player_shield(25)
-			ctx.add_enemy_status(ctx.active_enemy(), "freeze", 5)
+			ctx.add_enemy_status(ctx.active_enemy(), "freeze", 3)
 		"reinforce":
 			ctx.add_player_attack_bonus(3)
 		"convert":
@@ -722,12 +722,14 @@ static func _elbaphs_power(ctx: BattleContext) -> void:
 
 
 # ── Freeze Wave ───────────────────────────────────────────────────────────────
-## Freeze all enemies for 8 s. Every second while frozen: deal 50 damage and
-## roll a break-out check. Break probability = (hp%) × 60% + 5% per elapsed second.
-## High-HP enemies escape quickly; wounded enemies stay frozen longer.
+## Freeze all enemies for 8 s. Each second while still frozen: break-out check only
+## (no damage ticks). Break probability = (hp%) × 60% + 5% per elapsed second.
+## While freeze_until_ms is active, BattleLoop skips enemy.on_turn — no attacks.
+## Player gains 50 Shield immediately.
 static func _freeze_wave(ctx: BattleContext) -> void:
 	for e in _alive_enemies(ctx):
 		ctx.add_enemy_status(e, "freeze", 8)
+	ctx.add_player_shield(50)
 	if ctx.controller == null:
 		return
 	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
@@ -741,8 +743,6 @@ static func _freeze_wave(ctx: BattleContext) -> void:
 				var st := ctx.status_for_enemy(e)
 				if now >= int(st.get("freeze_until_ms", 0)):
 					continue  # already thawed
-				# Tick damage while frozen
-				ctx.damage_enemy(50, e)
 				# Break-out check (elapsed = sec - 1 because sec starts at 1)
 				var hp_pct := float(e.health()) / float(maxi(1, e.max_health()))
 				var break_prob := minf(1.0, hp_pct * 0.6 + float(sec - 1) * 0.05)

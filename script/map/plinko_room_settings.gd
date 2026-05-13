@@ -10,19 +10,20 @@ class_name PlinkoRoomSettings
 
 @export_group("Prize counter")
 @export var draw_cost: int = 8
-@export var shop_r4_cost: int = 15
-@export var shop_r5_cost: int = 22
-@export var shop_r6_cost: int = 30
+## Fixed rank rolls: ranks 1–5 share this price; 6 and 7 are higher (see below).
+@export var shop_roll_rank_1_to_5_cost: int = 12
+@export var shop_roll_rank_6_cost: int = 16
+@export var shop_roll_rank_7_cost: int = 18
 @export var lucky_draw_rank_min: int = 2
 @export var lucky_draw_rank_max: int = 7
 ## Shown above Lucky draw. Use two %d placeholders: rank min, rank max.
 @export var lucky_draw_intro_format: String = "Lucky Draw: random rank %d–%d ability for the score cost below."
 ## Spend entire score; gold gained = floor(score * this). Button disabled if result would be 0.
-@export var gold_per_plinko_point: float = 2
-## Empty space (px) between shop row and Cash out / Continue (push buttons lower).
+@export var gold_per_plinko_point: float = 0.2
+## Empty space (px) between shop rows and Cash out / Continue.
 @export var prize_counter_bottom_spacer_px: int = 56
-## Half-height of prize modal panel (also sets offset_top / offset_bottom).
-@export var prize_counter_panel_half_height: float = 280.0
+## Half-height of prize modal panel (offset_top / offset_bottom).
+@export var prize_counter_panel_half_height: float = 320.0
 
 @export_group("Symmetric slot tiers (rank 1–7 → ability pool; label shows score, not rank)")
 @export var symmetric_edge_rank: int = 2
