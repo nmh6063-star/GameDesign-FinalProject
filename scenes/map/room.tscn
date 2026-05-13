@@ -54,7 +54,6 @@ z_index = -1
 color = Color(1, 1, 1, 0)
 
 [node name="Border" type="Sprite2D" parent="Visuals" unique_id=1829986919]
-z_index = 0
 
 [node name="Sprite2D" type="Sprite2D" parent="Visuals" unique_id=447161206]
 z_index = 1

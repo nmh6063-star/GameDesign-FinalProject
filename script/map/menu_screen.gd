@@ -30,6 +30,7 @@ func _on_start_game_pressed() -> void:
 	sound.play_sound_from_string("click")
 	GameManager.generate_new_run()
 	GameManager.open_map()
+	sound.play_sound_from_string("Beneath The Mask", 0.25, true)
 
 
 func _on_tutorial_pressed() -> void:

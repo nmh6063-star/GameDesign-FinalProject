@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://cux7863nh88cw" path="res://assets/CapsuleBall.png" id="5_85g3d"]
 [ext_resource type="FontFile" uid="uid://ygxh47ffy164" path="res://assets/dogica/TTF/dogicabold.ttf" id="6_choun"]
 [ext_resource type="Texture2D" uid="uid://cwkwc8veij7iu" path="res://assets/white.jpg" id="8_muem4"]
+[ext_resource type="Texture2D" uid="uid://edk4f4pptld7" path="res://assets/color_wheel.png" id="9_jbj1t"]
 [ext_resource type="Script" uid="uid://cwd3n2iac6d77" path="res://script/player/player.gd" id="9_trceg"]
 [ext_resource type="Script" uid="uid://cddiivxjsx5a1" path="res://script/ui/line_indicator.gd" id="11_ya4ey"]
 [ext_resource type="Texture2D" uid="uid://bw1g8w6rafqq8" path="res://assets/DownIndicator.png" id="12_indicator"]
@@ -321,6 +322,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_queue_slot")
 position = Vector2(34, 34)
 
 [node name="HoldBox" type="Panel" parent="UI/BallQueue" unique_id=1041509992]
+visible = false
 layout_mode = 0
 offset_left = 960.0
 offset_top = 1.0
@@ -378,6 +380,15 @@ offset_bottom = 450.0
 theme_override_fonts/font = ExtResource("6_choun")
 theme_override_font_sizes/font_size = 10
 text = "I"
+
+[node name="TextureRect" type="TextureRect" parent="UI/BallQueue" unique_id=1034498637]
+layout_mode = 0
+offset_left = 750.0
+offset_top = 54.0
+offset_right = 1453.0
+offset_bottom = 700.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("9_jbj1t")
 
 [node name="StatsHUD" type="Control" parent="UI" unique_id=901000000]
 layout_mode = 3
@@ -508,7 +519,7 @@ layout_mode = 2
 
 [node name="Meter" type="Control" parent="UI/CursorManaPipes" unique_id=901000002]
 custom_minimum_size = Vector2(50, 9)
-layout_mode = 0
+anchors_preset = 0
 mouse_filter = 2
 
 [node name="Background" type="ColorRect" parent="UI/CursorManaPipes/Meter" unique_id=901000003]
@@ -1198,7 +1209,7 @@ position = Vector2(12, -8)
 [node name="Cave" type="Sprite2D" parent="Background" unique_id=1221723363]
 z_index = -1
 texture_filter = 1
-position = Vector2(248, 0)
+position = Vector2(248, 7.9999995)
 scale = Vector2(0.7, 0.7)
 texture = ExtResource("17_dp3eg")
 

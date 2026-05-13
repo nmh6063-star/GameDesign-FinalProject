@@ -130,6 +130,15 @@ func _physics_process(_delta: float) -> void:
 	_update_elbaphs_power(_delta)
 	_handle_status_effects()
 	_handle_topout_check()
+	_handle_combo_mana_sync()
+
+func _handle_combo_mana_sync():
+	if _context.MAX_MANA_PIPES > _context.mana_pipes:
+		_context.merge_progress = clamp(_context.internal_combo_track, 0, _context.MERGES_PER_MANA_PIPE)
+		if _context.internal_combo_track >= _context.MERGES_PER_MANA_PIPE:
+			_context.internal_combo_track = 0
+			_context.mana_pipes = mini(_context.mana_pipes + 1, _context.MAX_MANA_PIPES)
+		sync_combo_hud()
 
 func _handle_topout_check():
 	for ball in _context.active_balls():
@@ -210,8 +219,8 @@ func _handle_shoot_input() -> void:
 		_context.current_ball.get_node("CollisionShape2D").disabled = false
 		_context.current_ball.dropped.emit()
 		print("OOPS")
-	if _context.phase == BattleContext.Phase.PLAY \
-		and Input.is_action_just_pressed("shoot") \
+	#if _context.phase == BattleContext.Phase.PLAY \
+	if Input.is_action_just_pressed("shoot") \
 		and _can_enter_action_mode():
 		_enter_slow_mo()
 
@@ -288,6 +297,8 @@ func active_balls() -> Array:
 
 func effect_balls() -> Array:
 	var balls := active_balls()
+	if !_context.current_ball:
+		return []
 	var current := _context.current_ball as BallBase
 	if is_instance_valid(current) and current.is_active_for_effects():
 		balls.append(current)
@@ -554,6 +565,7 @@ func _topout():
 		return
 	_context.combo_timer = 0.0
 	_context.combo = 0
+	_context.internal_combo_track = 0
 	sync_combo_hud()
 	var effects2 = Effects.new()
 	_root.add_child(effects2)
@@ -809,10 +821,11 @@ func _finish_battle(text: String) -> void:
 		_show_post_battle_reward_selection()
 		return
 	game_manager.call("complete_current_room")
+	sound.play_sound_from_string("Beneath The Mask", 0.25, true)
 
 
 func _should_show_post_battle_reward() -> bool:
-	return true
+	return false
 
 
 func _should_open_victory_screen() -> bool:

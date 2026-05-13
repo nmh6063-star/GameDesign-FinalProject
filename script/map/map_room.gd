@@ -10,6 +10,7 @@ const TEXTURES := {
 	MapGenerator.Room.Type.SHOP: preload("res://assets/tempAssets/dollar.png"),
 	MapGenerator.Room.Type.CAMPFIRE: preload("res://assets/tempAssets/random.png"),
 	MapGenerator.Room.Type.BOSS: preload("res://assets/tempAssets/sword.png"),
+	MapGenerator.Room.Type.EVENT: preload("res://assets/tempAssets/mystery.png")
 }
 
 const LABELS := {

@@ -37,7 +37,7 @@ func _ready() -> void:
 		if not _gm.has_run():
 			_gm.generate_new_run(-1)
 	_refresh()
-	_maybe_reward()
+	#_maybe_reward()
 
 func _exit_tree() -> void:
 	if _gm == null:

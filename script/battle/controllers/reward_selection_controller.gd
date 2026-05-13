@@ -55,9 +55,11 @@ var _ability_hover_body: Label
 var _ability_hover_stat: Label
 ## Tracks hover content so we only reflow the tip when the target changes ("rank:3", "reward:1", …).
 var _hover_tip_key: String = ""
+var skipped = false
 
 const sound := preload("res://script/game_manager/sound_manager.gd")
 
+var coins_for_instance = 99
 
 func _ready() -> void:
 	_build_style_templates()
@@ -70,6 +72,7 @@ func _ready() -> void:
 	set_process(true)
 	_collection_button().pressed.connect(_on_collection_pressed)
 	_next_button().pressed.connect(_on_next_pressed)
+	$Overlay/Card/Skip.pressed.connect(_on_next_pressed)
 	_next_button().pressed.connect(sound.play_sound_from_string.bind("click"))
 	for i in range(REWARD_SLOT_COUNT):
 		var card := _reward_card(i)
@@ -81,7 +84,8 @@ func _ready() -> void:
 			orb.pressed.connect(sound.play_sound_from_string.bind("click"))
 		card.disabled = true
 	_begin_rank_pick_phase()
-	sound.play_sound_from_string("Beneath the Mask", 0.25, true)
+	_update_skip_count(true)
+	#sound.play_sound_from_string("Beneath the Mask", 0.25, true)
 
 
 func _process(_delta: float) -> void:
@@ -334,13 +338,16 @@ func _cache_top_rank_buttons() -> void:
 		var button := get_node("Overlay/Card/TopBar/RankOrbs/RankBall%d" % rank) as Button
 		_top_rank_buttons.append(button)
 
-
 func _cache_range_panels() -> void:
 	_range_panels.clear()
+
 	for i in range(3):
 		var p := get_node_or_null("Overlay/Card/TopBar/RangeTier%d" % i) as Panel
+
 		if p != null:
 			_range_panels.append(p)
+
+	_ensure_range_tier_coin_labels(["10 coins", "20 coins", "35 coins"])
 
 
 func _connect_range_panels() -> void:
@@ -418,7 +425,7 @@ func _update_range_panel_layout() -> void:
 		var gr := _union_global_rect(_controls_in_reward_range(i))
 		if gr.size.x <= 0.0 or gr.size.y <= 0.0:
 			continue
-		gr = gr.grow_individual(PAD, PAD, PAD, PAD)
+		gr = gr.grow_individual(PAD, PAD + 22.0, PAD, PAD)
 		var top_left: Vector2 = inv * gr.position
 		var bot_right: Vector2 = inv * (gr.position + gr.size)
 		var p := _range_panel(i)
@@ -426,6 +433,7 @@ func _update_range_panel_layout() -> void:
 			continue
 		p.position = top_left
 		p.size = bot_right - top_left
+	_ensure_range_tier_coin_labels(["10 coins", "20 coins", "35 coins"])
 
 
 func _refresh_range_panel_styles() -> void:
@@ -490,12 +498,23 @@ func _refresh_range_panel_styles_after_layout() -> void:
 	_update_range_panel_layout()
 	_refresh_range_panel_styles()
 
+func _update_skip_count(thing):
+	var text = $Overlay/Card/Skip
+	if thing:
+		text.text = "Skip (gain " + str(coins_for_instance) + " coins)"
+	else:
+		text.text = "Skip"
+		skipped = true
 
 func _on_range_pressed(range_id: int) -> void:
 	if _range_choice_locked:
 		return
 	if range_id < 0 or range_id > 2:
 		return
+	if !((range_id == 0 and coins_for_instance >= 10) or (range_id == 1 and coins_for_instance >= 20) or (range_id == 2 and coins_for_instance >= 35)):
+		sound.play_sound_from_string("error", 0.5, false, false)
+		return
+	_update_skip_count(false)
 	var pool: Array = RankAbilityCatalog.reward_pool_for_reward_range(range_id).duplicate()
 	if pool.is_empty():
 		return
@@ -552,6 +571,12 @@ func _on_next_pressed() -> void:
 	var picked: Dictionary = _ability_entries[_picked_index]
 	var slot_rank := int(picked.get("rank", 1))
 	PlayerState.equip_rank_ability(slot_rank, picked)
+	selection_completed.emit()
+	queue_free()
+
+func _on_skip_pressed():
+	if !skipped:
+		PlayerState.player_gold += coins_for_instance
 	selection_completed.emit()
 	queue_free()
 
@@ -730,3 +755,44 @@ func _next_button() -> Button:
 
 func _collection_button() -> Button:
 	return $Overlay/Card/CollectionButton as Button
+
+func _ensure_range_tier_coin_labels(range_texts: Array[String]) -> void:
+	for i in range(_range_panels.size()):
+		var panel := _range_panels[i]
+
+		if panel == null:
+			continue
+
+		var label := panel.get_node_or_null("CoinsLabel") as Label
+
+		if label == null:
+			label = Label.new()
+			label.name = "CoinsLabel"
+			panel.add_child(label)
+
+			label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			
+			var font: Font = load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
+			label.add_theme_font_override("font", font)
+			label.add_theme_font_size_override("font_size", 18)
+			label.add_theme_color_override("font_color", Color(1, 0.9, 0.2))
+
+		# Use passed-in text for each tier.
+		if i < range_texts.size():
+			label.text = range_texts[i]
+		else:
+			label.text = "coins"
+
+		label.anchor_left = 0.0
+		label.anchor_right = 1.0
+		label.anchor_top = 0.0
+		label.anchor_bottom = 0.0
+
+		# Keep label inside border and above orbs.
+		label.offset_left = 8
+		label.offset_right = -8
+
+		label.offset_top = 2
+		label.offset_bottom = 18

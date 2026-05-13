@@ -3,8 +3,8 @@ class_name BattleContext
 
 enum Phase { PLAY, RESOLVE }
 
-const MAX_MANA_PIPES := 5
-const MERGES_PER_MANA_PIPE := 5
+const MAX_MANA_PIPES := 3
+const MERGES_PER_MANA_PIPE := 15
 var COMBO_TIMEOUT := 5.0
 var BACK_TO_BACK_TIMEOUT := 0.25
 
@@ -21,6 +21,7 @@ var back2back := 0
 var combo_timer := 0.0
 var b2b_timer := BACK_TO_BACK_TIMEOUT
 var enemy_statuses := {}
+var internal_combo_track = 0
 var player_statuses := {
 	"shield": 0,
 	"attack_bonus": 0,
@@ -64,6 +65,7 @@ func reset_for_battle() -> void:
 	battle_result_text = ""
 	slow_mo_active = false
 	combo = 0
+	internal_combo_track = 0
 	combo_timer = 0.0
 	back2back = 0
 	b2b_timer = 0.0
@@ -156,6 +158,7 @@ func tick_combo(delta: float) -> void:
 	if combo_timer <= 0.0:
 		combo_timer = 0.0
 		combo = 0
+		internal_combo_track = 0
 		COMBO_TIMEOUT = 5.0
 	if controller != null:
 		controller.sync_combo_hud()
@@ -222,21 +225,25 @@ func create_floating_text(text: int, global_pos: Vector2):
 func register_merge(ball: Node2D) -> void:
 	sound.play_sound_from_string("merge", null, false, true, float(back2back) / 10.0)
 	combo += 1
+	internal_combo_track += 1
 	COMBO_TIMEOUT -= clampf(0.1 / (float(combo)/2.0), 0.25, 5.0)
 	combo_timer = COMBO_TIMEOUT
 	back2back += 1
 	b2b_timer = BACK_TO_BACK_TIMEOUT
 	if(back2back > 1):
 		combo += back2back
+		internal_combo_track += back2back
 		create_floating_text(back2back, ball.global_position)
 	if combo > int(battle_flags.get("max_combo_reached", 0)):
 		battle_flags["max_combo_reached"] = combo
+	"""
 	if mana_pipes < MAX_MANA_PIPES:
 		var progress_gain := maxi(1, int(combo_multiplier()))
 		merge_progress += progress_gain
 		while merge_progress >= MERGES_PER_MANA_PIPE and mana_pipes < MAX_MANA_PIPES:
 			merge_progress -= MERGES_PER_MANA_PIPE
 			mana_pipes = mini(mana_pipes + 1, MAX_MANA_PIPES)
+	"""
 	if controller != null:
 		controller.sync_mana_hud()
 		controller.sync_combo_hud()

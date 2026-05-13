@@ -46,7 +46,8 @@ var _camera_base_offset := Vector2.ZERO
 var _slot_abilities: Dictionary = {}
 
 const sound := preload("res://script/game_manager/sound_manager.gd")
-
+const REWARD_SCENE := preload("res://scenes/reward_selection.tscn")
+var _reward_overlay: RewardSelectionController
 
 func _ready() -> void:
 	if _settings == null:
@@ -300,6 +301,7 @@ func _show_prize_counter_ui() -> void:
 	if _prize_layer != null and is_instance_valid(_prize_layer):
 		_prize_layer.queue_free()
 		_prize_layer = null
+	"""
 
 	var font: Font = load("res://assets/dogica/TTF/dogicapixelbold.ttf") as Font
 	_prize_layer = CanvasLayer.new()
@@ -422,9 +424,15 @@ func _show_prize_counter_ui() -> void:
 	done.pressed.connect(_on_counter_done)
 	done.pressed.connect(sound.play_sound_from_string.bind("click"))
 	vbox.add_child(done)
-
+	"""
+	_reward_overlay = REWARD_SCENE.instantiate() as RewardSelectionController
+	_reward_overlay.coins_for_instance = _plinko_points
+	
+	_reward_overlay.selection_completed.connect(_on_counter_done)
+	add_child(_reward_overlay)
 	sound.play_sound_from_string("coin")
 	_refresh_drop_ui()
+	
 
 
 func _shop_cost_for_rank(rank: int) -> int:

@@ -42,6 +42,11 @@ text = "CURRENT ROOM: START"
 
 [node name="PlayerHealthBar" parent="." unique_id=759179228 instance=ExtResource("3_map_hp")]
 anchors_preset = 1
+offset_left = -324.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 38.0
+grow_vertical = 1
 
 [node name="SeedLabel" type="Label" parent="." unique_id=796882730]
 layout_mode = 1
