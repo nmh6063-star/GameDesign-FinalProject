@@ -270,7 +270,7 @@
 * **Consume Core**
 
   * Destroy one ball currently inside box.
-  * Then deal **100 damage**.
+  * Then deal **50 damage**.
 
 * **Poison Rain**
 
@@ -341,7 +341,7 @@
 
 * **Final Judgment**
 
-  * Deal **1000 damage** to one target enemy.
+  * Deal **12 damage** to the current enemy **6 times** (72 total).
 
 * **Apocalypse**
 

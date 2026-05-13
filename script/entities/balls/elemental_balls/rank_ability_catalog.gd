@@ -9,7 +9,6 @@ const ELEMENT_TYPE := "Rank"
 static func default_element_for_rank(rank: int) -> Dictionary:
 	var r := clampi(rank, 1, 7)
 	match r:
-		
 		1:
 			return _ability("strike", 1, "Strike", "Deal 10 damage to current enemy.")
 		2:
@@ -17,7 +16,7 @@ static func default_element_for_rank(rank: int) -> Dictionary:
 		3:
 			return _ability("power_slash", 3, "Power Slash", "Deal 25 damage to current enemy.")
 		4:
-			return _ability("cleave", 4, "Cleave", "Deal 20 damage to all enemies.")
+			return _ability("cleave", 4, "Cleave", "Deal 20 damage to each of 2 random enemies (same enemy can be hit twice).")
 		5:
 			var opts5 := reward_options_for_rank(5)
 			if opts5.is_empty():
@@ -26,7 +25,7 @@ static func default_element_for_rank(rank: int) -> Dictionary:
 		6:
 			return _ability("strike", 6, "Strike", "Deal 30 damage to current enemy.")
 		7:
-			return _ability("resurrection", 7, "Resurrection", "Revive once with low HP upon death (this battle).")
+			return _ability("strike", 7, "Strike", "Deal 34 damage to current enemy.")
 		_:
 			# clampi(1,7) makes this unreachable; satisfies analyzer for Dictionary return.
 			return _ability("strike", r, "Strike", "Deal 10 damage to current enemy.")
@@ -90,10 +89,10 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 		]
 		5:
 			return [
-			_ability("critical_edge", 5, "Critical Edge", "Deal 25 damage to 2 random enemies."),
+			_ability("critical_edge", 5, "Critical Edge", "Deal 25 damage to each of 2 random enemies (same enemy can be hit twice)."),
 			_ability("freeze_wave", 5, "Freeze Wave", "Freeze all enemies 8s — they cannot attack until thawed or they break free (chance each second: (HP%)×60% + 5%×elapsed s). No damage while frozen. Gain 50 Shield."),
 			_ability("giant_orb", 5, "Giant Orb", "All current balls gain ×3 attack and ×2 size for 5 ball drops. Effect is inherited on merge (does not stack)."),
-			_ability("consume_core", 5, "Consume Core", "Remove 1 ball from the box → deal 100 damage to current enemy."),
+			_ability("consume_core", 5, "Consume Core", "Remove 1 ball from the box → deal 50 damage to current enemy."),
 				_ability("poison_rain", 5, "Poison Rain", "For 5 shoots: every board merge adds +3 poison to all enemies. (☣ Rain indicator shown)"),
 				_ability("time_drift", 5, "Time Drift", "10s: enemies cannot act, player ignores control effects. Damage taken in first 5s is reflected as DoT in last 5s."),
 			_ability("contagion", 5, "Contagion", "Copy current enemy debuffs to one random other enemy (stacks with theirs)."),

@@ -49,6 +49,9 @@ var _pre_map_reward_pending := false
 
 
 func _ready() -> void:
+	# Keep receiving ESC while the game tree is paused (pause menu open) so web
+	# builds can still close the menu; itch.io/canvas input pairs with _input + InputMap.
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	_bind_controller()
 	if not has_run():
 		generate_new_run()
@@ -325,27 +328,47 @@ func _room_payload(room) -> Dictionary:
 	return room.to_dictionary() if room != null and room.has_method("to_dictionary") else {}
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not event is InputEventKey or not event.pressed or event.echo:
-		return
-	var scene := get_tree().current_scene
-	if scene == null:
-		return
-	if event.keycode == KEY_ESCAPE:
+func _input(event: InputEvent) -> void:
+	if _event_requests_pause(event):
+		get_viewport().set_input_as_handled()
+		if _pause_menu != null and is_instance_valid(_pause_menu) and _pause_menu.visible:
+			_pause_menu.hide_menu()
+			return
+		var scene := get_tree().current_scene
+		if scene == null:
+			return
 		var in_room := scene.scene_file_path in _ROOM_SCENES
 		var in_game := scene.scene_file_path not in _NON_GAME_SCENES
 		var can_restart := in_room and scene.scene_file_path != EVENT_SCENE_PATH
 		_show_pause_menu(in_room, in_game, can_restart)
 		return
-	if scene.scene_file_path in _NON_GAME_SCENES:
+	if not event is InputEventKey or not event.pressed or event.echo:
 		return
-	if event.keycode == KEY_P and scene.scene_file_path == BATTLE_SCENE_PATH:
-		var battle := scene.get_node_or_null("BallHolder/BattleController")
+	var scene2 := get_tree().current_scene
+	if scene2 == null:
+		return
+	if scene2.scene_file_path in _NON_GAME_SCENES:
+		return
+	if event.keycode == KEY_P and scene2.scene_file_path == BATTLE_SCENE_PATH:
+		var battle := scene2.get_node_or_null("BallHolder/BattleController")
 		if battle != null and battle.has_method("skip_to_post_battle_reward"):
 			battle.skip_to_post_battle_reward()
+			get_viewport().set_input_as_handled()
 		return
-	if event.keycode == KEY_P and scene.scene_file_path in _ROOM_SCENES:
+	if event.keycode == KEY_P and scene2.scene_file_path in _ROOM_SCENES:
 		complete_current_room()
+		get_viewport().set_input_as_handled()
 		return
 	if event.keycode == KEY_T:
 		PlayerState.apply_test_current_abilities_set()
+		get_viewport().set_input_as_handled()
+
+
+func _event_requests_pause(event: InputEvent) -> bool:
+	if event.is_action_pressed(&"toggle_pause"):
+		return true
+	if event is InputEventKey:
+		var k := event as InputEventKey
+		if k.pressed and not k.echo and (k.keycode == KEY_ESCAPE or k.physical_keycode == KEY_ESCAPE):
+			return true
+	return false

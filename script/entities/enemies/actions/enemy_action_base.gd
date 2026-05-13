@@ -19,7 +19,7 @@ func icon_texture() -> Texture2D:
 
 
 func damage_amount(enemy: EnemyBase) -> int:
-	return enemy.data.attack_damage if enemy != null and enemy.data != null else 0
+	return enemy.data.effective_attack_damage() if enemy != null and enemy.data != null else 0
 
 
 func special_effect() -> String:

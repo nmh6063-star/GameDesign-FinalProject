@@ -20,15 +20,6 @@ func hide_menu() -> void:
 	get_tree().paused = false
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if not visible:
-		return
-	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_ESCAPE:
-			hide_menu()
-			get_viewport().set_input_as_handled()
-
-
 func _on_continue_pressed() -> void:
 	hide_menu()
 

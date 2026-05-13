@@ -51,6 +51,10 @@ CHANGELOG
     - Run uses 3 drops (tunable); slot score values and miss points raised vs the
       old 5-drop tuning so prize score stays in a similar range.
 
+  May 13, 2026 — Consume Core / Final Judgment
+    - Consume Core: 50 damage to current enemy after removing a ball (was 100).
+    - Final Judgment: 6 hits × 12 damage to current enemy (was 4 × 12).
+
   May 13, 2026 — Poison Rain
     - Rain lasts 5 ball drops (was 3). Each board merge adds +3 poison to all
       enemies (was +2). Poison on enemies still decreases by 1 stack per attack
@@ -254,7 +258,7 @@ RANK 4
 --------------------------------------------------------------------------------
 
   Cleave (DEFAULT)
-    Deal 20 damage to ALL enemies.
+    Deal 20 damage to each of 2 random enemies (the same enemy can be hit twice if only one is alive).
 
   Greater Heal
     Heal 30% of missing HP.
@@ -306,7 +310,7 @@ RANK 5
 --------------------------------------------------------------------------------
 
   Critical Edge (DEFAULT)
-    Deal 25 or 30 damage to one enemy (chosen randomly).
+    Deal 25 damage to each of 2 random enemies (the same enemy can be hit twice if only one is alive).
 
   Freeze Wave
     Freeze ALL enemies for 8 seconds (8 freeze stacks). While frozen, they cannot
@@ -322,7 +326,7 @@ RANK 5
 
   Consume Core
     Remove 1 random ball from the box (permanently for this battle).
-    Then deal 100 damage to current enemy.
+    Then deal 50 damage to current enemy.
 
   Poison Rain
     Activate a 5-shoot Rain mode (☣ Rain ×N shown on enemies):
@@ -426,7 +430,7 @@ RANK 7
 --------------------------------------------------------------------------------
 
   Final Judgment (DEFAULT)
-    Deal 12 damage to current enemy 4 times (48 total).
+    Deal 12 damage to current enemy 6 times (72 total).
     Each hit benefits from Giant Orb / attack bonuses.
 
   Apocalypse
@@ -584,7 +588,7 @@ PLINKO ROOM (shrine gamble)
   random ability at exactly that rank; Cash out converts all remaining score to
   gold (rate on Settings). All roll pools match RankAbilityCatalog.reward_options
   plus that rank’s catalog default (R1 Strike, R2 Heavy Strike, R3 Power Slash,
-  R4 Cleave, R5 first rank-5 option, R6 Meteor Crash, R7 Final Judgment) when not
+  R4 Cleave, R5 first rank-5 option, R6 Strike, R7 Strike) when not
   already in the pool.
 
 ================================================================================

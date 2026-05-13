@@ -118,7 +118,8 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 4 ────────────────────────────────────────────────────────────
 		"cleave":
-			_deal_all(ctx, 20, source)
+			_deal_random_enemy(ctx, 20, source)
+			_deal_random_enemy(ctx, 20, source)
 		"greater_heal":
 			var lost_g: int = maxi(0, PlayerState.player_max_health - PlayerState.player_health)
 			ctx.heal_player(int(round(lost_g * 0.30)))
@@ -156,6 +157,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 5 ────────────────────────────────────────────────────────────
 		"critical_edge":
+			# Two hits of 25 on random targets (same enemy allowed if solo).
 			_deal_random_enemy(ctx, 25, source)
 			_deal_random_enemy(ctx, 25, source)
 		"freeze_wave":
@@ -164,7 +166,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			# ×3 attack, ×2 size — all balls, 5 drops, inherits on merge
 			_apply_giant_buff_all(ctx, 3.0, 2.0, false)
 		"consume_core":
-			_consume_random_ball_and_deal(ctx, 100, source)
+			_consume_random_ball_and_deal(ctx, 50, source)
 		"poison_rain":
 			# For 5 shoots, each board merge adds +3 poison to all enemies.
 			ctx.battle_flags["poison_rain_shoots"] = 5
@@ -225,8 +227,8 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 
 		# ── Rank 7 ────────────────────────────────────────────────────────────
 		"final_judgment":
-			# 4 hits of 12 damage on current enemy.
-			for _i in range(4):
+			# 6 hits of 12 damage on current enemy.
+			for _i in range(6):
 				_deal_single(ctx, 12, source)
 		"apocalypse":
 			# 6 hits of 8 damage to all enemies.

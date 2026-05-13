@@ -6,7 +6,7 @@ const _ICON := preload("res://assets/enemies/attack_icon/ice icon no back.png")
 
 
 func execute(ctx: BattleContext, enemy: EnemyBase) -> void:
-	ctx.damage_player(enemy.data.attack_damage)
+	ctx.damage_player(enemy.data.effective_attack_damage())
 	ctx.player_statuses["freeze_stacks"] = FREEZE_DURATION
 
 

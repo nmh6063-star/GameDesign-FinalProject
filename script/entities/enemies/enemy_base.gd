@@ -137,7 +137,7 @@ func cooldown_left() -> float:
 
 
 func cooldown_total() -> float:
-	return data.attack_interval if data != null else 0.0
+	return data.effective_attack_interval() if data != null else 0.0
 
 
 func flash() -> void:
@@ -160,7 +160,7 @@ func _restart_attack_cooldown() -> void:
 	if data == null or data.attack_interval <= 0.0:
 		_attack_cooldown.stop()
 		return
-	_attack_cooldown.wait_time = data.attack_interval
+	_attack_cooldown.wait_time = data.effective_attack_interval()
 	_attack_cooldown.start()
 
 

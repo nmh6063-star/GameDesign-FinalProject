@@ -194,13 +194,15 @@ func create_floating_text(text: int, global_pos: Vector2):
 	
 	# Wait for the label to size itself
 	await Engine.get_main_loop().process_frame
-	
+	if not is_instance_valid(label):
+		return
+
 	# Center the text on the position
 	label.global_position = global_pos - (label.size / 2)
-	
+
 	# Create tween
 	var tween = Engine.get_main_loop().create_tween()
-	
+
 	# Move upward
 	tween.parallel().tween_property(
 		label,
@@ -208,7 +210,7 @@ func create_floating_text(text: int, global_pos: Vector2):
 		label.global_position.y - 50,
 		1.0
 	)
-	
+
 	# Fade out
 	tween.parallel().tween_property(
 		label,
@@ -216,10 +218,11 @@ func create_floating_text(text: int, global_pos: Vector2):
 		0.0,
 		1.0
 	)
-	
-	# Delete when finished
+
+	# Delete when finished (scene may unload first — e.g. return to title from playground)
 	tween.finished.connect(func():
-		label.queue_free()
+		if is_instance_valid(label):
+			label.queue_free()
 	)
 
 func register_merge(ball: Node2D) -> void:
