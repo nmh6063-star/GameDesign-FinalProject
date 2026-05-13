@@ -183,8 +183,10 @@ func create_floating_text(text: int, global_pos: Vector2):
 	label.z_index = 100
 	
 	label.modulate = Color(1, 1, 1, 1)
-	
-	Engine.get_main_loop().root.get_node("Main").add_child(label)
+	if Engine.get_main_loop().root.get_node_or_null("Tutorial"):
+		Engine.get_main_loop().root.get_node("Tutorial").add_child(label)
+	else:
+		Engine.get_main_loop().root.get_node("Main").add_child(label)
 	
 	# Wait for the label to size itself
 	await Engine.get_main_loop().process_frame

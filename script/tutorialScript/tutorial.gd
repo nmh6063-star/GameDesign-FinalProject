@@ -21,6 +21,9 @@ var _pending_attack_cursor := false
 var _attack_phase_active := false
 var _hold_x_canvas: CanvasLayer = null
 var _hold_x_label: Label = null
+var toppedout = false
+var stop_shoot = false
+var final_tip = false
 
 signal _dismissed
 
@@ -34,6 +37,7 @@ func _ready() -> void:
 	_battle_controller.first_merge_done.connect(_on_first_merge)
 	_battle_controller.first_pip_filled.connect(_on_first_pip)
 	_battle_controller.mana_depleted.connect(_on_mana_depleted)
+	_battle_controller.topped_out.connect(_on_toppedout)
 	_battle_controller.battle_finished.connect(_on_battle_finished)
 	_show_cursor()
 
@@ -48,10 +52,12 @@ func _input(event: InputEvent) -> void:
 func _process(_delta: float) -> void:
 	if not _attack_phase_active:
 		return
-	var holding := Input.is_action_pressed("shoot")
+	var holding = _battle_controller._context.slow_mo_active
 	_mouse_for_attack.visible = holding
 	if _hold_x_label:
 		_hold_x_label.visible = not holding
+	if stop_shoot and _battle_controller._context.slow_mo_active:
+		Input.action_press("drop")
 
 
 # ── Tip triggers ─────────────────────────────────────────────────────────────
@@ -69,17 +75,39 @@ func _on_first_merge() -> void:
 
 
 func _on_first_pip() -> void:
+	await get_tree().create_timer(0.3).timeout
 	_pending_attack_cursor = true
-	_enqueue_tip("Mana pip filled! \nHold X to enter aim mode, \nthen click a ball to spend a pip and shoot it.")
+	_enqueue_tip("Mana pip filled! \nPress X to enter aim mode, \nthen click a ball to spend a pip and shoot it.")
 
 
 func _on_mana_depleted() -> void:
-	_attack_phase_active = false
-	_mouse_for_attack.visible = false
-	if _hold_x_canvas:
-		_hold_x_canvas.queue_free()
-		_hold_x_canvas = null
-		_hold_x_label = null
+	if !stop_shoot:
+		stop_shoot = true
+		_attack_phase_active = false
+		_mouse_for_attack.visible = false
+		if _hold_x_canvas:
+			_hold_x_canvas.queue_free()
+			_hold_x_canvas = null
+			_hold_x_label = null
+		_force_topout()
+
+func _force_topout():
+	await get_tree().create_timer(1.0).timeout
+	_enqueue_tip("Nice Shot! \nBeware of topouts! \nTopouts occur when you try to drop a ball \nwhile overlapping another ball. \n To demonstrate, try dropping a ball \non top of the filled board...")
+
+func spawn_set():
+	await get_tree().create_timer(0.5).timeout
+	var new_node := Node2D.new()
+	new_node.name = "TOPOUT"
+	Engine.get_main_loop().root.add_child(new_node)
+	for i in range(15):
+		_battle_controller._context.drop_ball_in_box("ball_normal", 7)
+
+func _on_toppedout():
+	await get_tree().create_timer(1.0).timeout
+	toppedout = true
+	_enqueue_tip("Topouts deal damange, clear your board, \nand take away a mana pip! \nMake sure to avoid topping out if you can!")
+	_enqueue_tip("Throughout your run you will find \nvarious different ball types. \nThe higher the rank of the ball, \nthe more powerful the abilities. \nTry out different combinations as you play \nto find the best way to win!")
 
 
 func _on_battle_finished() -> void:
@@ -157,6 +185,12 @@ func _cleanup_tip(canvas: CanvasLayer, hint_canvas: CanvasLayer) -> void:
 	canvas.queue_free()
 	hint_canvas.queue_free()
 	get_tree().paused = false
+	if stop_shoot and !toppedout:
+		spawn_set()
+	elif toppedout and !final_tip:
+		final_tip = true
+	elif final_tip:
+		_on_battle_finished()
 
 
 func _add_dark_rect(parent: Node, x: float, y: float, w: float, h: float) -> void:
@@ -178,7 +212,7 @@ func _start_attack_phase() -> void:
 	_hold_x_canvas.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(_hold_x_canvas)
 	_hold_x_label = Label.new()
-	_hold_x_label.text = "Hold X"
+	_hold_x_label.text = "Press X"
 	_hold_x_label.position = Vector2(650, 300)
 	_hold_x_canvas.add_child(_hold_x_label)
 	_mouse_for_attack.position = ATTACK_CURSOR_START

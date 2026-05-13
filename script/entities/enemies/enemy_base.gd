@@ -28,7 +28,7 @@ func _ready() -> void:
 	
 func _physics_process(delta: float) -> void:
 	scaler += 1.5 * delta
-	self.scale.y = 0.5 + abs(sin(scaler))/2.0
+	self.scale.y = 0.75 + abs(sin(scaler))/4.0
 
 
 func setup() -> void:

@@ -23,7 +23,7 @@ const sound := preload("res://script/game_manager/sound_manager.gd")
 @onready var color_over = get_node_or_null("/root/Main/UI/OverEffects/Color")
 @onready var ui = get_node_or_null("/root/Main/UI")
 
-var music = ["BattleJazz", "PersonaJazz", "MoonlitMelee"]
+var music = ["BattleJazz", "PersonaJazz", "MoonlitMelee", "Ogre Theme"]
 
 var overlays = {
 	"frozen": preload("res://assets/frost.png")
@@ -76,6 +76,12 @@ func _on_timer_timeout():
 	self.queue_free()
 
 func _color(type):
+	if get_node("/root/Tutorial"):
+		over_effects_ui = get_node_or_null("/root/Tutorial/UI/OverEffects")
+		color_over = get_node_or_null("/root/Tutorial/UI/OverEffects/Color")
+		image = get_node_or_null("/root/Tutorial/UI/Effects/Image")
+		color = get_node_or_null("/root/Tutorial/UI/Effects/Color")
+		ui = get_node_or_null("/root/Tutorial/UI")
 	color.visible = true
 	if type == "damage":
 		color.modulate = Color(1.0, 0.0, 0.0, 0.25)
@@ -87,6 +93,12 @@ func _color(type):
 	timer.start()
 
 func _image(type):
+	if get_node("/root/Tutorial"):
+		over_effects_ui = get_node_or_null("/root/Tutorial/UI/OverEffects")
+		color_over = get_node_or_null("/root/Tutorial/UI/OverEffects/Color")
+		image = get_node_or_null("/root/Tutorial/UI/Effects/Image")
+		color = get_node_or_null("/root/Tutorial/UI/Effects/Color")
+		ui = get_node_or_null("/root/Tutorial/UI")
 	image.visible = true
 	image.texture = overlays[type]
 	image.modulate = Color(1.0, 1.0, 1.0, 0.35)
@@ -102,6 +114,12 @@ func _on_ui_timer_timeout(obj):
 
 func _starter():
 	get_tree().paused = true
+	if get_node("/root/Tutorial"):
+		over_effects_ui = get_node_or_null("/root/Tutorial/UI/OverEffects")
+		color_over = get_node_or_null("/root/Tutorial/UI/OverEffects/Color")
+		image = get_node_or_null("/root/Tutorial/UI/Effects/Image")
+		color = get_node_or_null("/root/Tutorial/UI/Effects/Color")
+		ui = get_node_or_null("/root/Tutorial/UI")
 	over_effects_ui.visible = true
 	color_over.visible = true
 	color_over.modulate = Color(0, 0, 0, 0.5)
@@ -181,6 +199,12 @@ func _on_go_finished():
 	self.queue_free()
 	
 func _top_out():
+	if get_node("/root/Tutorial"):
+		over_effects_ui = get_node_or_null("/root/Tutorial/UI/OverEffects")
+		color_over = get_node_or_null("/root/Tutorial/UI/OverEffects/Color")
+		image = get_node_or_null("/root/Tutorial/UI/Effects/Image")
+		color = get_node_or_null("/root/Tutorial/UI/Effects/Color")
+		ui = get_node_or_null("/root/Tutorial/UI")
 	sound.play_sound_from_string("topout")
 	get_tree().paused = true
 	
@@ -192,6 +216,23 @@ func _top_out():
 	label.text = "TOPPED OUT!"
 	label.position = camera.get_screen_center_position()
 	label.add_theme_font_size_override("font_size", 48)
+	var tween = create_tween()
+	
+	# Move upward
+	tween.parallel().tween_property(
+		label,
+		"global_position:y",
+		label.global_position.y - 50,
+		1.0
+	)
+	
+	# Fade out
+	tween.parallel().tween_property(
+		label,
+		"modulate:a",
+		0.0,
+		1.0
+	)
 	control.add_child(label)
 	await get_tree().create_timer(1.0).timeout
 	control.queue_free()

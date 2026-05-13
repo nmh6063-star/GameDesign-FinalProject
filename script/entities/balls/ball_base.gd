@@ -276,10 +276,19 @@ func rank_state():
 	
 func get_shapes_outer_x_bounds(
 ) -> Dictionary:
-		var right_shape = get_node("/root/Main/Background/Box/left_bound").shape as RectangleShape2D
-		var left_shape = get_node("/root/Main/Background/Box/right_bound").shape as RectangleShape2D
-		var right_transform = get_node("/root/Main/Background/Box/left_bound").global_transform
-		var left_transform = get_node("/root/Main/Background/Box/right_bound").global_transform
+		var right_shape = get_node_or_null("/root/Main/Background/Box/left_bound")
+		var left_shape = get_node_or_null("/root/Main/Background/Box/right_bound")
+		var right_transform = get_node_or_null("/root/Main/Background/Box/left_bound")
+		var left_transform = get_node_or_null("/root/Main/Background/Box/right_bound")
+		if !right_shape:
+			right_shape = get_node_or_null("/root/Tutorial/Background/Box/left_bound")
+			left_shape = get_node_or_null("/root/Tutorial/Background/Box/right_bound")
+			right_transform = get_node_or_null("/root/Tutorial/Background/Box/left_bound")
+			left_transform = get_node_or_null("/root/Tutorial/Background/Box/right_bound")
+		right_shape = right_shape.shape as RectangleShape2D
+		left_shape = left_shape.shape as RectangleShape2D
+		right_transform = right_transform.global_transform
+		left_transform = left_transform.global_transform
 		
 		var left_half_width = left_shape.size.x / 2.0
 		var right_half_width = right_shape.size.x / 2.0

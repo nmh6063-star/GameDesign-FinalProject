@@ -124,15 +124,14 @@ func _physics_process(_delta: float) -> void:
 	_context.tick_combo(_delta)
 	_context.tick_b2b(_delta)
 	_sync_status_tags()
-<<<<<<< HEAD
 	_update_elbaphs_power(_delta)
-=======
 	_handle_status_effects()
 	_handle_topout_check()
->>>>>>> origin/finalState
 
 func _handle_topout_check():
 	for ball in _context.active_balls():
+		if get_node_or_null("/root/Tutorial"):
+			return
 		if ball.global_position.y > get_node("/root/Main/Background/Box/bottom_bound").global_position.y || ball.global_position.y < get_node("/root/Main/Background/Box/top_bound").global_position.y:
 			_topout()
 
@@ -525,6 +524,8 @@ func _begin_stage() -> void:
 	_begin_turn()
 	
 func _topout():
+	if get_node("/root/Tutorial") and !get_node_or_null("/root/TOPOUT"):
+		return
 	_context.combo_timer = 0.0
 	_context.combo = 0
 	sync_combo_hud()
@@ -534,7 +535,11 @@ func _topout():
 	var effects = Effects.new()
 	_root.add_child(effects)
 	effects._top_out()
-	var children = get_node("/root/Main/BallHolder").get_children()
+	var children = null
+	if get_node("/root/Tutorial"):
+		children = get_node("/root/Tutorial/BallHolder").get_children()
+	else:
+		children = get_node("/root/Main/BallHolder").get_children()
 	for child in children:
 		if child.name != "BallPlaceholder" and child.name != "LineIndicator" and child.name != "BattleController":
 			child.queue_free() 

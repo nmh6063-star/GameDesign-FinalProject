@@ -322,11 +322,13 @@ func _show_swap_dialog(new_ability: Dictionary, rank: int) -> void:
 		overlay.queue_free()
 		_check_end())
 	swap_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
+	swap_btn.pressed.connect(sound.play_sound_from_string.bind("Beneath the Mask"))
 
 	skip_btn.pressed.connect(func():
 		overlay.queue_free()
 		_check_end())
 	skip_btn.pressed.connect(sound.play_sound_from_string.bind("click"))
+	skip_btn.pressed.connect(sound.play_sound_from_string.bind("Beneath the Mask"))
 
 
 func _make_dialog_button(label_text: String, color: Color) -> Button:

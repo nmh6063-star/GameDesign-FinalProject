@@ -239,7 +239,6 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"dot_echo": {
-<<<<<<< HEAD
 		"class": "alchemist",
 	},
 	"thunder_fang": {"class": "alchemist"},
@@ -257,13 +256,9 @@ static var typing_by_id = {
 	"guillotine":     {"class": "alchemist"},
 	"second_wind":    {"class": "alchemist"},
 	"overkill":       {"class": "alchemist"},
-=======
-			"class": "alchemist",
-		},
 		"resurrection": {
 			"class": "alchemist",
 		}
->>>>>>> origin/finalState
 	}
 
 static var sprite_map = {

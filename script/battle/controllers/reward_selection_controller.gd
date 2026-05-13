@@ -562,18 +562,35 @@ func _on_collection_pressed() -> void:
 
 func _apply_rank_ball_visuals() -> void:
 	var chosen_slot := _picked_ability_rank_slot()
+
 	for rank in range(1, 8):
 		var b := _top_rank_button(rank)
 		var chosen := rank == chosen_slot
+
 		var deco := (
-			_make_orb_style(Color(0.816, 0.816, 0.816), Color(0.906, 0.0, 0.0), 4)
+			_make_orb_style(rank_to_color(rank), Color(0.0, 0.0, 0.0), 4)
 			if chosen
 			else _make_rank_decor_style(rank)
 		)
+
 		b.add_theme_stylebox_override("normal", deco)
 		b.add_theme_stylebox_override("hover", deco.duplicate())
 		b.add_theme_stylebox_override("pressed", deco.duplicate())
 		b.add_theme_stylebox_override("focus", deco.duplicate())
+
+		var texture_rect := b.get_node("TextureRect") as TextureRect
+		var equipped_ability = PlayerState.elements.get(rank)
+
+		if equipped_ability != null and equipped_ability is Dictionary:
+			var function_name = equipped_ability.get("function", "")
+			var sprite_data = Abilities.get_sprite_files(function_name)
+
+			if sprite_data.has("overlay"):
+				texture_rect.texture = sprite_data["overlay"]
+			else:
+				texture_rect.texture = null
+		else:
+			texture_rect.texture = null
 
 
 func _apply_reward_selection_visual() -> void:
@@ -585,7 +602,7 @@ func _apply_reward_selection_visual() -> void:
 			card.add_theme_stylebox_override("hover", _reward_style_selected.duplicate())
 			card.add_theme_stylebox_override("pressed", _reward_style_selected.duplicate())
 			if orb != null:
-				var orb_sel := _make_orb_style(Color(0.816, 0.816, 0.816), Color(0.906, 0.0, 0.0), 4)
+				var orb_sel := _make_orb_style(Color(0.816, 0.816, 0.816), Color(0.0, 0.0, 0.0), 4)
 				orb.add_theme_stylebox_override("normal", orb_sel)
 				orb.add_theme_stylebox_override("hover", orb_sel.duplicate())
 				orb.add_theme_stylebox_override("pressed", orb_sel.duplicate())
@@ -617,6 +634,24 @@ func _clear_reward_row() -> void:
 			lbl.text = "—"
 		card.modulate = Color(1, 1, 1, 0.45)
 
+func rank_to_color(rank):
+	match rank:
+		1:
+			return Color(0, 1.0, 0)
+		2:
+			return Color(0, 0, 1.0)
+		3:
+			return Color(0.5, 0, 0.5)
+		4:
+			return Color(1.0, 0, 0)
+		5:
+			return Color(1.0, 0.5, 0)
+		6:
+			return Color(1.0, 1.0, 0)
+		7:
+			return Color(1.0, 1.0, 1.0)
+		_:
+			return Color(1.0, 1.0, 1.0)
 
 func _refresh_reward_cards() -> void:
 	for i in range(REWARD_SLOT_COUNT):
@@ -630,6 +665,8 @@ func _refresh_reward_cards() -> void:
 				lbl.text = str(e.get("name", ""))
 				var data = Abilities.get_sprite_files(e.get("function", ""))
 				orb.get_node("overlay").texture = data["overlay"]
+				orb.get_node("overlay").scale = Vector2(1.5, 1.5)
+				orb.self_modulate = rank_to_color(clampi(int(e.get("rank", 1)), 1, 7))
 			card.disabled = false
 			if orb != null:
 				orb.disabled = false
