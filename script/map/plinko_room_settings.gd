@@ -3,10 +3,10 @@ class_name PlinkoRoomSettings
 ## Tunables for PlinkoRoom — edit on the Settings child node in plinko_room.tscn (Inspector).
 
 @export_group("Drops & scoring")
-@export var max_drops: int = 5
-@export var points_slot_base: int = 2
-@export var points_slot_per_rank: int = 1
-@export var miss_points: int = 1
+@export var max_drops: int = 3
+@export var points_slot_base: int = 3
+@export var points_slot_per_rank: int = 2
+@export var miss_points: int = 2
 
 @export_group("Prize counter")
 @export var draw_cost: int = 8

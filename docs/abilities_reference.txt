@@ -46,8 +46,10 @@ CHANGELOG
       PlinkoRoom → Settings child).
     - Lucky draw (random rank in configured min–max) and cash-out-all-score-for-gold
       remain. Hover tooltips on rolls / lucky draw / cash out show the player’s
-      current ability for that rank (or the default Strike entry from the catalog
-      if the slot is unset).
+      current ability for that rank (or the catalog default for that rank if
+      the slot is unset).
+    - Run uses 3 drops (tunable); slot score values and miss points raised vs the
+      old 5-drop tuning so prize score stays in a similar range.
 
   May 13, 2026 — Freeze Wave
     - No longer deals 50 damage each second while enemies are frozen; break-free
@@ -242,7 +244,7 @@ RANK 4
 --------------------------------------------------------------------------------
 
   Cleave (DEFAULT)
-    Deal 15 damage to ALL enemies.
+    Deal 20 damage to ALL enemies.
 
   Greater Heal
     Heal 30% of missing HP.
@@ -570,7 +572,9 @@ PLINKO ROOM (shrine gamble)
   range and offers a swap; fixed rolls R1–R7 each spend that rank’s price for a
   random ability at exactly that rank; Cash out converts all remaining score to
   gold (rate on Settings). All roll pools match RankAbilityCatalog.reward_options
-  plus that rank’s default Strike-style entry.
+  plus that rank’s catalog default (R1 Strike, R2 Heavy Strike, R3 Power Slash,
+  R4 Cleave, R5 first rank-5 option, R6 Meteor Crash, R7 Final Judgment) when not
+  already in the pool.
 
 ================================================================================
 END OF ABILITIES REFERENCE

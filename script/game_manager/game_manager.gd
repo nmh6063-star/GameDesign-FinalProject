@@ -173,6 +173,15 @@ func complete_current_room() -> void:
 	open_map()
 
 
+## Boss victory screen: persist completion, then leave run UI for the title menu.
+func complete_run_victory_to_menu() -> void:
+	var room = active_room()
+	if room != null:
+		_controller.mark_current_room_complete()
+		room_completed.emit(_room_payload(room))
+	exit_to_menu()
+
+
 func restart_run(seed: int = -1) -> void:
 	generate_new_run(seed if seed >= 0 else current_seed())
 	run_reset.emit()

@@ -8,8 +8,27 @@ const ELEMENT_TYPE := "Rank"
 
 static func default_element_for_rank(rank: int) -> Dictionary:
 	var r := clampi(rank, 1, 7)
-	var dmg := 8
-	return _ability("strike", r, "Strike", "Deal %d damage to current enemy." % dmg)
+	match r:
+		1:
+			return _ability("strike", 1, "Strike", "Deal 8 damage to current enemy.")
+		2:
+			return _ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy.")
+		3:
+			return _ability("power_slash", 3, "Power Slash", "Deal 25 damage to current enemy.")
+		4:
+			return _ability("cleave", 4, "Cleave", "Deal 20 damage to all enemies.")
+		5:
+			var opts5 := reward_options_for_rank(5)
+			if opts5.is_empty():
+				return _ability("strike", 5, "Strike", "Deal 8 damage to current enemy.")
+			return (opts5[0] as Dictionary).duplicate(true)
+		6:
+			return _ability("meteor_crash", 6, "Meteor Crash", "Deal 30 damage to all enemies.")
+		7:
+			return _ability("final_judgment", 7, "Final Judgment", "Deal 12 damage to current enemy 4 times (48 total).")
+		_:
+			# clampi(1,7) makes this unreachable; satisfies analyzer for Dictionary return.
+			return _ability("strike", r, "Strike", "Deal 8 damage to current enemy.")
 
 
 ## Combined reward pools for reward tiers: 0 → ranks 1–3, 1 → 4–6, 2 → rank 7 only.
@@ -125,10 +144,13 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 static func all_display_rows_for_rank(rank: int) -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
 	var base := default_element_for_rank(rank)
+	var base_fn := String(base.get("function", ""))
 	rows.append(
 		{"name": base["name"], "description": base["description"], "is_base": true, "function": base["function"]}
 	)
 	for opt in reward_options_for_rank(rank):
+		if String(opt.get("function", "")) == base_fn:
+			continue
 		rows.append(
 			{
 				"name": opt["name"],
