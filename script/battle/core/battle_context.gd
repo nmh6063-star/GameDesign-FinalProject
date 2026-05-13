@@ -247,10 +247,10 @@ func register_merge(ball: Node2D) -> void:
 	if controller != null:
 		controller.sync_mana_hud()
 		controller.sync_combo_hud()
-	# Poison Rain: each board merge adds +2 poison stacks to all living enemies.
+	# Poison Rain: each board merge adds +3 poison stacks to all living enemies.
 	if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
 		for e in _alive_enemies():
-			add_enemy_status(e, "poison", 2)
+			add_enemy_status(e, "poison", 3)
 
 
 func can_shoot() -> bool:
@@ -519,16 +519,17 @@ func consume_enemy_stack(enemy: EnemyBase, key: String, amount: int = 1) -> void
 	st[k] = max(0, int(st.get(k, 0)) - max(0, amount))
 
 
-## Burn ticks every 2 seconds; each tick deals current stacks as damage then removes
+## Burn ticks every 1 second; each tick deals current stacks as damage then removes
 ## max(1, round(25% of stacks)) stacks.
 func tick_enemy_burn(delta: float) -> void:
+	const BURN_TICK_SEC := 1.0
 	for enemy in _alive_enemies():
 		var st := status_for_enemy(enemy)
 		if int(st.get("burn_stack", 0)) <= 0:
 			continue
 		st["burn_accum"] = float(st.get("burn_accum", 0.0)) + maxf(0.0, delta)
-		while float(st.get("burn_accum", 0.0)) >= 2.0 and int(st.get("burn_stack", 0)) > 0:
-			st["burn_accum"] -= 2.0
+		while float(st.get("burn_accum", 0.0)) >= BURN_TICK_SEC and int(st.get("burn_stack", 0)) > 0:
+			st["burn_accum"] -= BURN_TICK_SEC
 			var burn_stacks := int(st.get("burn_stack", 0))
 			_damage_enemy_dot(burn_stacks, enemy)
 			var lost := maxi(1, int(round(float(burn_stacks) * 0.25)))
@@ -536,7 +537,6 @@ func tick_enemy_burn(delta: float) -> void:
 
 
 ## Poison fires before each enemy attack (1 dmg, 1 stack consumed).
-## During Poison Rain the stack GROWS instead of shrinking.
 ## Returns false if enemy is frozen (attack blocked).
 func on_enemy_attack_started(enemy: EnemyBase) -> bool:
 	var st := status_for_enemy(enemy)
@@ -550,10 +550,7 @@ func on_enemy_attack_started(enemy: EnemyBase) -> bool:
 	var poison_stacks := int(st.get("poison_stack", 0))
 	if poison_stacks > 0:
 		_damage_enemy_dot(poison_stacks, enemy)
-		if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
-			st["poison_stack"] = poison_stacks + 1  # Rain: stacks bloom
-		else:
-			st["poison_stack"] = poison_stacks - 1
+		st["poison_stack"] = poison_stacks - 1
 	return true
 
 

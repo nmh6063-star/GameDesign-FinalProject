@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://box8rqf4wjr51" path="res://script/entities/enemies/enemy_data.gd" id="2_data"]
 [ext_resource type="Script" uid="uid://dnu77ff3ufbjb" path="res://script/entities/enemies/actions/mana_drain_action.gd" id="3_action"]
 [ext_resource type="Script" uid="uid://yo4105wmtbek" path="res://script/entities/enemies/effects/enemy_effect_base.gd" id="3_eff"]
-[ext_resource type="Script" uid="uid://buniuu8uh8tif" path="res://script/entities/enemies/actions/fog_board_action.gd" id="3_ehwko"]
+[ext_resource type="Script" path="res://script/entities/enemies/actions/fog_board_action.gd" id="3_ehwko"]
 [ext_resource type="Texture2D" uid="uid://cmauy0ytsy0rn" path="res://assets/enemies/mage no back.png" id="5_chb2f"]
 
 [sub_resource type="Resource" id="Action_1"]

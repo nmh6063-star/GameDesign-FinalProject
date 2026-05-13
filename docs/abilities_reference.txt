@@ -18,8 +18,8 @@ CHANGELOG
     - All descriptions below updated to match exact code values.
     - Corrupt Field redesigned: 12 poison stacks + 20% attack debuff for 1 shoot.
       (⚗ Wkn 1 indicator on poisoned enemies while active.)
-    - Poison Rain redesigned: 3-shoot "rain" mode — stacks grow instead of shrink,
-      every board merge adds +2 poison to all enemies. (☣ Rain ×N indicator on enemies.)
+    - Poison Rain: 5-shoot window; each merge +3 poison to all enemies. Poison
+      stacks still tick down normally on enemy attacks (no special “grow” rule).
 
   May 6, 2026 — Session 2
     - Pollution moved from Rank 2 → Rank 3.
@@ -50,6 +50,11 @@ CHANGELOG
       the slot is unset).
     - Run uses 3 drops (tunable); slot score values and miss points raised vs the
       old 5-drop tuning so prize score stays in a similar range.
+
+  May 13, 2026 — Poison Rain
+    - Rain lasts 5 ball drops (was 3). Each board merge adds +3 poison to all
+      enemies (was +2). Poison on enemies still decreases by 1 stack per attack
+      tick as usual (removed “stacks grow instead of shrink” during Rain).
 
   May 13, 2026 — Freeze Wave
     - No longer deals 50 damage each second while enemies are frozen; break-free
@@ -105,13 +110,15 @@ STATUS EFFECT RULES
 
   NOTE: Burn and Poison DOT damage does NOT benefit from attack_bonus,
   clone multipliers, or poison apple charges. Only direct damage does.
+  Enemy Burn DOT ticks every 1 second: damage equals current burn stacks on that
+  enemy, then a fraction of stacks is removed (see battle code).
 
 --------------------------------------------------------------------------------
 RANK 1
 --------------------------------------------------------------------------------
 
   Strike (DEFAULT)
-    Deal 8 damage to current enemy (flat, all ranks).
+    Deal 10 + (rank − 1) × 4 damage to the current enemy (10 at rank 1 … 34 at rank 7).
 
   Mend
     Heal 5% of missing HP.
@@ -223,7 +230,10 @@ RANK 3
 
   Charm
     Apply 1 charm stack to ALL enemies.
-    Each enemy redirects their next attack at a random other enemy.
+    On each enemy's next attack, there is a 50% chance that hit is redirected to
+    exactly one random other enemy (full damage to that target only; no overkill
+    spill to a second enemy from that redirected hit). Otherwise the attack hits
+    you as normal.
 
   Thunder Fang
     Deal 5% of current HP to the active target and 5% to every other enemy.
@@ -315,10 +325,11 @@ RANK 5
     Then deal 100 damage to current enemy.
 
   Poison Rain
-    Activate a 3-shoot Rain mode (☣ Rain ×N shown on enemies):
-    • Enemies no longer lose poison stacks — instead stacks INCREASE by 1 each tick.
-    • Every board merge adds +2 poison stacks to all living enemies.
-    The effect expires after 3 ball drops.
+    Activate a 5-shoot Rain mode (☣ Rain ×N shown on enemies):
+    • Every board merge adds +3 poison stacks to all living enemies.
+    • Poison still behaves normally otherwise (including −1 poison stack per enemy
+      attack when poisoned).
+    The effect expires after 5 ball drops.
 
   Time Drift
     Slow game time to 40% speed for 10 seconds.

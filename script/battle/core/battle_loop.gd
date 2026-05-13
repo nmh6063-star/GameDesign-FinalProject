@@ -281,7 +281,7 @@ func resolve_enemy_turn(enemy: EnemyBase = null) -> void:
 		return
 	if not _context.on_enemy_attack_started(acting_enemy):
 		return
-	# Charm: redirect the attack to a random other enemy
+	# Charm: may redirect each damage instance from this turn (see damage_player).
 	var charm_st := _context.status_for_enemy(acting_enemy)
 	if int(charm_st.get("charm_stack", 0)) > 0:
 		_context.set_charm_redirect(acting_enemy)
@@ -401,7 +401,9 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 		ctx.battle_flags["enemies_killed"] = int(ctx.battle_flags.get("enemies_killed", 0)) + 1
 	# Overkill: overflow damage to next alive enemy when this kill is confirmed
 	if ctx != null and not target.is_alive():
-		if bool(ctx.battle_flags.get("overkill_active", false)):
+		if bool(ctx.battle_flags.get("suppress_overkill_spill", false)):
+			pass
+		elif bool(ctx.battle_flags.get("overkill_active", false)):
 			var overflow := maxi(0, amount - pre_health)
 			if overflow > 0:
 				var remain := _alive_enemy_slots()
@@ -414,18 +416,11 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 func damage_player(amount: int) -> void:
 	if amount <= 0 or PlayerState.player_health <= 0:
 		return
-	var effects = Effects.new()
-	_root.add_child(effects)
-	effects._color("damage")
-	var effects2 = Effects.new()
-	_root.add_child(effects2)
-	effects2.shake(amount)
-	sound.play_sound_from_string("hurt")
 	# Corrupt Field: poisoned enemies deal 20% less damage for 1 shoot.
 	if bool(_context.battle_flags.get("corrupt_field_active", false)):
-		var attacker := active_enemy()
-		if attacker != null:
-			var atk_st := _context.status_for_enemy(attacker)
+		var attacker_cf := active_enemy()
+		if attacker_cf != null:
+			var atk_st := _context.status_for_enemy(attacker_cf)
 			if int(atk_st.get("poison_stack", 0)) > 0:
 				amount = int(round(float(amount) * 0.8))
 	if _context.should_reflect_damage():
@@ -433,14 +428,22 @@ func damage_player(amount: int) -> void:
 		if attacker != null:
 			damage_enemy(amount, attacker, _context)
 		return
-	# Charm: redirect attack to a random enemy that isn't the charmed attacker
+	# Charm: 50% chance this hit is redirected to exactly one other enemy (no overkill spill).
 	var charm_src := _context.charm_redirect_source()
 	if charm_src != null:
 		var others := _alive_enemies_excluding(charm_src)
-		if not others.is_empty():
+		if not others.is_empty() and randi_range(1, 100) <= 50:
+			_context.battle_flags["suppress_overkill_spill"] = true
 			damage_enemy(amount, others[randi() % others.size()], _context)
+			_context.battle_flags.erase("suppress_overkill_spill")
 			return
-		# Only one enemy (the charmed one) — attack still hits player
+	var effects = Effects.new()
+	_root.add_child(effects)
+	effects._color("damage")
+	var effects2 = Effects.new()
+	_root.add_child(effects2)
+	effects2.shake(amount)
+	sound.play_sound_from_string("hurt")
 	# Playground: never let HP drop below 100
 	var gm_pg := _game_manager()
 	if gm_pg != null and bool(gm_pg.get("is_playground_mode")):

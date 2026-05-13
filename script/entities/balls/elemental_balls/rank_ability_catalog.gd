@@ -9,8 +9,9 @@ const ELEMENT_TYPE := "Rank"
 static func default_element_for_rank(rank: int) -> Dictionary:
 	var r := clampi(rank, 1, 7)
 	match r:
+		
 		1:
-			return _ability("strike", 1, "Strike", "Deal 8 damage to current enemy.")
+			return _ability("strike", 1, "Strike", "Deal 10 damage to current enemy.")
 		2:
 			return _ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy.")
 		3:
@@ -18,14 +19,17 @@ static func default_element_for_rank(rank: int) -> Dictionary:
 		4:
 			return _ability("cleave", 4, "Cleave", "Deal 20 damage to all enemies.")
 		5:
-			return _ability("strike", 5, "Strike", "Deal 8 damage to current enemy.")
+			var opts5 := reward_options_for_rank(5)
+			if opts5.is_empty():
+				return _ability("strike", 5, "Strike", "Deal 26 damage to current enemy.")
+			return (opts5[0] as Dictionary).duplicate(true)
 		6:
-			return _ability("strike", 6, "Strike", "Deal 28 damage to current enemy.")
+			return _ability("strike", 6, "Strike", "Deal 30 damage to current enemy.")
 		7:
 			return _ability("resurrection", 7, "Resurrection", "Revive once with low HP upon death (this battle).")
 		_:
 			# clampi(1,7) makes this unreachable; satisfies analyzer for Dictionary return.
-			return _ability("strike", r, "Strike", "Deal 8 damage to current enemy.")
+			return _ability("strike", r, "Strike", "Deal 10 damage to current enemy.")
 
 
 ## Combined reward pools for reward tiers: 0 → ranks 1–3, 1 → 4–6, 2 → rank 7 only.
@@ -74,7 +78,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			_ability("reinforce", 3, "Reinforce", "Gain +2 attack damage this battle (excludes DOT)."),
 				_ability("convert", 3, "Convert", "Upgrade 1 random ball in the box by +1 rank (this battle)."),
 			_ability("echo_shot", 3, "Echo Shot", "Reapply the last resolved damage + effect."),
-			_ability("charm", 3, "Charm", "All enemies redirect their next attack at each other (1 stack)."),
+			_ability("charm", 3, "Charm", "All enemies gain 1 charm stack. On their next attack, 50% chance the hit strikes one random other enemy (single target); otherwise it hits you."),
 		]
 		4:
 			return [
@@ -90,7 +94,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			_ability("freeze_wave", 5, "Freeze Wave", "Freeze all enemies 8s — they cannot attack until thawed or they break free (chance each second: (HP%)×60% + 5%×elapsed s). No damage while frozen. Gain 50 Shield."),
 			_ability("giant_orb", 5, "Giant Orb", "All current balls gain ×3 attack and ×2 size for 5 ball drops. Effect is inherited on merge (does not stack)."),
 			_ability("consume_core", 5, "Consume Core", "Remove 1 ball from the box → deal 100 damage to current enemy."),
-				_ability("poison_rain", 5, "Poison Rain", "For 3 shoots: enemies gain poison stacks instead of losing them, and every board merge adds +2 poison to all enemies. (☣ Rain indicator shown)"),
+				_ability("poison_rain", 5, "Poison Rain", "For 5 shoots: every board merge adds +3 poison to all enemies. (☣ Rain indicator shown)"),
 				_ability("time_drift", 5, "Time Drift", "10s: enemies cannot act, player ignores control effects. Damage taken in first 5s is reflected as DoT in last 5s."),
 			_ability("contagion", 5, "Contagion", "Copy current enemy debuffs to one random other enemy (stacks with theirs)."),
 		]
