@@ -12,20 +12,17 @@ static func default_element_for_rank(rank: int) -> Dictionary:
 		1:
 			return _ability("strike", 1, "Strike", "Deal 8 damage to current enemy.")
 		2:
-			return _ability("strike", 2, "Strike", "Deal 12 damage to current enemy.")
+			return _ability("heavy_strike", 2, "Heavy Strike", "Deal 18 damage to current enemy.")
 		3:
-			return _ability("strike", 3, "Strike", "Deal 16 damage to current enemy.")
+			return _ability("power_slash", 3, "Power Slash", "Deal 25 damage to current enemy.")
 		4:
-			return _ability("strike", 4, "Strike", "Deal 20 damage to current enemy.")
+			return _ability("cleave", 4, "Cleave", "Deal 20 damage to all enemies.")
 		5:
-			#var opts5 := reward_options_for_rank(5)
-			#if opts5.is_empty():
-			return _ability("strike", 5, "Strike", "Deal 24 damage to current enemy.")
-			#return (opts5[0] as Dictionary).duplicate(true)
+			return _ability("strike", 5, "Strike", "Deal 8 damage to current enemy.")
 		6:
 			return _ability("strike", 6, "Strike", "Deal 28 damage to current enemy.")
 		7:
-			return _ability("strike", 7, "Strike", "Deal 32 damage to current enemy.")
+			return _ability("resurrection", 7, "Resurrection", "Revive once with low HP upon death (this battle).")
 		_:
 			# clampi(1,7) makes this unreachable; satisfies analyzer for Dictionary return.
 			return _ability("strike", r, "Strike", "Deal 8 damage to current enemy.")

@@ -71,9 +71,9 @@ func _on_first_ball_dropped() -> void:
 
 func _on_first_merge() -> void:
 	await get_tree().create_timer(0.3).timeout
-	_enqueue_tip("Great merge! \n Maintaining combos of 15 gives you 1 mana pipe")
+	_enqueue_tip("Great merge! \n Maintaining combos of 10 gives you 1 mana pipe")
 	_enqueue_tip("Combos are made by doing \nmultiple merges within a given time frame. \nStack merges to build combos!")
-	_enqueue_tip("Merges follow the order on the right. \nGoing from ranks 1-7 to the color white. \nTry building a combo of 15 now!")
+	_enqueue_tip("Merges follow the order on the right. \nGoing from ranks 1-7 to the color white. \nTry building a combo of 10 now!")
 
 
 func _on_first_pip() -> void:
