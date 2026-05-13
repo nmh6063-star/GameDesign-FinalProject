@@ -6,11 +6,13 @@ signal first_merge_done
 signal first_pip_filled
 signal mana_depleted
 signal battle_finished
+signal topped_out
 
 var _drops := 0
 var _merge_announced := false
 var _pip_announced := false
 var _pip_depleted_announced := false
+var _pip_cap = 0
 
 
 func _override_enemy_ids_from_stage() -> void:
@@ -32,9 +34,15 @@ func sync_mana_hud() -> void:
 	if not _pip_announced and _context.mana_pipes >= 1:
 		_pip_announced = true
 		first_pip_filled.emit()
-	if _pip_announced and not _pip_depleted_announced and _context.mana_pipes == 0:
+	if _pip_announced and not _pip_depleted_announced and _context.mana_pipes < _pip_cap:
 		_pip_depleted_announced = true
 		mana_depleted.emit()
+	_pip_cap = _context.mana_pipes
+
+func _topout():
+	super._topout()
+	if get_node_or_null("/root/TOPOUT"):
+		topped_out.emit()
 
 
 func _finish_battle(text: String) -> void:

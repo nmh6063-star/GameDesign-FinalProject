@@ -6,7 +6,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
-			_deal_single(ctx, 8 * clampi(rank, 1, 7), source)
+			_deal_single(ctx, 8, source)
 		"mend":
 			var lost_mend := maxi(0, PlayerState.player_max_health - PlayerState.player_health)
 			var heal_mend := maxi(1, int(round(float(lost_mend) * 0.05)))
@@ -14,12 +14,12 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			var mend_dmg := maxi(1, int(round(float(heal_mend) * 0.10)))
 			_deal_single(ctx, mend_dmg, source)
 		"venom":
-			ctx.add_enemy_status(ctx.active_enemy(), "poison", 6)
+			ctx.add_enemy_status(ctx.active_enemy(), "poison", 5)
 		"ember":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "burn", 3)
 		"guard":
-			ctx.add_player_shield(5)
+			ctx.add_player_shield(20)
 		"critical":
 			# 50%: deal 5 to all enemies; else: deal 5 to current target
 			if randi_range(1, 2) == 1:
@@ -41,16 +41,16 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				ctx.add_enemy_status(e, "freeze", 5)
 				_deal_single(ctx, 10, source)
 		"iron_guard":
-			ctx.add_player_shield(25)
+			ctx.add_player_shield(80)
 		"triple_shot":
-			for _i in range(3):
-				_deal_random_enemy(ctx, 10, source)
+			for _i in range(4):
+				_deal_random_enemy(ctx, 6, source)
 		"scatter_drop":
 			for _i in range(2):
 				_spawn_random_ball_rank_1_to_3(ctx, source)
 		"critical_strike":
 			if randi_range(1, 2) == 1:
-				_deal_single(ctx, 25, source)
+				_deal_single(ctx, 30, source)
 			else:
 				_deal_single(ctx, 10, source)
 		"fireburn":
@@ -62,7 +62,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				if enemies.is_empty():
 					break
 				var target := enemies[randi() % enemies.size()] as EnemyBase
-				ctx.add_enemy_status(target, "poison", 8)
+				ctx.add_enemy_status(target, "poison", 6)
 
 		# ── Rank 3 ────────────────────────────────────────────────────────────
 		"power_slash":
@@ -83,7 +83,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				ctx.add_enemy_status(target, "burn", 8)
 			ctx.battle_flags["last_damage"] = 8
 		"ice_shield":
-			ctx.add_player_shield(20)
+			ctx.add_player_shield(50)
 			ctx.add_enemy_status(ctx.active_enemy(), "freeze", 5)
 		"reinforce":
 			ctx.add_player_attack_bonus(3)
@@ -114,7 +114,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			ctx.set_player_reflect_hits(3)
 		"corrupt_field":
 			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "poison", 12)
+				ctx.add_enemy_status(e, "poison", 9)
 			ctx.battle_flags["corrupt_field_active"] = true
 		"tide_turner":
 			# Mark pending; resolved in battle_loop.try_shoot after all on_shot calls.
@@ -283,19 +283,10 @@ static func _safe_origin(ctx: BattleContext, source: BallBase) -> Vector2:
 	return Vector2(200.0, 100.0)
 
 
-static func _spawn_random_ball_rank_1_to_3(ctx: BattleContext, source: BallBase) -> void:
-	var ball_rank := randi_range(1, 3)
-	# Always spread from the drop-zone centre so balls don't cluster on one side.
-	var centre: Vector2
-	if ctx.controller != null and ctx.controller.has_method("drop_zone_global"):
-		centre = ctx.controller.drop_zone_global()
-		if centre == Vector2.ZERO:
-			centre = _safe_origin(ctx, source)
-	else:
-		centre = _safe_origin(ctx, source)
-	var spawn_pos := centre + Vector2(randf_range(-80.0, 80.0), -30.0)
-	ctx.spawn_ball("ball_normal", spawn_pos,
-			Vector2(randf_range(-40.0, 40.0), 0.0), ball_rank)
+static func _spawn_random_ball_rank_1_to_3(ctx: BattleContext, _source: BallBase) -> void:
+	# Use the same element-aware drop as Shower so spawned balls carry the
+	# player's current rank ability and can merge with existing board balls.
+	ctx.drop_element_ball_in_box(randi_range(1, 3), INF)
 
 
 # ── Ball manipulation ─────────────────────────────────────────────────────────
@@ -585,7 +576,7 @@ static func _regeneration(ctx: BattleContext) -> void:
 		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
 		t.timeout.connect(func():
 			if ctx.controller != null:
-				ctx.heal_player(3)
+				ctx.heal_player(20)
 		)
 
 

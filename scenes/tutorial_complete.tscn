@@ -18,3 +18,5 @@ offset_top = 137.17773
 offset_right = 314.61966
 offset_bottom = 281.17773
 metadata/_edit_use_anchors_ = true
+
+[connection signal="pressed" from="TutorailCompleted/GoBackToMenu" to="." method="_on_go_back_to_menu_pressed"]

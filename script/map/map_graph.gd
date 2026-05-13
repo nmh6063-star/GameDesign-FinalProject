@@ -22,6 +22,8 @@ const ROOM_SCENE := preload("res://scenes/map/room.tscn")
 @onready var _seed := $SeedLabel as Label
 @onready var _hint := $InstructionsLabel as Label
 
+const sound := preload("res://script/game_manager/sound_manager.gd")
+
 var _positions := {}
 var _reward_overlay: RewardSelectionController
 var _hover_choice_room_id := -1
@@ -36,7 +38,6 @@ func _ready() -> void:
 			_gm.generate_new_run(-1)
 	_refresh()
 	_maybe_reward()
-
 
 func _exit_tree() -> void:
 	if _gm == null:
@@ -120,6 +121,9 @@ func _on_room_clicked(room: MapGenerator.Room) -> void:
 		return
 	if _gm == null or not _gm.select_map_room(int(room.id)):
 		return
+	for child in get_node("/root").get_children():
+		if child.name.contains("player"):
+			child.queue_free()
 	_gm.enter_selected_room()
 
 
@@ -142,7 +146,6 @@ func _update_labels(controller: MapController) -> void:
 	else:
 		_status.text = "ROOM RESOLVED"
 	_hint.text = "CLICK AN AVAILABLE ROOM TO TRAVEL"
-
 
 func _build_positions(run: MapGenerator.Run) -> Dictionary:
 	var positions := {}

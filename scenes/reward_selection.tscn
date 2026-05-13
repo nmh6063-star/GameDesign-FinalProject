@@ -192,6 +192,20 @@ theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 11
 text = "1"
 
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall1" unique_id=745156880]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="RankBall2" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=2057946245]
 custom_minimum_size = Vector2(65, 65)
 layout_mode = 2
@@ -199,6 +213,20 @@ size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 12
 text = "2"
+
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall2" unique_id=1516913812]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="RankBall3" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=365342912]
 custom_minimum_size = Vector2(82, 82)
@@ -208,6 +236,20 @@ theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 13
 text = "3"
 
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall3" unique_id=195881083]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="RankBall4" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1901142864]
 custom_minimum_size = Vector2(98, 98)
 layout_mode = 2
@@ -215,6 +257,20 @@ size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 14
 text = "4"
+
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall4" unique_id=79480904]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="RankBall5" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=47480578]
 custom_minimum_size = Vector2(114, 114)
@@ -224,6 +280,20 @@ theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 15
 text = "5"
 
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall5" unique_id=1067327898]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="RankBall6" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=1864321979]
 custom_minimum_size = Vector2(130, 130)
 layout_mode = 2
@@ -232,6 +302,20 @@ theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 16
 text = "6"
 
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall6" unique_id=1948539462]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
 [node name="RankBall7" type="Button" parent="Overlay/Card/TopBar/RankOrbs" unique_id=19951802]
 custom_minimum_size = Vector2(148, 148)
 layout_mode = 2
@@ -239,6 +323,20 @@ size_flags_vertical = 4
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 17
 text = "7"
+
+[node name="TextureRect" type="TextureRect" parent="Overlay/Card/TopBar/RankOrbs/RankBall7" unique_id=813404996]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="RangeTier0" type="Panel" parent="Overlay/Card/TopBar" unique_id=40291001]
 z_index = 1
@@ -613,11 +711,10 @@ text = "Next"
 [node name="HoverTip" type="Panel" parent="." unique_id=1511428514]
 visible = false
 z_index = 100
-layout_mode = 0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_hover_tip")
 
-[node name="MarginContainer" type="MarginContainer" parent="HoverTip"]
+[node name="MarginContainer" type="MarginContainer" parent="HoverTip" unique_id=757178460]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -638,7 +735,6 @@ theme_override_constants/separation = 8
 
 [node name="TipTitle" type="Label" parent="HoverTip/MarginContainer/VBox" unique_id=800868246]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 16
@@ -646,7 +742,6 @@ text = "Rank 1"
 
 [node name="TipBody" type="Label" parent="HoverTip/MarginContainer/VBox" unique_id=800868247]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 12
@@ -655,7 +750,6 @@ autowrap_mode = 3
 
 [node name="TipStat" type="Label" parent="HoverTip/MarginContainer/VBox" unique_id=2137696531]
 layout_mode = 2
-mouse_filter = 2
 theme_override_colors/font_color = Color(0.08, 0.06, 0.06, 1)
 theme_override_fonts/font = ExtResource("3_font")
 theme_override_font_sizes/font_size = 12

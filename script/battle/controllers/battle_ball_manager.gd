@@ -64,7 +64,7 @@ func consume(ball: BallBase) -> void:
 	_root.add_child(effect)
 	var effect2 = Effects.new()
 	_root.add_child(effect2)
-	effect2.freeze_frame(float(ball.rank) / 1000.0)
+	effect2.freeze_frame(float(ball.rank) / 50.0)
 	effect.shake(ball.rank / 10.0)
 	ball.die()
 
@@ -165,48 +165,57 @@ func drop_element_ball_at_x(rank: int, x: float = INF) -> BallBase:
 
 func spawn_setup_ball() -> BallBase:
 	var entry := _take_queue_entry()
+
 	var base = entry["scene"].instantiate() as BallBase
-	if PlayerState.elements[entry["rank"]]:
-		base.type.append(PlayerState.elements[entry["rank"]]["type"])
-	var new_data = []
-	for element in PlayerState.elements:
-		if element == 0:
-			for i in PlayerState.elements[0]:
-				var obj = {
-					"element": BallCatalog.data_for_element(i["type"].to_lower()),
-					"effect": i["function"],
-					"rank": i["rank"]
-				}
-				new_data.append(obj)
-		elif PlayerState.elements[element]:
-			var obj = {
-				"element": BallCatalog.data_for_element(PlayerState.elements[element]["type"].to_lower()),
-				"effect": PlayerState.elements[element]["function"],
-				"rank": PlayerState.elements[element]["rank"]
-			}
-			new_data.append(obj)
-	base.element_list = new_data
+
+	base.type = (entry.get("type", []) as Array).duplicate(true)
+	base.element_list = (entry.get("element_list", []) as Array).duplicate(true)
+
 	var entry_data = entry["data"]
+
 	var setup_radius: float = entry_data.radius_for_rank(int(entry["rank"]))
-	return _spawn_instance(base, entry["data"], entry["rank"], _setup_ball_position(setup_radius), true)
+
+	return _spawn_instance(
+		base,
+		entry["data"],
+		entry["rank"],
+		_setup_ball_position(setup_radius),
+		true
+	)
 
 
 func hold_swap(current_ball: BallBase) -> bool:
 	if not is_instance_valid(current_ball) or current_ball.data == null or not current_ball.is_setup_ball():
 		return false
+
 	var replacement := _take_queue_entry() if _held_entry.is_empty() else _held_entry.duplicate()
+
 	if replacement.is_empty():
 		return false
+
 	_held_entry = _entry_from_ball(current_ball)
-	current_ball.configure(replacement["data"], replacement["rank"], _context, _target)
+
+	current_ball.type = (replacement.get("type", []) as Array).duplicate(true)
+	current_ball.element_list = (replacement.get("element_list", []) as Array).duplicate(true)
+
+	current_ball.configure(
+		replacement["data"],
+		replacement["rank"],
+		_context,
+		_target
+	)
+
 	_apply_playfield_bounds_to_ball(current_ball)
+
 	var swap_radius: float = current_ball.data.radius_for_rank(current_ball.rank)
+
 	current_ball.position = _setup_ball_position(swap_radius)
 	current_ball.linear_velocity = Vector2.ZERO
 	current_ball.angular_velocity = 0.0
 	current_ball.rotation = 0.0
 	current_ball.sleeping = false
 	current_ball.set_playfield_state(true)
+
 	return true
 
 
@@ -279,24 +288,37 @@ func _fill_queue() -> void:
 
 func _roll_ball_entry() -> Dictionary:
 	var total_weight := 0
+
 	for entry in _spawn_pool:
 		total_weight += entry["data"].spawn_weight
+
 	var roll := randi_range(1, total_weight)
+
 	for entry in _spawn_pool:
 		roll -= entry["data"].spawn_weight
+
 		if roll <= 0:
+			var rank := _roll_queue_rank()
+
 			return {
 				"id": entry["id"],
 				"scene": entry["scene"],
 				"data": entry["data"],
-				"rank": _roll_queue_rank(),
+				"rank": rank,
+				"element_list": _build_element_list(),
+				"type": _build_ball_types(rank),
 			}
+
 	var entry: Dictionary = _spawn_pool[0]
+	var rank := _roll_queue_rank()
+
 	return {
 		"id": entry["id"],
 		"scene": entry["scene"],
 		"data": entry["data"],
-		"rank": _roll_queue_rank(),
+		"rank": rank,
+		"element_list": _build_element_list(),
+		"type": _build_ball_types(rank),
 	}
 
 
@@ -376,4 +398,37 @@ func _entry_from_ball(ball: BallBase) -> Dictionary:
 		"scene": BallCatalog.scene_for_id(ball.data.id),
 		"data": ball.data,
 		"rank": ball.rank,
+		"element_list": ball.element_list.duplicate(true),
+		"type": ball.type.duplicate(true),
 	}
+
+func _build_element_list() -> Array:
+	var new_data := []
+
+	for element in PlayerState.elements:
+		if element == 0:
+			for i in PlayerState.elements[0]:
+				new_data.append({
+					"element": BallCatalog.data_for_element(String(i.get("type", "")).to_lower()),
+					"effect": i.get("function", ""),
+					"rank": i.get("rank", 1),
+				})
+		elif PlayerState.elements[element] != null:
+			var el: Dictionary = PlayerState.elements[element]
+			new_data.append({
+				"element": BallCatalog.data_for_element(String(el.get("type", "")).to_lower()),
+				"effect": el.get("function", ""),
+				"rank": el.get("rank", 1),
+			})
+
+	return new_data
+
+func _build_ball_types(rank: int) -> Array:
+	var out := []
+
+	if PlayerState.elements.get(rank) != null:
+		var type_str := String(PlayerState.elements[rank].get("type", ""))
+		if not type_str.is_empty():
+			out.append(type_str)
+
+	return out

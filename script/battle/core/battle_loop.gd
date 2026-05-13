@@ -33,6 +33,9 @@ var _hud: BattleHudAdapter
 var _turn_running := false
 var _selected_enemy_index := 0
 var _enemy_slots: Array = []
+var started = false
+var frozen = false
+var burnt = true
 
 var _reward_overlay: RewardSelectionController
 var _elbaphs_update_acc := 0.0
@@ -56,6 +59,7 @@ var _player_shield_fill: ColorRect = null
 @onready var _ui_root := _root.get_node("UI") as CanvasLayer
 @onready var _ability_button := _root.get_node_or_null("UI/BallQueue/InspectAbilityButton") as Button
 
+signal status_met
 
 func _ready() -> void:
 	_hud = BattleHudAdapter.new(_ui_root)
@@ -66,6 +70,7 @@ func _ready() -> void:
 	if PlayerState.aim_size_level > 0:
 		_target.scale = Vector2.ONE * (1.0 + PlayerState.aim_size_level * 0.25)
 	call_deferred("_initialize")
+	
 
 
 func get_context() -> BattleContext:
@@ -102,6 +107,12 @@ func _begin_battle() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if !started:
+		var effects = Effects.new()
+		_root.add_child(effects)
+		effects._starter()
+		started = true
+		return
 	_handle_ability_overlay_input()
 	_step_battle_resolution()
 	_handle_selection_input()
@@ -111,9 +122,30 @@ func _physics_process(_delta: float) -> void:
 	_handle_shoot_input()
 	_context.tick_enemy_burn(_delta)
 	_context.tick_combo(_delta)
+	_context.tick_b2b(_delta)
 	_sync_status_tags()
 	_update_elbaphs_power(_delta)
+	_handle_status_effects()
+	_handle_topout_check()
 
+func _handle_topout_check():
+	for ball in _context.active_balls():
+		if get_node_or_null("/root/Tutorial"):
+			return
+		if ball.global_position.y > get_node("/root/Main/Background/Box/bottom_bound").global_position.y || ball.global_position.y < get_node("/root/Main/Background/Box/top_bound").global_position.y:
+			_topout()
+
+func _handle_status_effects():
+	var freeze = int(_context.player_statuses.get("freeze_stacks", 0))
+	if freeze > 0 and !frozen:
+		frozen = true
+		var effects = Effects.new()
+		_root.add_child(effects)
+		effects._image("frozen")
+		sound.play_sound_from_string("freeze")
+	elif freeze == 0 and frozen:
+		status_met.emit()
+		frozen = false
 
 func _handle_ability_overlay_input() -> void:
 	if not Input.is_action_just_pressed("inspect_ability"):
@@ -143,6 +175,8 @@ func _update_enemy_realtime_views() -> void:
 func _update_target_visual() -> void:
 	_target.position = _root.get_local_mouse_position()
 	_target.visible = _context.slow_mo_active
+	if _context.current_ball and _context.slow_mo_active:
+		_context.current_ball.visible = false
 
 
 func _handle_hold_input() -> void:
@@ -154,6 +188,7 @@ func _handle_hold_input() -> void:
 		return
 	if _box.hold_swap(_context.current_ball):
 		track_ball(_context.current_ball)
+	sound.play_sound_from_string("hold")
 
 
 func _handle_shoot_input() -> void:
@@ -165,6 +200,13 @@ func _handle_shoot_input() -> void:
 		elif Input.is_action_just_pressed("shoot"):
 			_exit_slow_mo()
 		return
+	if !_context.slow_mo_active and Input.is_action_just_pressed("drop") and _context.current_ball:
+		_context.current_ball.sleeping = false
+		_context.current_ball.gravity_scale = _context.current_ball.GRAVITY_SCALE
+		_context.current_ball.set_up = false
+		_context.current_ball.get_node("CollisionShape2D").disabled = false
+		_context.current_ball.dropped.emit()
+		print("OOPS")
 	if _context.phase == BattleContext.Phase.PLAY \
 		and Input.is_action_just_pressed("shoot") \
 		and _can_enter_action_mode():
@@ -341,6 +383,13 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 func damage_player(amount: int) -> void:
 	if amount <= 0 or PlayerState.player_health <= 0:
 		return
+	var effects = Effects.new()
+	_root.add_child(effects)
+	effects._color("damage")
+	var effects2 = Effects.new()
+	_root.add_child(effects2)
+	effects2.shake(amount)
+	sound.play_sound_from_string("hurt")
 	# Corrupt Field: poisoned enemies deal 20% less damage for 1 shoot.
 	if bool(_context.battle_flags.get("corrupt_field_active", false)):
 		var attacker := active_enemy()
@@ -438,6 +487,8 @@ func _enter_slow_mo() -> void:
 func _exit_slow_mo() -> void:
 	_context.slow_mo_active = false
 	Engine.time_scale = 1.0
+	if _context.current_ball:
+		_context.current_ball.visible = true
 	sound.play_sound_from_string("speed")
 
 
@@ -471,9 +522,38 @@ func _begin_stage() -> void:
 	sync_mana_hud()
 	set_physics_process(true)
 	_begin_turn()
+	
+func _topout():
+	if get_node("/root/Tutorial") and !get_node_or_null("/root/TOPOUT"):
+		return
+	_context.combo_timer = 0.0
+	_context.combo = 0
+	sync_combo_hud()
+	var effects2 = Effects.new()
+	_root.add_child(effects2)
+	effects2.shake(100.0)
+	var effects = Effects.new()
+	_root.add_child(effects)
+	effects._top_out()
+	var children = null
+	if get_node("/root/Tutorial"):
+		children = get_node("/root/Tutorial/BallHolder").get_children()
+	else:
+		children = get_node("/root/Main/BallHolder").get_children()
+	for child in children:
+		if child.name != "BallPlaceholder" and child.name != "LineIndicator" and child.name != "BattleController":
+			child.queue_free() 
+	damage_player(50.0)
+	_context.try_consume_shot()
 
 
 func _on_ball_dropped() -> void:
+	var ball_check = _context.current_ball
+	for ball in _context.active_balls():
+		if ball_check == ball:
+			continue
+		if _context.are_touching(ball_check, ball, -4.0):
+			_topout()
 	_context.consume_freeze_on_ball_drop()
 	var burn := int(_context.player_statuses.get("burn_stacks", 0))
 	if burn > 0:
@@ -642,6 +722,9 @@ func _sync_ball_hud() -> void:
 
 
 func _finish_battle(text: String) -> void:
+	for child in get_node("/root").get_children():
+		if child.name.contains("player"):
+			child.queue_free()
 	if _context.has_battle_result():
 		return
 	if _context.slow_mo_active:
@@ -653,10 +736,14 @@ func _finish_battle(text: String) -> void:
 	_target.visible = false
 	set_physics_process(false)
 	_hud.show_result(text)
+	if text == "Game Over":
+		sound.play_sound_from_string("lose", null, false, false)
+	else:
+		sound.play_sound_from_string("victory", null, false, false)
 	var game_manager := _game_manager()
 	if game_manager == null:
 		return
-	await get_tree().create_timer(1.1).timeout
+	await get_tree().create_timer(2.0).timeout
 	if not is_inside_tree():
 		return
 	if text == "Game Over":

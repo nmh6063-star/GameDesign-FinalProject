@@ -256,6 +256,9 @@ static var typing_by_id = {
 	"guillotine":     {"class": "alchemist"},
 	"second_wind":    {"class": "alchemist"},
 	"overkill":       {"class": "alchemist"},
+		"resurrection": {
+			"class": "alchemist",
+		}
 	}
 
 static var sprite_map = {

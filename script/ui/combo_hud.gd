@@ -29,7 +29,7 @@ func _pop_animation() -> void:
 	var tween := create_tween()
 	var value := float($VBox/ComboCount.text)
 	# Cap the scale so the label never overflows its panel at high combo counts.
-	var peak   := minf(1.15 + value / 5.0,  1.75)
-	var settle := minf(1.0  + value / 10.0, 1.35)
+	var peak   := 1.15 + value / 5.0
+	var settle := 1.0  + value / 10.0
 	tween.tween_property($VBox/ComboCount, "scale", Vector2(peak,   peak),   0.06).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_property($VBox/ComboCount, "scale", Vector2(settle, settle), 0.12).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
