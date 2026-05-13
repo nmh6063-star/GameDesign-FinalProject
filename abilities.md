@@ -118,10 +118,8 @@
 
 * **Pollution**
 
-  * If target enemy currently has Poison:
-
-    * Double current Poison **strength**
-  * Poison stacks remain unchanged unless otherwise designed.
+  * If the **current enemy** has **no** poison: apply **10** poison stacks.
+  * If they **already** have poison: **that enemy** loses **half** of their poison stacks (rounded down).
 
 * **FireBurn**
 
@@ -274,12 +272,6 @@
   * Destroy one ball currently inside box.
   * Then deal **100 damage**.
 
-* **Upgrade Pulse**
-
-  * In a small area inside box:
-
-    * Upgrade random ball(s) by +1 rank.
-
 * **Poison Rain**
 
   * Apply Poison to all enemies:
@@ -418,7 +410,8 @@
 
 * **Thunder Strike** *(R7)*
 
-  * Deal 2% × thunder stacks of each enemy's current HP to that enemy.
+  * If **no** enemy has thunder stacks: give the **current enemy** **15** thunder stacks (no damage this cast).
+  * Otherwise: each enemy with thunder takes **2% × stacks** of their current HP as damage.
 
 * **Elbaph's Power** *(R7)*
 

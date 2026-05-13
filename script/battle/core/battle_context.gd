@@ -94,6 +94,7 @@ func reset_for_battle() -> void:
 	}
 	_charm_redirect_source = null
 	_thunder_propagating = false
+	PlayerState.reset_battle_damage_stats()
 
 
 func start_turn() -> void:
@@ -511,18 +512,20 @@ func consume_enemy_stack(enemy: EnemyBase, key: String, amount: int = 1) -> void
 	st[k] = max(0, int(st.get(k, 0)) - max(0, amount))
 
 
-## Burn ticks every second
+## Burn ticks every 2 seconds; each tick deals current stacks as damage then removes
+## max(1, round(25% of stacks)) stacks.
 func tick_enemy_burn(delta: float) -> void:
 	for enemy in _alive_enemies():
 		var st := status_for_enemy(enemy)
 		if int(st.get("burn_stack", 0)) <= 0:
 			continue
 		st["burn_accum"] = float(st.get("burn_accum", 0.0)) + maxf(0.0, delta)
-		while float(st.get("burn_accum", 0.0)) >= 1.0 and int(st.get("burn_stack", 0)) > 0:
-			st["burn_accum"] -= 1.0
+		while float(st.get("burn_accum", 0.0)) >= 2.0 and int(st.get("burn_stack", 0)) > 0:
+			st["burn_accum"] -= 2.0
 			var burn_stacks := int(st.get("burn_stack", 0))
 			_damage_enemy_dot(burn_stacks, enemy)
-			st["burn_stack"] = burn_stacks - 1
+			var lost := maxi(1, int(round(float(burn_stacks) * 0.25)))
+			st["burn_stack"] = maxi(0, burn_stacks - lost)
 
 
 ## Poison fires before each enemy attack (1 dmg, 1 stack consumed).

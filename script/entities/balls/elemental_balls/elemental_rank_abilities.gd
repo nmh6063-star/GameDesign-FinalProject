@@ -37,9 +37,8 @@ static var functions: Array[String] = [
 	"critical_edge",
 	"freeze_wave",
 	"giant_orb",
-	"consume_core",
-	"upgrade_pulse",
-	"poison_rain",
+		"consume_core",
+		"poison_rain",
 	"time_drift",
 	"contagion",
 	"meteor_crash",
@@ -185,9 +184,6 @@ static var typing_by_id = {
 			"class": "alchemist",
 		},
 		"consume_core": {
-			"class": "alchemist",
-		},
-		"upgrade_pulse": {
 			"class": "alchemist",
 		},
 		"poison_rain": {

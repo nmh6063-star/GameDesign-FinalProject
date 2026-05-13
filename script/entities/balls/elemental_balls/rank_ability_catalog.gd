@@ -53,7 +53,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			]
 		3:
 			return [
-				_ability("pollution", 3, "Pollution", "Double poison stacks on current enemy."),
+				_ability("pollution", 3, "Pollution", "If the current enemy has no poison: apply 10 poison. If they already have poison: that enemy loses half their poison stacks (rounded down)."),
 				_ability("fireball", 3, "Fireball", "Hit 2 random enemies for 8 each and apply Burn (8 stacks) to each."),
 			_ability("reinforce", 3, "Reinforce", "Gain +2 attack damage this battle (excludes DOT)."),
 				_ability("convert", 3, "Convert", "Upgrade 1 random ball in the box by +1 rank (this battle)."),
@@ -82,7 +82,6 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 			_ability("freeze_wave", 5, "Freeze Wave", "Freeze all enemies 8s — they cannot attack until thawed or they break free (chance each second: (HP%)×60% + 5%×elapsed s). No damage while frozen. Gain 50 Shield."),
 			_ability("giant_orb", 5, "Giant Orb", "All current balls gain ×3 attack and ×2 size for 5 ball drops. Effect is inherited on merge (does not stack)."),
 			_ability("consume_core", 5, "Consume Core", "Remove 1 ball from the box → deal 100 damage to current enemy."),
-			_ability("upgrade_pulse", 5, "Upgrade Pulse", "Upgrade a random nearby ball by +1 rank."),
 				_ability("poison_rain", 5, "Poison Rain", "For 3 shoots: enemies gain poison stacks instead of losing them, and every board merge adds +2 poison to all enemies. (☣ Rain indicator shown)"),
 				_ability("time_drift", 5, "Time Drift", "10s: enemies cannot act, player ignores control effects. Damage taken in first 5s is reflected as DoT in last 5s."),
 			_ability("contagion", 5, "Contagion", "Copy current enemy debuffs to one random other enemy (stacks with theirs)."),
@@ -117,7 +116,7 @@ static func reward_options_for_rank(rank: int) -> Array[Dictionary]:
 				_ability("one_shower", 7, "Shower", "Spawn 10 rank 1-3 balls spread randomly across the box (1 per second for 10s)."),
 			_ability("dot_echo", 7, "Echo", "This battle: every DOT damage instance triggers twice."),
 			_ability("baators_flame", 7, "Baator's Flame", "Convert all DoT on enemies to Burn: Poison ×1.5, ⚡Thunder ×2, Freeze ×10 stacks."),
-			_ability("thunder_strike", 7, "Thunder Strike", "Strike each enemy for 2% of their current HP per ⚡ thunder stack they carry."),
+			_ability("thunder_strike", 7, "Thunder Strike", "If no enemy has ⚡ thunder: apply 15 stacks to the current enemy. Otherwise, each enemy with thunder takes 2% of their current HP damage per stack."),
 			_ability("elbaphs_power", 7, "Elbaph's Power", "For 15s: all ball sizes scale 1.0×→1.5× and direct damage scales 1.0×→3.0×. Excludes DoT."),
 		]
 	return []

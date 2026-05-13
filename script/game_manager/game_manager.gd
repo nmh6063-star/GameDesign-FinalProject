@@ -11,6 +11,7 @@ const EVENT_SCENE_PATH := "res://scenes/event_room.tscn"
 const PLINKO_SCENE_PATH := "res://scenes/plinko_room.tscn"
 const PLAYGROUND_SCENE_PATH := "res://scenes/playground.tscn"
 const MENU_SCENE_PATH := "res://scenes/menu_screen.tscn"
+const VICTORY_SCENE_PATH := "res://scenes/victory_screen.tscn"
 const PAUSE_MENU_SCENE := preload("res://scenes/pause_menu.tscn")
 
 const _NON_GAME_SCENES := [
@@ -18,6 +19,7 @@ const _NON_GAME_SCENES := [
 	"res://scenes/tutorial.tscn",
 	"res://scenes/tutorial_complete.tscn",
 	PLAYGROUND_SCENE_PATH,
+	VICTORY_SCENE_PATH,
 ]
 
 const _ROOM_SCENES := [

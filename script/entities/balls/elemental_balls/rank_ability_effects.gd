@@ -3,11 +3,13 @@ class_name RankAbilityEffects
 
 
 static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: int) -> void:
+	if ctx == null:
+		return
+	PlayerState.begin_stat_attrib_execute(ctx, source, rank, kind)
 	# Track highest rank played this battle for gold calculation
-	if ctx != null:
-		var cur_max := int(ctx.battle_flags.get("max_rank_played", 0))
-		if rank > cur_max:
-			ctx.battle_flags["max_rank_played"] = rank
+	var cur_max := int(ctx.battle_flags.get("max_rank_played", 0))
+	if rank > cur_max:
+		ctx.battle_flags["max_rank_played"] = rank
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
@@ -73,10 +75,17 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"power_slash":
 			_deal_single(ctx, 25, source)
 		"pollution":
-			# Doubles poison stacks on current target
-			var st := ctx.status_for_enemy(ctx.active_enemy())
-			if not st.is_empty():
-				st["poison_stack"] = int(st.get("poison_stack", 0)) * 2
+			var ae := ctx.active_enemy()
+			if ae == null or not ae.is_alive():
+				return
+			var st := ctx.status_for_enemy(ae)
+			var ps := int(st.get("poison_stack", 0))
+			if ps <= 0:
+				ctx.add_enemy_status(ae, "poison", 10)
+			else:
+				var p := int(st.get("poison_stack", 0))
+				if p > 0:
+					st["poison_stack"] = maxi(0, int(floor(float(p) * 0.5)))
 		"fireball":
 			# Two hits on random enemies, each also applies 8 burn stacks
 			for _i in range(2):
@@ -84,7 +93,8 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				if enemies.is_empty():
 					break
 				var target := enemies[randi() % enemies.size()] as EnemyBase
-				ctx.damage_enemy(12, target)
+				var hit := _apply_attack_mult(ctx, source, 12)
+				ctx.damage_enemy(hit, target)
 				ctx.add_enemy_status(target, "burn", 8)
 			ctx.battle_flags["last_damage"] = 8
 		"ice_shield":
@@ -154,8 +164,6 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			_apply_giant_buff_all(ctx, 3.0, 2.0, false)
 		"consume_core":
 			_consume_random_ball_and_deal(ctx, 100, source)
-		"upgrade_pulse":
-			_upgrade_random_ball_with_fx(ctx, 1)
 		"poison_rain":
 			# Activate the Rain effect: stacks grow instead of shrink for 3 shoots,
 			# and every direct hit adds 2 more stacks.
@@ -253,9 +261,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 	# Preserve last effect for Echo Shot (never record echo_shot itself)
 	if kind != "echo_shot":
 		ctx.battle_flags["last_effect_id"] = "%s_%d" % [kind, rank]
-
-
-# ── Single / All / Random helpers ─────────────────────────────────────────────
+	PlayerState.end_stat_attrib_execute(ctx)
 
 static func _deal_single(ctx: BattleContext, amount: int, source: BallBase = null) -> void:
 	var ae := ctx.active_enemy()
@@ -702,7 +708,20 @@ static func _baators_flame(ctx: BattleContext) -> void:
 # ── Thunder Strike ────────────────────────────────────────────────────────────
 
 static func _thunder_strike(ctx: BattleContext) -> void:
-	for e in _alive_enemies(ctx):
+	var enemies := _alive_enemies(ctx)
+	if enemies.is_empty():
+		return
+	var any_thunder := false
+	for e in enemies:
+		if int(ctx.status_for_enemy(e).get("thunder_stack", 0)) > 0:
+			any_thunder = true
+			break
+	if not any_thunder:
+		var cur := ctx.active_enemy()
+		if cur != null and cur.is_alive():
+			ctx.add_enemy_status(cur, "thunder", 15)
+		return
+	for e in enemies:
 		var stacks := int(ctx.status_for_enemy(e).get("thunder_stack", 0))
 		if stacks <= 0:
 			continue

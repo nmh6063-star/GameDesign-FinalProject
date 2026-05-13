@@ -14,8 +14,7 @@ CHANGELOG
     - Power Slash: damage corrected to 30 (was 18 in code / 30 in old description).
     - Scatter Drop: now always spawns normal balls only; spawn position randomised
       across the full drop-zone width (±80 px) instead of anchoring to the source.
-    - Convert / Upgrade Pulse: now play a green expanding ring effect on the
-      upgraded ball.
+    - Convert: now plays a green expanding ring effect on the upgraded ball.
     - All descriptions below updated to match exact code values.
     - Corrupt Field redesigned: 12 poison stacks + 20% attack debuff for 1 shoot.
       (⚗ Wkn 1 indicator on poisoned enemies while active.)
@@ -196,7 +195,9 @@ RANK 3
     Deal 25 damage to current enemy.
 
   Pollution
-    Double the current poison stack count on the current enemy.
+    If the current enemy has no poison stacks: apply Poison (10 stacks).
+    If the current enemy already has poison: that enemy loses half of their
+    poison stacks (floor; minimum 0).
 
   Fireball
     Hit 2 random enemies for 8 damage each.
@@ -310,9 +311,6 @@ RANK 5
   Consume Core
     Remove 1 random ball from the box (permanently for this battle).
     Then deal 100 damage to current enemy.
-
-  Upgrade Pulse
-    Upgrade 1 random ball in the box by +1 rank (capped at rank 7).
 
   Poison Rain
     Activate a 3-shoot Rain mode (☣ Rain ×N shown on enemies):
@@ -464,9 +462,10 @@ RANK 7
     Source stacks are cleared; only Burn remains.
 
   Thunder Strike
-    For each living enemy that carries at least 1 ⚡ thunder stack:
+    If no living enemy has any ⚡ thunder stacks: apply 15 thunder stacks to the
+    current enemy (no damage this cast).
+    Otherwise, for each living enemy with thunder stacks ≥ 1:
       Deal (enemy's current HP) × (2% per thunder stack) as direct damage.
-    Example: enemy with 200 HP and 15 stacks takes 200 × 0.30 = 60 damage.
 
   Elbaph's Power
     For 15 seconds, all balls on the board grow continuously:

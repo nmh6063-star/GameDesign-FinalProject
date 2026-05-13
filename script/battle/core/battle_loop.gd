@@ -14,6 +14,7 @@ const CURRENT_ABILITY_SCENE := preload("res://scenes/current_ability.tscn")
 const Effects := preload("res://script/battle/core/general_effects.gd")
 const sound := preload("res://script/game_manager/sound_manager.gd")
 const PlaygroundOverlayScript := preload("res://script/map/playground_overlay.gd")
+const MapGenerator := preload("res://script/map/map_generator.gd")
 
 const BURST_AREA_RADIUS := 320.0
 const BURST_STRENGTH := 35.0
@@ -373,6 +374,14 @@ func damage_enemy(amount: int, enemy: EnemyBase = null, ctx: BattleContext = nul
 	var applied := target.take_damage_with_context(amount, ctx)
 	if applied <= 0:
 		return
+	if ctx != null and applied > 0:
+		var uid := int(ctx.battle_flags.get("stat_damage_uid", 0))
+		if uid > 0:
+			PlayerState.record_ball_battle_damage(uid, applied)
+		var rks := int(ctx.battle_flags.get("stat_rank_slot", 0))
+		var ak := str(ctx.battle_flags.get("stat_ability_kind", ""))
+		if rks > 0 and not ak.is_empty():
+			PlayerState.record_run_rank_segment_damage(rks, ak, applied)
 	if slot != null:
 		slot.sync_realtime_view()
 		slot.show_damage(applied, ENEMY_DAMAGE_COLOR)
@@ -792,6 +801,10 @@ func _finish_battle(text: String) -> void:
 	# Award currency on victory
 	if text == "Stage Clear":
 		PlayerState.add_gold(_compute_battle_gold_reward())
+	if _should_open_victory_screen():
+		PlayerState.pending_victory_snapshot = PlayerState.build_victory_snapshot(_context, self)
+		get_tree().change_scene_to_file("res://scenes/victory_screen.tscn")
+		return
 	if _should_show_post_battle_reward():
 		_show_post_battle_reward_selection()
 		return
@@ -800,6 +813,20 @@ func _finish_battle(text: String) -> void:
 
 func _should_show_post_battle_reward() -> bool:
 	return true
+
+
+func _should_open_victory_screen() -> bool:
+	if _context.battle_result_text != "Stage Clear":
+		return false
+	var gm := _game_manager()
+	if gm == null or bool(gm.get("is_playground_mode")):
+		return false
+	if get_node_or_null("/root/Tutorial") != null:
+		return false
+	var room = gm.active_room() if gm.has_method("active_room") else null
+	if room == null:
+		return false
+	return int(room.type) == MapGenerator.Room.Type.BOSS
 
 
 ## Gold = base (8 + 6 per enemy killed) × rank multiplier × combo multiplier, capped at 80.

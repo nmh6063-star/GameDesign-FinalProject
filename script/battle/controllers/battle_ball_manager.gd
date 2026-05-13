@@ -251,6 +251,8 @@ func preview() -> Array:
 func _spawn_instance(ball: BallBase, data, rank: int, position: Vector2, is_set_up: bool) -> BallBase:
 	_ball_parent.add_child(ball)
 	ball.configure(data, rank, _context, _target)
+	var uid := PlayerState.alloc_ball_stat_uid()
+	_context.ball_status_for(ball)["stat_uid"] = uid
 	_apply_playfield_bounds_to_ball(ball)
 	ball.position = position
 	ball.visible = true
