@@ -45,8 +45,8 @@ func sync_ball_queue(next_item: Dictionary, queue_items: Array, hold_item: Dicti
 func sync_mana(current: int, merge_progress: int) -> void:
 	var merges := BattleContext.MERGES_PER_MANA_PIPE
 	var used_scripts := false
-	if _stats_hud != null and _stats_hud.has_method("sync_mana_meter"):
-		_stats_hud.call("sync_mana_meter", merge_progress, merges)
+	if _cursor_mana_pipes != null and _cursor_mana_pipes.has_method("sync_merge_meter"):
+		_cursor_mana_pipes.call("sync_merge_meter", merge_progress, merges)
 		used_scripts = true
 	if _cursor_mana_pipes != null and _cursor_mana_pipes.has_method("sync_pipes"):
 		_cursor_mana_pipes.call("sync_pipes", current)
@@ -151,8 +151,8 @@ func _bind_nodes() -> void:
 
 	_stats_hud = _root.get_node_or_null("StatsHUD") as Control
 	_cursor_mana_pipes = _root.get_node_or_null("CursorManaPipes") as Control
-	_mana_meter_bg = _root.get_node_or_null("StatsHUD/Row/Meter/Background") as ColorRect
-	_mana_meter_fill = _root.get_node_or_null("StatsHUD/Row/Meter/Fill") as ColorRect
+	_mana_meter_bg = _root.get_node_or_null("CursorManaPipes/Meter/Background") as ColorRect
+	_mana_meter_fill = _root.get_node_or_null("CursorManaPipes/Meter/Fill") as ColorRect
 	_mana_pipes_parent = _root.get_node_or_null("CursorManaPipes/ManaPipes") as HBoxContainer
 	_combo_hud = _root.get_node_or_null("ComboHUD") as Control
 
