@@ -2,8 +2,8 @@ extends Node
 
 const RankAbilityCatalog := preload("res://script/entities/balls/elemental_balls/rank_ability_catalog.gd")
 
-var player_max_health := 1000
-var player_health := 1000
+var player_max_health := 500
+var player_health := 500
 var aim_size_level: int = 0
 var player_gold: int = 0
 var elements = {
@@ -53,7 +53,7 @@ func equip_rank_ability(rank: int, ability: Dictionary) -> void:
 func reset_for_run() -> void:
 	player_health = player_max_health
 	aim_size_level = 0
-	player_gold = 200
+	player_gold = 50
 	reset_default_rank_slots()
 
 

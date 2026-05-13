@@ -20,7 +20,7 @@ CHANGELOG
     - Corrupt Field redesigned: 12 poison stacks + 20% attack debuff for 1 shoot.
       (⚗ Wkn 1 indicator on poisoned enemies while active.)
     - Poison Rain redesigned: 3-shoot "rain" mode — stacks grow instead of shrink,
-      every direct hit adds +2 stacks. (☣ Rain ×N indicator on enemies.)
+      every board merge adds +2 poison to all enemies. (☣ Rain ×N indicator on enemies.)
 
   May 6, 2026 — Session 2
     - Pollution moved from Rank 2 → Rank 3.
@@ -229,7 +229,7 @@ RANK 4
 
   Chain Spark
     Hit up to 3 different enemies sequentially.
-    First hit: 10 damage. Second hit: 20 damage. Third hit: 40 damage.
+    First hit: 20 damage. Second hit: 15 damage. Third hit: 10 damage.
 
   Mirror Shield
     Reflect the next 2 incoming damage instances back to the attacker.
@@ -291,7 +291,7 @@ RANK 5
   Poison Rain
     Activate a 3-shoot Rain mode (☣ Rain ×N shown on enemies):
     • Enemies no longer lose poison stacks — instead stacks INCREASE by 1 each tick.
-    • Every direct hit on an enemy adds +2 poison stacks to them.
+    • Every board merge adds +2 poison stacks to all living enemies.
     The effect expires after 3 ball drops.
 
   Time Drift

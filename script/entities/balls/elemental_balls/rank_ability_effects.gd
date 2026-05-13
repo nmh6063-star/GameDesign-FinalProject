@@ -3,6 +3,11 @@ class_name RankAbilityEffects
 
 
 static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: int) -> void:
+	# Track highest rank played this battle for gold calculation
+	if ctx != null:
+		var cur_max := int(ctx.battle_flags.get("max_rank_played", 0))
+		if rank > cur_max:
+			ctx.battle_flags["max_rank_played"] = rank
 	match kind:
 		# ── Rank 1 ────────────────────────────────────────────────────────────
 		"strike":
@@ -19,7 +24,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "burn", 3)
 		"guard":
-			ctx.add_player_shield(20)
+			ctx.add_player_shield(10)
 		"critical":
 			# 50%: deal 5 to all enemies; else: deal 5 to current target
 			if randi_range(1, 2) == 1:
@@ -41,7 +46,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				ctx.add_enemy_status(e, "freeze", 5)
 				_deal_single(ctx, 10, source)
 		"iron_guard":
-			ctx.add_player_shield(80)
+			ctx.add_player_shield(40)
 		"triple_shot":
 			for _i in range(4):
 				_deal_random_enemy(ctx, 6, source)
@@ -50,7 +55,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				_spawn_random_ball_rank_1_to_3(ctx, source)
 		"critical_strike":
 			if randi_range(1, 2) == 1:
-				_deal_single(ctx, 30, source)
+				_deal_single(ctx, 20, source)
 			else:
 				_deal_single(ctx, 10, source)
 		"fireburn":
@@ -83,7 +88,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 				ctx.add_enemy_status(target, "burn", 8)
 			ctx.battle_flags["last_damage"] = 8
 		"ice_shield":
-			ctx.add_player_shield(50)
+			ctx.add_player_shield(25)
 			ctx.add_enemy_status(ctx.active_enemy(), "freeze", 5)
 		"reinforce":
 			ctx.add_player_attack_bonus(3)
@@ -111,7 +116,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"chain_spark":
 			_chain_spark(ctx)
 		"mirror_shield":
-			ctx.set_player_reflect_hits(3)
+			ctx.set_player_reflect_hits(1)
 		"corrupt_field":
 			for e in _alive_enemies(ctx):
 				ctx.add_enemy_status(e, "poison", 9)
@@ -121,23 +126,32 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 			ctx.battle_flags["tide_turner_pending"] = true
 		"weakness_brand":
 			ctx.add_enemy_status(ctx.active_enemy(), "weakness_brand", 3)
+		"mend_plus":
+			var lost_mp := maxi(0, PlayerState.player_max_health - PlayerState.player_health)
+			var heal_mp := maxi(1, int(round(float(lost_mp) * 0.08)))
+			ctx.heal_player(heal_mp)
+			_deal_single(ctx, maxi(1, int(round(float(heal_mp) * 0.12))), source)
+		"bulwark":
+			ctx.add_player_shield(30)
+		"glacial_ward":
+			ctx.add_player_shield(40)
+			ctx.add_enemy_status(ctx.active_enemy(), "freeze", 5)
 		"lifesteal_field":
 			ctx.player_statuses["direct_damage_heal_ratio"] = \
-					maxf(float(ctx.player_statuses.get("direct_damage_heal_ratio", 0.0)), 0.1)
+					maxf(float(ctx.player_statuses.get("direct_damage_heal_ratio", 0.0)), 0.05)
 		"fortress":
-			ctx.add_player_shield(50)
-			ctx._damage_player_hp_only(15)
+			ctx.add_player_shield(25)
+			ctx._damage_player_hp_only(8)
 
 		# ── Rank 5 ────────────────────────────────────────────────────────────
 		"critical_edge":
-			var pool := [25, 30]
-			_deal_single(ctx, int(pool[randi() % pool.size()]), source)
+			_deal_random_enemy(ctx, 25, source)
+			_deal_random_enemy(ctx, 25, source)
 		"freeze_wave":
-			for e in _alive_enemies(ctx):
-				ctx.add_enemy_status(e, "freeze", 3)
+			_freeze_wave(ctx)
 		"giant_orb":
-			# ×3 attack, ×2 size — no double-trigger
-			_apply_giant_orb(ctx)
+			# ×3 attack, ×2 size — all balls, 5 drops, inherits on merge
+			_apply_giant_buff_all(ctx, 3.0, 2.0, false)
 		"consume_core":
 			_consume_random_ball_and_deal(ctx, 100, source)
 		"upgrade_pulse":
@@ -153,7 +167,14 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"chaos_slash":
 			_chaos_slash(ctx)
 		"guillotine":
-			_guillotine(ctx, source)
+			_guillotine(ctx, source)  # 25% missing HP
+		"recovery_plus":
+			var lost_rp := maxi(0, PlayerState.player_max_health - PlayerState.player_health)
+			ctx.heal_player(int(round(float(lost_rp) * 0.15)))
+		"iron_fortress":
+			ctx.add_player_shield(60)
+		"regen_pulse":
+			_regen_pulse(ctx)
 
 		# ── Rank 6 ────────────────────────────────────────────────────────────
 		"meteor_crash":
@@ -175,14 +196,15 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"reflect_wall":
 			ctx.set_player_reflect_for_seconds(12.0)
 		"giant_core":
-			# ×3 attack, ×2 trigger, ×2 size — only affects rank 1–5 balls
-			_apply_giant_core(ctx)
+			# ×3 attack, trigger twice, ×2 size — all balls, 5 drops, inherits on merge
+			_apply_giant_buff_all(ctx, 3.0, 2.0, true)
 		"dot_siphon":
 			var cur_siphon := float(ctx.player_statuses.get("dot_damage_heal_ratio", 0.0))
-			ctx.player_statuses["dot_damage_heal_ratio"] = maxf(cur_siphon, 0.1)
+			ctx.player_statuses["dot_damage_heal_ratio"] = maxf(cur_siphon, 0.10)
 		"gatekeeper":
 			ctx.battle_flags["gatekeeper_charges"] = \
 					int(ctx.battle_flags.get("gatekeeper_charges", 0)) + 3
+			ctx.battle_flags["gatekeeper_ratio"] = 0.25
 		"storm_surge":
 			_storm_surge(ctx)
 		"second_wind":
@@ -205,9 +227,9 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"resurrection":
 			ctx.set_resurrection_ready()
 		"time_stop":
-			_clear_all_balls(ctx)
-			var stop_secs := 10
-			var stop_until := ctx.now_ms() + stop_secs * 1000
+			# Remove only the highest-rank ball (random among ties)
+			_clear_highest_rank_ball(ctx)
+			var stop_until := ctx.now_ms() + 10 * 1000
 			for e in _alive_enemies(ctx):
 				var ts_st := ctx.status_for_enemy(e)
 				ts_st["time_stop_until_ms"] = stop_until
@@ -216,7 +238,7 @@ static func execute(ctx: BattleContext, source: BallBase, kind: String, rank: in
 		"miracle_cascade":
 			_miracle_cascade(ctx, source)
 		"sacrifice_nova":
-			_sacrifice_nova(ctx)
+			_sacrifice_nova(ctx, 800)
 		"one_shower":
 			_one_shower(ctx, source)
 		"dot_echo":
@@ -410,9 +432,9 @@ static func _chain_spark(ctx: BattleContext) -> void:
 	var enemies := _alive_enemies(ctx)
 	if enemies.is_empty():
 		return
-	var dmg := 20
+	var damages: Array[int] = [20, 15, 10]
 	var last_idx := -1
-	for _i in range(3):
+	for i in range(3):
 		var idx: int
 		if enemies.size() == 1:
 			idx = 0
@@ -421,44 +443,27 @@ static func _chain_spark(ctx: BattleContext) -> void:
 			if idx == last_idx:
 				idx = (idx + 1) % enemies.size()
 		last_idx = idx
-		ctx.damage_enemy(dmg, enemies[idx])
-		dmg *= 2
+		ctx.damage_enemy(damages[i], enemies[idx])
 	ctx.battle_flags["last_damage"] = 10
 
 
 # ── Giant Orb / Giant Core ────────────────────────────────────────────────────
 
-static func _apply_giant_orb(ctx: BattleContext) -> void:
-	var balls := ctx.active_balls()
-	if balls.is_empty():
-		return
-	var ball := balls[randi() % balls.size()] as BallBase
-	var st := ctx.ball_status_for(ball)
-	if bool(st.get("is_giant", false)):
-		return
-	st["attack_mult"]   = 3.0
-	st["trigger_twice"] = false
-	st["is_giant"]      = true
-	st["size_mult"]     = 2.0
-	ball.refresh()
-
-
-static func _apply_giant_core(ctx: BattleContext) -> void:
-	# Only affects rank 1–5 balls
-	var eligible: Array = []
+## Giant Orb / Giant Core: apply ×attack buff to ALL current balls for 5 drops.
+## Effect is inherited when two balls merge, but does not stack.
+static func _apply_giant_buff_all(ctx: BattleContext, attack_mult: float,
+		size_mult: float, trigger_twice: bool) -> void:
 	for b in ctx.active_balls():
 		var ball := b as BallBase
-		if ball.rank <= 5 and not bool(ctx.ball_status_for(ball).get("is_giant", false)):
-			eligible.append(ball)
-	if eligible.is_empty():
-		return
-	var ball := eligible[randi() % eligible.size()] as BallBase
-	var st := ctx.ball_status_for(ball)
-	st["attack_mult"]   = 3.0
-	st["trigger_twice"] = true
-	st["is_giant"]      = true
-	st["size_mult"]     = 2.0
-	ball.refresh()
+		var st := ctx.ball_status_for(ball)
+		if bool(st.get("is_giant", false)):
+			continue  # no stacking
+		st["attack_mult"]      = attack_mult
+		st["size_mult"]        = size_mult
+		st["trigger_twice"]    = trigger_twice
+		st["is_giant"]         = true
+		st["giant_drops_left"] = 5
+		ball.refresh()
 
 
 # ── Time Drift ────────────────────────────────────────────────────────────────
@@ -469,20 +474,18 @@ static func _time_drift(ctx: BattleContext) -> void:
 	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
 	if tree == null:
 		return
-	# Slow time for 10 seconds
-	Engine.time_scale = 0.4
-	var restore_timer: SceneTreeTimer = tree.create_timer(10.0, true, false, true)
-	restore_timer.timeout.connect(func(): Engine.time_scale = 1.0)
-	# First 5 seconds: incoming player damage is stored (handled in BattleContext.damage_player)
+	const DURATION := 10.0
+	# Block enemy attacks for the full 10 s and grant player control immunity
+	ctx.battle_flags["time_drift_enemy_until_ms"] = ctx.now_ms() + int(DURATION * 1000)
 	ctx.battle_flags["time_drift_active"] = true
 	ctx.battle_flags["time_drift_stored"] = 0
-	var mid_timer: SceneTreeTimer = tree.create_timer(5.0, true, false, true)
+	# After 5 s: stop storing damage, reflect it back as DOT over the remaining 5 s
+	var mid_timer: SceneTreeTimer = tree.create_timer(DURATION * 0.5, true, false, true)
 	mid_timer.timeout.connect(func():
 		ctx.battle_flags["time_drift_active"] = false
 		var stored := int(ctx.battle_flags.get("time_drift_stored", 0))
 		if stored <= 0:
 			return
-		# Deal stored damage back to enemies over the final 5 seconds (1 tick/sec)
 		var per_tick := maxi(1, stored / 5)
 		for i in range(5):
 			var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
@@ -540,10 +543,10 @@ static func _miracle_cascade(ctx: BattleContext, source: BallBase) -> void:
 
 # ── Sacrifice Nova ────────────────────────────────────────────────────────────
 
-static func _sacrifice_nova(ctx: BattleContext) -> void:
+static func _sacrifice_nova(ctx: BattleContext, damage: int = 500) -> void:
 	var self_damage := int(round(PlayerState.player_health * 0.5))
 	ctx._damage_player_raw(self_damage)
-	_schedule_damage_all(ctx, 10.0, 500)
+	_schedule_damage_all(ctx, 10.0, damage)
 
 
 # ── Shower ────────────────────────────────────────────────────────────────────
@@ -576,8 +579,46 @@ static func _regeneration(ctx: BattleContext) -> void:
 		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
 		t.timeout.connect(func():
 			if ctx.controller != null:
-				ctx.heal_player(20)
+				ctx.heal_player(10)
 		)
+
+
+# ── Regen Pulse (R5 empowered Regeneration) ───────────────────────────────────
+
+static func _regen_pulse(ctx: BattleContext) -> void:
+	if ctx.controller == null:
+		return
+	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
+	if tree == null:
+		return
+	for i in range(1, 11):
+		var t: SceneTreeTimer = tree.create_timer(float(i), true, false, true)
+		t.timeout.connect(func():
+			if ctx.controller != null:
+				ctx.heal_player(15)
+		)
+
+
+# ── Time Stop (clears only the highest-rank ball) ─────────────────────────────
+
+static func _clear_highest_rank_ball(ctx: BattleContext) -> void:
+	var balls := ctx.active_balls()
+	if balls.is_empty():
+		return
+	var max_rank := 0
+	for ball in balls:
+		var b := ball as BallBase
+		if b.rank > max_rank:
+			max_rank = b.rank
+	var candidates: Array = []
+	for ball in balls:
+		var b := ball as BallBase
+		if b.rank == max_rank:
+			candidates.append(b)
+	if candidates.is_empty():
+		return
+	var victim := candidates[randi() % candidates.size()] as BallBase
+	ctx.consume_ball(victim)
 
 
 # ── Guillotine ────────────────────────────────────────────────────────────────
@@ -678,6 +719,36 @@ static func _elbaphs_power(ctx: BattleContext) -> void:
 		st["elbaphs_power"] = true
 		st["attack_mult"]   = 1.0
 		st["size_mult"]     = 1.0
+
+
+# ── Freeze Wave ───────────────────────────────────────────────────────────────
+## Freeze all enemies for 8 s. Every second while frozen: deal 50 damage and
+## roll a break-out check. Break probability = (hp%) × 60% + 5% per elapsed second.
+## High-HP enemies escape quickly; wounded enemies stay frozen longer.
+static func _freeze_wave(ctx: BattleContext) -> void:
+	for e in _alive_enemies(ctx):
+		ctx.add_enemy_status(e, "freeze", 8)
+	if ctx.controller == null:
+		return
+	var tree: SceneTree = ctx.controller.get_tree() as SceneTree
+	if tree == null:
+		return
+	for sec in range(1, 9):
+		var t: SceneTreeTimer = tree.create_timer(float(sec), true, false, true)
+		t.timeout.connect(func():
+			var now := ctx.now_ms()
+			for e in _alive_enemies(ctx):
+				var st := ctx.status_for_enemy(e)
+				if now >= int(st.get("freeze_until_ms", 0)):
+					continue  # already thawed
+				# Tick damage while frozen
+				ctx.damage_enemy(50, e)
+				# Break-out check (elapsed = sec - 1 because sec starts at 1)
+				var hp_pct := float(e.health()) / float(maxi(1, e.max_health()))
+				var break_prob := minf(1.0, hp_pct * 0.6 + float(sec - 1) * 0.05)
+				if randf() < break_prob:
+					st["freeze_until_ms"] = now  # breaks free
+		)
 
 
 # ── Alive enemies helper ──────────────────────────────────────────────────────

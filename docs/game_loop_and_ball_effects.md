@@ -174,7 +174,7 @@ Exposed up the chain via:
 
 | Key | Type | Set by | Effect |
 |-----|------|--------|--------|
-| `poison_rain_shoots` | int (0–3) | Poison Rain | Poison stacks grow instead of shrink; hits add +2 stacks |
+| `poison_rain_shoots` | int (0–3) | Poison Rain | Poison stacks grow instead of shrink; merges add +2 poison to all enemies |
 | `corrupt_field_active` | bool | Corrupt Field | Poisoned enemies deal −20% damage for 1 shoot |
 | `bomb_orb_ticks` | int | Bomb Orb | Bomb countdown displayed on enemies; 0 = inactive |
 

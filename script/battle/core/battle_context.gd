@@ -239,6 +239,10 @@ func register_merge(ball: Node2D) -> void:
 	if controller != null:
 		controller.sync_mana_hud()
 		controller.sync_combo_hud()
+	# Poison Rain: each board merge adds +2 poison stacks to all living enemies.
+	if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
+		for e in _alive_enemies():
+			add_enemy_status(e, "poison", 2)
 
 
 func can_shoot() -> bool:
@@ -364,11 +368,6 @@ func damage_enemy(amount: int, enemy: EnemyBase = null) -> void:
 	# Thunder chain: the struck enemy's stacks echo damage to all other thundered enemies
 	if actual_target != null:
 		_propagate_thunder(base, actual_target)
-	# Poison Rain: each direct hit adds 2 poison stacks to the struck enemy.
-	if int(battle_flags.get("poison_rain_shoots", 0)) > 0:
-		var target := enemy if enemy != null else active_enemy()
-		if target != null and is_instance_valid(target) and target.is_alive():
-			add_enemy_status(target, "poison", 2)
 
 
 ## Player takes damage. During Time Drift, incoming damage is stored
@@ -387,10 +386,11 @@ func _damage_player_raw(amount: int) -> void:
 	var fragile := int(battle_flags.get("fragile_stacks", 0))
 	if fragile > 0:
 		amount = int(round(float(amount) * (1.0 + 0.2 * float(fragile))))
-	# Gatekeeper: convert 50% of each hit into Shield
+	# Gatekeeper: convert a portion of each hit into Shield (ratio set when equipped)
 	var gk := int(battle_flags.get("gatekeeper_charges", 0))
 	if gk > 0:
-		var shield_gain := int(round(float(amount) * 0.5))
+		var gk_ratio := float(battle_flags.get("gatekeeper_ratio", 0.25))
+		var shield_gain := int(round(float(amount) * gk_ratio))
 		amount -= shield_gain
 		add_player_shield(shield_gain)
 		battle_flags["gatekeeper_charges"] = gk - 1
@@ -533,6 +533,9 @@ func on_enemy_attack_started(enemy: EnemyBase) -> bool:
 	if now_ms() <= int(st.get("freeze_until_ms", 0)):
 		return false
 	if now_ms() <= int(st.get("time_stop_until_ms", 0)):
+		return false
+	# Time Drift: enemy actions are blocked for its full duration
+	if now_ms() < int(battle_flags.get("time_drift_enemy_until_ms", 0)):
 		return false
 	var poison_stacks := int(st.get("poison_stack", 0))
 	if poison_stacks > 0:
